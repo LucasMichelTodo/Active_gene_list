@@ -1,0 +1,401 @@
+#+STARTUP: hideblocks
+#+PROPERTY: header-args :eval never-export
+#+OPTIONS: ^:{}
+
+#+SETUPFILE: ~/.emacs.d/org-html-themes-master/setup/theme-readtheorg.setup
+#+HTML_HEAD: <style>pre.src {background-color: #3F3F3F ; color: #e5e5e5;}</style>
+#+HTML_HEAD: <style>table{overflow-x:auto} </style>
+
+#+TITLE:  Creation of active gene-lists
+#+AUTHOR: Lucas Michel Todó
+#+EMAIL:  lucas.michel@isglobal.org
+#+DATE:   31/03/2020
+
+* Active/Inactive Gene Lists
+:PRO  PERTIES:
+:header-args:R: :session active_gene_lists
+:header-args:R+: :tangle ./Scripts/active_gene_list.R
+:header-args:R+: :exports results
+:END:
+
+Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
+We will define 4 possible expresion states:
+- Active
+  - Regular
+  - Variant Active
+  - Variant Repressed
+- Inactive
+
+** Create microarrays DF
+We load our microarray data.
+We willl load the red signal and transform it into percentiles.
+We will also load the areas data to calculate FC among strains.
+
+#+BEGIN_SRC R :results none
+#### Imports ####
+
+library(readxl)
+library(tidyverse)
+library(reshape2)
+
+#### Max Dif function ####
+
+max_dif <- function(vect){
+  mx <- max(vect, na.rm = T)
+  mn <- min(vect, na.rm = T)
+  if (is.infinite(mx) | is.infinite(mn)) {
+    md <- NA
+  } else {
+    md <- mx - mn
+  }
+  return(md)
+}
+
+#### Red Signal DF ####
+
+## Read translation table
+map <- read.csv('/Users/lucas/ISGlobal/PhD_Project/Data/oldnames_table.csv')
+excl <- "~/ISGlobal/Variantome_RoviraGraells/3D7_Variantome_AllData_withGam.xls"
+
+## Import Red Signal table
+red <- read_excel(excl, sheet = 4)
+
+colnames(red)[1] <- "Old_id"
+
+red_df <- red %>%
+  select(Old_id,
+         Red_12B = `Aver.2Higher1.2B.`,
+         Red_10G = `Aver.2Higher10G.`,
+         Red_3D7B = `Aver.2Higher3D7-B.`) %>%
+  left_join(map, by='Old_id') %>%
+  select(-Old_id) %>%
+  group_by(Gene_id) %>% summarize_all(list(mean))
+
+## Transform into percentiles
+
+red_df <- red_df %>%
+  mutate(Percent_12B = (rank(Red_12B)/length(Red_12B))*100) %>%
+  mutate(Percent_10G = (rank(Red_10G)/length(Red_10G))*100) %>%
+  mutate(Percent_3D7B = (rank(Red_3D7B)/length(Red_3D7B))*100)
+
+## Add max percentile dif
+
+red_df <- red_df %>%
+  mutate(MaxRedPercentDif= apply(select(., contains('Percent_')), 1, max_dif))
+
+print(red_df, width = 200)
+
+#### Areas DF ####
+
+# Import Areas table
+
+area <- read_excel(excl, sheet = 2)
+
+colnames(area)[1] <- "Old_id"
+
+area_df <- area %>%
+  select(Old_id,
+         l_12B = `left.1.2b`,
+         r_12B = `right.1.2b`,
+         m_12B = `mid.1.2b`,
+         s_12B = `sides.1.2b`,
+         l_10G = `left.10g`,
+         r_10G = `right.10g`,
+         m_10G = `mid.10g`,
+         s_10G = `sides.10g`,
+         l_3D7B = `left.3d7b`,
+         r_3D7B = `right.3d7b`,
+         m_3D7B = `mid.3d7b`,
+         s_3D7B = `sides.3d7b`) %>%
+
+  mutate_at(vars(-Old_id), as.numeric) %>%
+
+  mutate(MaxArea_12B = apply(select(., contains("12B")), 1, max)) %>%
+  mutate(MaxArea_10G = apply(select(., contains("10G")), 1, max)) %>%
+  mutate(MaxArea_3D7B = apply(select(., contains("3D7B")), 1, max)) %>%
+  mutate(MaxArea = apply(select(., contains('MaxArea_')), 1, max)) %>%
+  mutate(MinArea = apply(select(., contains('MaxArea_')), 1, min)) %>%
+  mutate(MaxAreaDif = apply(select(., contains('MaxArea_')), 1, max_dif)) %>%
+
+  left_join(map, by='Old_id') %>%
+  select(-Old_id) %>%
+  group_by(Gene_id) %>% summarize_all(list(mean))
+
+
+print(area_df, width = 200)
+#+END_SRC
+
+Red Signal DataFrame
+#+BEGIN_SRC R :results output
+head(as.data.frame(red_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id     Red_12B     Red_10G    Red_3D7B Percent_12B
+1          mal_mito_3 22579.33333 36436.73333 30636.82500  96.0335622
+2 MAL13P1.415_oldname   770.82083   702.22292   640.11667  21.3196034
+3  MAL13P1.65_oldname   111.33333    87.05833    91.05833   6.2166285
+4  MAL7P1.142_oldname  5924.44167  5194.40000  5114.63333  75.4767353
+5  MAL8P1.310_oldname    37.21250    35.37917    33.24167   0.8581236
+6   MAL8P1.90_oldname    80.55417    46.18333    54.64167   4.1952708
+  Percent_10G Percent_3D7B MaxRedPercentDif
+1   98.474447   97.8832952        2.4408848
+2   20.861937   18.4591915        2.8604119
+3    5.053394    4.5194508        1.6971777
+4   72.444699   71.7200610        3.7566743
+5    1.115561    0.5911518        0.5244088
+6    2.002288    2.2501907        2.1929825
+#+end_example
+
+Areas DataFrame
+#+BEGIN_SRC R :results output
+head(as.data.frame(area_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id     l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
+1          mal_mito_3 30.592496 61.080128 49.676556 41.99607 25.372470 62.38873
+2 MAL13P1.415_oldname  5.423269  8.488971  1.289779 12.62246  6.117132 10.59524
+3  MAL13P1.65_oldname 18.322430        NA 17.593468       NA 14.071128       NA
+4  MAL7P1.142_oldname  9.389247 12.807814 10.340803 11.85626 13.661078 14.52676
+5  MAL8P1.310_oldname        NA        NA        NA       NA        NA       NA
+6   MAL8P1.90_oldname        NA        NA        NA       NA        NA       NA
+      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B MaxArea_12B
+1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349    61.08013
+2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459    12.62246
+3        NA       NA 19.333324       NA        NA        NA          NA
+4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034    12.80781
+5        NA       NA        NA       NA        NA        NA          NA
+6        NA       NA        NA       NA        NA        NA          NA
+  MaxArea_10G MaxArea_3D7B  MaxArea  MinArea MaxAreaDif
+1    62.38873     62.83441 62.83441 61.08013   1.754283
+2    13.03616     10.51234 13.03616 10.51234   2.523820
+3          NA           NA       NA       NA         NA
+4    14.78623     13.34518 14.78623 12.80781   1.978419
+5          NA           NA       NA       NA         NA
+6          NA           NA       NA       NA         NA
+#+end_example
+
+** Load RNA-Seq Data
+We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
+All data-sets are from RNA-Seq studies in the 3D7 strain.
+We are using 4 different data-sets:
+- Otto et.al.
+- Hoeijmakers et.al.
+- Toenhake et.al.
+- Bartfai et.al.
+
+#+BEGIN_SRC R :results none
+#### Load Data-Sets ####
+
+otto <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %>%
+  select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)`)
+hoej <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %>%
+  select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)`)
+toen <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %>%
+  select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)`)
+bart <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %>%
+  select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)`)
+
+## Join DF
+rna_df <- full_join(otto, hoej) %>%
+  full_join(hoej) %>%
+  full_join(toen) %>%
+  full_join(bart)
+
+## Add mean and sd
+rna_df <- rna_df %>%
+  mutate(MeanPercent = apply(select(., -Gene_id), 1, mean)) %>%
+  mutate(StdDevPercent = apply(select(., -Gene_id), 1, sd))
+
+
+print(rna_df, width=200)
+#+END_SRC
+
+#+BEGIN_SRC R :results output
+head(as.data.frame(rna_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+        Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
+1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
+2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
+3 PF3D7_0100300        34.2         8.7         7.7         7.4      14.500
+4 PF3D7_0100400        50.3        18.3        11.3        37.4      29.325
+5 PF3D7_0100500        49.7        11.4        14.0        32.5      26.900
+6 PF3D7_0100600        18.5         7.8         2.3        12.1      10.175
+  StdDevPercent
+1     11.546942
+2      9.241313
+3     11.383980
+4     15.424068
+5     15.474657
+6      5.930167
+#+end_example
+
+We plot the standard deviation of the percentile values among different studies and we can see that for the vast majority of genes it doesn't go above 10.
+#+BEGIN_SRC R :file ./Plots/rnaseq_perc_sd.png :exports results :results output graphics
+p <- ggplot(rna_df, aes(x=StdDevPercent)) +
+  geom_histogram() +
+  ggtitle("SD of Percent value (among different studies)")
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/rnaseq_perc_sd.png]]
+
+** Create Join DF
+#+BEGIN_SRC R :results none
+red_df
+area_df
+rna_df
+
+all_df <- select(red_df, Gene_id, contains('Percent')) %>%
+  full_join(select(area_df,
+                   Gene_id,
+                   contains('MaxArea_'),
+                   MaxArea,
+                   MinArea,
+                   MaxAreaDif), by = 'Gene_id') %>%
+  full_join(select(rna_df, Gene_id, MeanPercent), by = 'Gene_id')
+
+## Add Vartiant Genes information
+
+cvg <- read_excel("./CVG_list_jan2020_final.xlsx", sheet = "Final")
+
+final_df <- cvg %>%
+  select("Gene_id" = `Gene ID`, "Variant" = `Final Customized`) %>%
+  right_join(all_df, by = 'Gene_id') %>%
+  mutate(Variant = recode(Variant, YES = TRUE, NO = FALSE, .missing = FALSE))
+
+print(final_df, width = 200)
+#+END_SRC
+
+#+RESULTS:
+: org_babel_R_eoe
+
+** Create Lists according to thresholds
+
+Now that we have all the data loaded in, we can star to set labels for each gene.
+
+We will jhave the following categories:
+- Active : Mean percentile (from rna-seq experiments) >= 25%
+  - Regular : Non-variant according to our variant genes list.
+  - Variant Active: Variant according to our variant genes list.
+  - Variant Repressed: Variant and red signal percentile differnce > 30% and area diffrence > 1 (~2FC)
+
+- Inactive: Mean percentile (from rna-seq experiments) < 25%
+#+BEGIN_SRC R
+print(final_df, width = 200)
+
+th_rnapcnt <- 25
+th_redpcnt <- 30
+th_areadif <- 10
+
+## Set state for each gene and strain
+
+state_df <- final_df %>%
+  mutate(State_12B = case_when(
+           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
+           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
+
+           Variant &
+           MeanPercent >= th_rnapcnt &
+           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
+
+           Variant &
+           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+           MaxAreaDif >= th_areadif &
+           abs(MaxArea_12B - MaxArea) <= abs(MaxArea_12B - MinArea) ~ 'Var_Active',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+           MaxAreaDif >= th_areadif &
+           abs(MaxArea_12B - MaxArea) > abs(MaxArea_12B - MinArea) ~ 'Var_Respressed',
+
+           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
+
+           TRUE ~ 'Wrong!')) %>%
+
+  mutate(State_10G = case_when(
+           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
+           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
+
+           Variant &
+           MeanPercent >= th_rnapcnt &
+           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
+
+           Variant &
+           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+           MaxAreaDif >= th_areadif &
+           abs(MaxArea_10G - MaxArea) <= abs(MaxArea_10G - MinArea) ~ 'Var_Active',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+           MaxAreaDif >= th_areadif &
+           abs(MaxArea_10G - MaxArea) > abs(MaxArea_10G - MinArea) ~ 'Var_Respressed',
+
+           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
+
+           TRUE ~ 'Wrong!')) %>% #
+
+  mutate(State_3D7B = case_when(
+           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
+           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
+
+           Variant &
+           MeanPercent >= th_rnapcnt &
+           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
+
+           Variant &
+           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+           MaxAreaDif >= th_areadif &
+           abs(MaxArea_3D7B - MaxArea) <= abs(MaxArea_3D7B - MinArea) ~ 'Var_Active',
+
+           Variant &
+           MaxRedPercentDif >= th_redpcnt &
+            MaxAreaDif >= th_areadif &
+           abs(MaxArea_3D7B - MaxArea) > abs(MaxArea_3D7B - MinArea) ~ 'Var_Respressed',
+
+           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
+
+           TRUE ~ 'Wrong!')) # Check all rows are set.
+
+## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
+## Here we use it to make sure all rows are set (no "Wrong!" appearing)
+
+table(state_df$State_3D7B)
+table(state_df$State_12B)
+table(state_df$State_10G)
+
+write.csv(state_df, './Results_Tables/state_df_rna25_red30_area10.csv')
+
+print(state_df, width = 200)
+
+state_df %>%
+  filter(State_12B != State_10G) %>%
+  select(contains('12B'), contains('10G')) %>%
+  write.csv('./Results_Tables/gens_dif12B_10G.csv')
+
+
+state_df %>%
+  filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200') %>%
+  write.csv('./Results_Tables/clag_genes.csv')
+
+table(state_df$State_12B)
+#+END_SRC
+
+#+RESULTS:

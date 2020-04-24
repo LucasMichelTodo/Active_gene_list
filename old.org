@@ -1,0 +1,375 @@
+* Old Aproach
+:PROPERTIES:
+:header-args:R: :session gene_lists
+:header-args:R+: :tangle ./Scripts/old_active_gene_list.R
+:header-args:R+: :exports none
+:END:
+** Create DF
+First we will create a table with the data from the variantome dataset and the new IDS.
+#+BEGIN_SRC R :results both :exports both
+library(readxl)
+library(tidyverse)
+library(reshape2)
+
+## Read translation table
+map <- read.csv('/Users/lucas/ISGlobal/PhD_Project/Data/oldnames_table.csv')
+
+## Import variantome table
+variantome <- read_excel("~/ISGlobal/Variantome_RoviraGraells/3D7_Variantome_AllData_withGam.xls", sheet = 4)
+colnames(variantome)[1] <- "Old_id"
+
+df <- variantome %>%
+  select(Old_id, AvgDif_12B = `1.2B`,
+         AvgDif_10G = `10G`,
+         AvgDif_3D7B = `3D7-B`,
+         Red_12B = `Aver.2Higher1.2B.`,
+         Red_10G = `Aver.2Higher10G.`,
+         Red_3D7B = `Aver.2Higher3D7-B.`) %>%
+  left_join(map, by='Old_id') %>%
+  select(-Old_id) %>%
+  group_by(Gene_id) %>% summarize_all(funs(mean))
+
+## Set filtring parameters
+
+thld_avgDif <- 1
+thld_redSig <- 500
+#+END_SRC
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+head(as.data.frame(df))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id             |          AvgDif_12B |         AvgDif_10G |        AvgDif_3D7B |          Red_12B |          Red_10G |         Red_3D7B |
+|---------------------+---------------------+--------------------+--------------------+------------------+------------------+------------------|
+| mal_mito_3          |   0.267761693248818 | -0.120344284674781 | -0.112004962614052 | 22579.3333333334 | 36436.7333333333 |        30636.825 |
+| MAL13P1.415_oldname |  0.0679538119950426 | 0.0987120685970946 | -0.230336267379568 | 770.820833333333 | 702.222916666667 | 640.116666666666 |
+| MAL13P1.65_oldname  |    0.10723484317636 |  -0.20884704241373 |  0.182394289673772 | 111.333333333333 | 87.0583333333331 | 91.0583333333334 |
+| MAL7P1.142_oldname  | -0.0102277219474107 |  0.307380539956238 | -0.180503925757113 | 5924.44166666666 |           5194.4 | 5114.63333333334 |
+| MAL8P1.310_oldname  |                 nil |                nil |                nil |          37.2125 | 35.3791666666666 | 33.2416666666666 |
+| MAL8P1.90_oldname   |                 nil |                nil |                nil | 80.5541666666665 | 46.1833333333334 | 54.6416666666667 |
+
+** Plot 1: Dif. from Avg. Density plot
+We now plot the distribution of the ~AvgDif~ parameter.
+#+BEGIN_SRC R :file ./Plots/avgdif_density.png :exports results :results output graphics
+## Plot Difference from Average distribution
+x <- df %>% select(Gene_id, starts_with("Avg"))
+mx <- melt(x)
+
+p <- ggplot(mx, aes(x = value, color = variable, fill=variable)) +
+  geom_density(alpha = 0.2)
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/avgdif_density.png]]
+
+And the same plot but zooming in a little.
+#+BEGIN_SRC R :file ./Plots/avgdif_density_zoom.png :exports results :results output graphics
+p <- ggplot(mx, aes(x = value, color = variable, fill=variable)) +
+  geom_density(alpha = 0.2) +
+  xlim(c(-1.5,1.5))
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/avgdif_density_zoom.png]]
+
+** Plot 2: Max. AvgDif difference
+To better characterize the distribution of diferences from averages we compute a new parameter ~MaxAvgDif~ which corresponds, for each gene, to the difference between the strain with the maximum ~AvgDif~ and the strain with the minimum ~AvgDif~.
+
+#+BEGIN_SRC R :results none
+## Calculate Max dif from average
+
+max_dif <- function(vect){
+  mx <- max(vect, na.rm = T)
+  mn <- min(vect, na.rm = T)
+  if (is.infinite(mx) | is.infinite(mn)) {
+    md <- NA
+  } else {
+    md <- mx - mn
+  }
+  return(md)
+}
+
+md <- df %>% select(starts_with('Avg')) %>%
+  apply(1, max_dif)
+
+df['MaxAvgDif'] <- md
+#+END_SRC
+
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+head(as.data.frame(df))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id             |          AvgDif_12B |         AvgDif_10G |        AvgDif_3D7B |          Red_12B |          Red_10G |         Red_3D7B |         MaxAvgDif |
+|---------------------+---------------------+--------------------+--------------------+------------------+------------------+------------------+-------------------|
+| mal_mito_3          |   0.267761693248818 | -0.120344284674781 | -0.112004962614052 | 22579.3333333334 | 36436.7333333333 |        30636.825 | 0.388105977923598 |
+| MAL13P1.415_oldname |  0.0679538119950426 | 0.0987120685970946 | -0.230336267379568 | 770.820833333333 | 702.222916666667 | 640.116666666666 | 0.329048335976662 |
+| MAL13P1.65_oldname  |    0.10723484317636 |  -0.20884704241373 |  0.182394289673772 | 111.333333333333 | 87.0583333333331 | 91.0583333333334 | 0.391241332087502 |
+| MAL7P1.142_oldname  | -0.0102277219474107 |  0.307380539956238 | -0.180503925757113 | 5924.44166666666 |           5194.4 | 5114.63333333334 | 0.487884465713352 |
+| MAL8P1.310_oldname  |                 nil |                nil |                nil |          37.2125 | 35.3791666666666 | 33.2416666666666 |               nil |
+| MAL8P1.90_oldname   |                 nil |                nil |                nil | 80.5541666666665 | 46.1833333333334 | 54.6416666666667 |               nil |
+
+And again, we plot the distribution.
+
+#+BEGIN_SRC R :file ./Plots/maxdif_avgdif_density.png :exports results :results output graphics
+p <- ggplot(df, aes(x=MaxAvgDif)) +
+  geom_density() +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+  geom_vline(xintercept = thld_avgDif, color = 'red')
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/maxdif_avgdif_density.png]]
+
+** Plot 3: Red Signal
+We also plot the distribution of red signal in the different strains.
+#+BEGIN_SRC R :file ./Plots/redsignal_density.png :exports results :results output graphics
+a <- df %>% select(Gene_id, starts_with("Red"))
+mx <- melt(a)
+
+p <- ggplot(mx, aes(x = log2(value), color = variable, fill=variable)) +
+  geom_density(alpha = 0.2) +
+  geom_vline(xintercept = thld_redSig, color = 'red') +
+  xlim(c(0,20))
+p
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/redsignal_density.png]]
+
+And again we zoom in.
+
+#+BEGIN_SRC R :file ./Plots/redsignal_density_zoom.png :exports results :results output graphics
+x <- df %>% select(Gene_id, starts_with("Red"))
+mx <- melt(x)
+
+p <- ggplot(mx, aes(x = value, color = variable, fill=variable)) +
+  geom_density(alpha = 0.2) +
+  geom_vline(xintercept = thld_redSig, color = 'red') +
+  xlim(c(0,1000))
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/redsignal_density_zoom.png]]
+
+** Filter and set gene
+Given the above plots we decide to set the following filters:
+- ~MaxAvgDif~ > 1: Genes above the ~MaxAvgDif~ threhold will be considered susceptible of being active or inactive. In strains with ~AvgDif~ > 0 will be set as active and in strains with ~AvgDif~ < 0 will be set as inactive.
+
+- ~RedSignal~ < 500: Genes below the ~RedSiganl~ threshold will be set as non expressed.
+
+
+
+#+BEGIN_SRC R :results none
+## Remove rows in which AvgMaxdif == NA (means no avg for any strain) (79 rows)
+
+table(is.na(df$MaxAvgDif))
+df <- df %>% filter(!is.na(MaxAvgDif))
+head(df)
+
+## Set genes as active or inactively
+## Set as inactive only if:
+## - Red val. < thld
+## - Differentialy expressed (max.avg.dist > thld) and dif from avg is negative
+
+x <- df
+
+x['Exp_12B'] <- 1
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_12B) & x$AvgDif_12B < 0),]$Exp_12B <- 0
+x[x$Red_12B < thld_redSig,]$Exp_12B <- 0
+
+x['Exp_10G'] <- 1
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_10G) & x$AvgDif_10G < 0),]$Exp_10G <- 0
+x[x$Red_10G < thld_redSig,]$Exp_10G <- 0
+
+x['Exp_3D7B'] <- 1
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_3D7B) & x$AvgDif_3D7B < 0),]$Exp_3D7B <- 0
+x[x$Red_3D7B < thld_redSig,]$Exp_3D7B <- 0
+#+END_SRC
+
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+head(as.data.frame(x))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id             |          AvgDif_12B |         AvgDif_10G |         AvgDif_3D7B |          Red_12B |          Red_10G |         Red_3D7B |         MaxAvgDif | Exp_12B | Exp_10G | Exp_3D7B |
+|---------------------+---------------------+--------------------+---------------------+------------------+------------------+------------------+-------------------+---------+---------+----------|
+| mal_mito_3          |   0.267761693248818 | -0.120344284674781 |  -0.112004962614052 | 22579.3333333334 | 36436.7333333333 |        30636.825 | 0.388105977923598 |       1 |       1 |        1 |
+| MAL13P1.415_oldname |  0.0679538119950426 | 0.0987120685970946 |  -0.230336267379568 | 770.820833333333 | 702.222916666667 | 640.116666666666 | 0.329048335976662 |       1 |       1 |        1 |
+| MAL13P1.65_oldname  |    0.10723484317636 |  -0.20884704241373 |   0.182394289673772 | 111.333333333333 | 87.0583333333331 | 91.0583333333334 | 0.391241332087502 |       0 |       0 |        0 |
+| MAL7P1.142_oldname  | -0.0102277219474107 |  0.307380539956238 |  -0.180503925757113 | 5924.44166666666 |           5194.4 | 5114.63333333334 | 0.487884465713352 |       1 |       1 |        1 |
+| PF3D7_0100100       |  -0.486523081523902 |  0.401471440732195 | -0.0011392334651362 | 104.170833333333 | 215.035416666667 |            264.4 | 0.887994522256097 |       0 |       0 |        0 |
+| PF3D7_0100200       |    1.11991731717889 |  -2.38163884354815 |    0.42782867941035 |           1357.7 | 72.6791666666667 |           724.15 |  3.50155616072704 |       1 |       0 |        1 |
+
+We print the CLAG genes as an example.
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+## Clag Genes, for reference
+as.data.frame(x %>% filter(Gene_id == 'PF3D7_0302500' |
+                           Gene_id == 'PF3D7_0302200'))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id       |       AvgDif_12B |        AvgDif_10G |       AvgDif_3D7B |          Red_12B |          Red_10G |         Red_3D7B |        MaxAvgDif | Exp_12B | Exp_10G | Exp_3D7B |
+|---------------+------------------+-------------------+-------------------+------------------+------------------+------------------+------------------+---------+---------+----------|
+| PF3D7_0302200 | -2.0406885998032 |  1.74119178264367 | -3.08189717001966 | 6776.36666666666 | 53468.6833333333 |          2114.85 | 4.82308895266334 |       0 |       1 |        0 |
+| PF3D7_0302500 | 1.97111075148879 | -1.48115914659425 |  1.93148368751444 |         42288.05 | 8684.10833333335 | 42932.1166666667 | 3.45226989808304 |       1 |       0 |        1 |
+
+** Analysis of filter
+We set to analyze how well is the method working.
+We start by analyzing which genes are set as On in 1.2B and Off in 10G or viceversa.
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+y <-  x %>%
+  filter((Exp_12B == 0 & Exp_10G ==1) | (Exp_10G == 0 & Exp_12B ==1)) %>%
+  select(Gene_id,
+         AvgDif_12B,
+         AvgDif_10G,
+         Red_12B,
+         Red_10G,
+         MaxAvgDif,
+         Exp_12B,
+         Exp_10G,)
+print(as.data.frame(y[1:10,]))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id       |          AvgDif_12B |         AvgDif_10G |          Red_12B |          Red_10G |         MaxAvgDif | Exp_12B | Exp_10G |
+|---------------+---------------------+--------------------+------------------+------------------+-------------------+---------+---------|
+| PF3D7_0100200 |    1.11991731717889 |  -2.38163884354815 |           1357.7 | 72.6791666666667 |  3.50155616072704 |       1 |       0 |
+| PF3D7_0105500 |  0.0489584718938026 |   0.16399098778581 | 433.308333333334 |         686.9375 | 0.487278087386684 |       0 |       1 |
+| PF3D7_0207000 |  -0.526202510077004 |   1.00189320055097 | 21834.5333333334 | 27544.4166666666 |  1.52809571062797 |       0 |       1 |
+| PF3D7_0216000 | -0.0254222000840357 |  0.236673824092975 | 478.983333333333 | 585.808333333334 | 0.452515058622937 |       0 |       1 |
+| PF3D7_0220800 |   0.987500725023946 |  -2.82961720035568 | 24883.0833333334 | 647.391666666667 |  3.81711792537962 |       1 |       0 |
+| PF3D7_0221800 |   0.183492027648437 |  0.175361779360891 | 648.641666666667 | 460.708333333333 | 0.608356507588119 |       1 |       0 |
+| PF3D7_0302200 |    -2.0406885998032 |   1.74119178264367 | 6776.36666666666 | 53468.6833333333 |  4.82308895266334 |       0 |       1 |
+| PF3D7_0302500 |    1.97111075148879 |  -1.48115914659425 |         42288.05 | 8684.10833333335 |  3.45226989808304 |       1 |       0 |
+| PF3D7_0304600 |  0.0132231518157773 |  0.313087412705911 | 542.879166666666 |           419.65 | 0.729871042541499 |       1 |       0 |
+| PF3D7_0315300 |  0.0650943806256122 | 0.0251007326283702 | 515.585416666667 | 476.585416666667 | 0.143255909305464 |       1 |       0 |
+
+We can sport a first problem here. There are many genes for which the ~MaxAvgDif~ is < 1 but are marked as active in one strain and inactive in another because of one being slightly above the ~RedSignal~ threshold and the other beneath.
+
+#+BEGIN_SRC R :results output value :exports results :colnames yes
+y <-  x %>%
+  filter(((Exp_12B == 0 & Exp_10G ==1) | (Exp_10G == 0 & Exp_12B ==1)) & MaxAvgDif < 1) %>%
+  select(Gene_id,
+         AvgDif_12B,
+         AvgDif_10G,
+         Red_12B,
+         Red_10G,
+         MaxAvgDif,
+         Exp_12B,
+         Exp_10G,)
+print(as.data.frame(y[1:10,]))
+#+END_SRC
+
+#+RESULTS:
+| Gene_id       |          AvgDif_12B |         AvgDif_10G |          Red_12B |          Red_10G |         MaxAvgDif | Exp_12B | Exp_10G |
+|---------------+---------------------+--------------------+------------------+------------------+-------------------+---------+---------|
+| PF3D7_0105500 |  0.0489584718938026 |   0.16399098778581 | 433.308333333334 |         686.9375 | 0.487278087386684 |       0 |       1 |
+| PF3D7_0216000 | -0.0254222000840357 |  0.236673824092975 | 478.983333333333 | 585.808333333334 | 0.452515058622937 |       0 |       1 |
+| PF3D7_0221800 |   0.183492027648437 |  0.175361779360891 | 648.641666666667 | 460.708333333333 | 0.608356507588119 |       1 |       0 |
+| PF3D7_0304600 |  0.0132231518157773 |  0.313087412705911 | 542.879166666666 |           419.65 | 0.729871042541499 |       1 |       0 |
+| PF3D7_0315300 |  0.0650943806256122 | 0.0251007326283702 | 515.585416666667 | 476.585416666667 | 0.143255909305464 |       1 |       0 |
+| PF3D7_0324100 |    0.16529399281076 |  0.208507272707057 |          492.475 | 599.433333333334 | 0.343166523917063 |       0 |       1 |
+| PF3D7_0403000 |   0.132669534147043 | -0.229982975166176 |            651.2 |           479.75 | 0.362652509313219 |       1 |       0 |
+| PF3D7_0500600 |   0.824511185091613 |                nil | 574.408333333333 | 99.9749999999999 |                 0 |       1 |       0 |
+| PF3D7_0523700 |   0.452915687631154 |  0.349209859307414 |            395.3 |            557.7 | 0.777470764299502 |       0 |       1 |
+| PF3D7_0524200 |  -0.407916581482253 | -0.209882896559442 | 494.266666666667 | 610.558333333334 | 0.790569006913928 |       0 |       1 |
+
+To avoid this we will add a "smoothing" filter for the red signal. When a gene is beneath the red signal threshold in any strain, it will also be set to 0 (non-expressed) in the rest of the strains if the red signal in those other strains is not above a certain more stingent treshold. We will set this more stringent threshold at 700 (being 500 the initial threshold).
+
+#+BEGIN_SRC R :results none
+head(x)
+
+## Start filtering again because we need to apply first RedSignal filters then MaxAvgDif.
+
+## Remove rows in which AvgMaxdif == NA (means no avg for any strain) (79 rows)
+
+table(is.na(df$MaxAvgDif))
+df <- df %>% filter(!is.na(MaxAvgDif))
+head(df)
+
+## Set genes as active or inactively
+## Set as inactive only if:
+## - Red val. < thld
+## - Differentialy expressed (max.avg.dist > thld) and dif from avg is negative
+
+x <- df
+
+## Red smoothed filter
+
+smoothThld <- function(vect, th1, th2){
+  if (any(vect < th1)) {out <- vect >= th2}
+  else {out <- vect >= th1}
+  return(as.numeric(out))
+}
+
+smthRed <- x %>%
+  select(starts_with('Red')) %>%
+  apply(1, function(x) smoothThld(x, thld_redSig, thld_redSig+200)) %>%
+  t() %>%
+  as_tibble()
+
+x['Exp_12B'] <- smthRed$V1
+x['Exp_10G'] <- smthRed$V2
+x['Exp_3D7B'] <- smthRed$V3
+
+## MaxAvgDif filters
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_12B) & x$AvgDif_12B < 0),]$Exp_12B <- 0
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_10G) & x$AvgDif_10G < 0),]$Exp_10G <- 0
+x[x$MaxAvgDif >= thld_avgDif & (!is.na(x$AvgDif_3D7B) & x$AvgDif_3D7B < 0),]$Exp_3D7B <- 0
+
+y <-  x %>%
+  filter((Exp_12B == 0 & Exp_10G ==1) | (Exp_10G == 0 & Exp_12B ==1)) %>%
+  select(Gene_id,
+         AvgDif_12B,
+         AvgDif_10G,
+         Red_12B,
+         Red_10G,
+         MaxAvgDif,
+         Exp_12B,
+         Exp_10G,)
+#+END_SRC
+
+This solves the "values near the threshold issue".
+#+BEGIN_SRC R :results output value :exports results
+as.data.frame(y %>% filter(MaxAvgDif < 1))
+#+END_SRC
+
+#+RESULTS:
+| PF3D7_0112800  |   0.0142920368642602 |    0.30092233930748 |          754.425 | 599.066666666667 | 0.611396287525703 | 1 | 0 |
+| PF3D7_0623400  |   -0.209381444564172 |  -0.221218647800778 | 700.908333333334 |            582.4 | 0.602632002220393 | 1 | 0 |
+| PF3D7_0722900  |  -0.0505577840472567 |   0.346271722040364 | 490.583333333333 | 782.500000000001 |  0.65341541473565 | 0 | 1 |
+| PF3D7_0800800  |    0.745885414204071 | -0.0529254945464496 | 751.983333333335 |          143.625 |  0.79881090875052 | 1 | 0 |
+| PF3D7_0819800  |  0.00241857302771872 |   0.342395903346842 |           715.85 | 532.283333333333 | 0.619168500133873 | 1 | 0 |
+| PF3D7_0927500  | -0.00728521307204741 |  -0.166037460505218 | 818.516666666667 | 437.133333333333 | 0.414560851981147 | 1 | 0 |
+| PF3D7_1218100  |   -0.226801500307667 | -0.0747994582900221 | 854.483333333334 | 494.604166666667 |  0.36146414890537 | 1 | 0 |
+| PF3D7_1240300  |     -0.1909881827823 |   0.161437642356421 | 336.962500000001 |           843.25 | 0.352425825138722 | 0 | 1 |
+| PF3D7_1446400  |    0.313575652739111 |   0.119073758298419 |           712.35 |           498.85 | 0.614624508725479 | 1 | 0 |
+| PF3D7_1472500  |   -0.194254327101676 |  -0.261861804831208 | 742.808333333333 | 453.783333333334 | 0.673931478447896 | 1 | 0 |
+| PF3D7_API00800 |    0.446672302404285 |  -0.292588931406495 | 819.966666666665 | 397.441666666667 | 0.739261233810781 | 1 | 0 |
+| PF3D7_API01400 |  0.00200335650552728 |    0.12568689198752 |         2534.575 |          495.225 |  0.43574031585722 | 1 | 0 |
+| PF3D7_API03000 |    0.173963556900647 |  0.0182467319451973 | 870.341666666669 | 493.708333333333 | 0.608301876282595 | 1 | 0 |
+
+#+BEGIN_SRC R :results none
+y
+write.csv(x, './active_genes.csv')
+#+END_SRC
+With this new smoothing threshold the number of genes with different state between 1.2B and 10G is 39.
+
+And the final table is the following:
+[[file:./active_genes.csv]]
+
+#+BEGIN_SRC R :results none
+x %>% select(Exp_12B) %>% table()
+x %>% select(Exp_10G) %>% table()
+x %>% select(Exp_3D7B) %>% table()
+#+END_SRC

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2020-04-09 Thu 17:15 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Creation of active gene-lists</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="Lucas Michel Todó" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+<style>pre.src {background-color: #3F3F3F ; color: #e5e5e5;}</style>
+<style>table{overflow-x:auto} </style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Creation of active gene-lists</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org6dad00b">1. Actiev/Inactive Gene Lists</a>
+<ul>
+<li><a href="#org9c2b9e0">1.1. Create microarrays DF</a></li>
+<li><a href="#org6fb5e0f">1.2. Load RNA-Seq Data</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org6dad00b" class="outline-2">
+<h2 id="org6dad00b"><span class="section-number-2">1</span> Actiev/Inactive Gene Lists</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
+We will define 4 possible expresion states:
+</p>
+<ul class="org-ul">
+<li>Active
+<ul class="org-ul">
+<li>Regular</li>
+<li>Variant Active</li>
+<li>Variant Repressed</li>
+</ul></li>
+<li>Inactive</li>
+</ul>
+</div>
+
+<div id="outline-container-org9c2b9e0" class="outline-3">
+<h3 id="org9c2b9e0"><span class="section-number-3">1.1</span> Create microarrays DF</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+We load our microarray data.
+We willl load the red signal and transform it into percentiles.
+We will also load the areas data to calculate FC among strains.
+</p>
+
+<p>
+Red Signal DataFrame
+</p>
+<pre class="example">
+              Gene_id     Red_12B     Red_10G    Red_3D7B Percent_12B
+1          mal_mito_3 22579.33333 36436.73333 30636.82500  96.0335622
+2 MAL13P1.415_oldname   770.82083   702.22292   640.11667  21.3196034
+3  MAL13P1.65_oldname   111.33333    87.05833    91.05833   6.2166285
+4  MAL7P1.142_oldname  5924.44167  5194.40000  5114.63333  75.4767353
+5  MAL8P1.310_oldname    37.21250    35.37917    33.24167   0.8581236
+6   MAL8P1.90_oldname    80.55417    46.18333    54.64167   4.1952708
+  Percent_10G Percent_3D7B
+1   98.474447   97.8832952
+2   20.861937   18.4591915
+3    5.053394    4.5194508
+4   72.444699   71.7200610
+5    1.115561    0.5911518
+6    2.002288    2.2501907
+</pre>
+
+<p>
+Areas DataFrame
+</p>
+<pre class="example">
+               Old_id    l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
+1 1396.pre-tRNA-Met-1 52.07122 26.697018 48.027987 30.74025 48.007175 22.34826
+2 1399.pre-tRNA-Gly-1 43.06044 27.673743 39.081224 31.65296 40.745787 20.85755
+3 1399.pre-tRNA-Leu-1 41.86042 22.593902 35.842097 28.61222 41.137203 20.33420
+4 1400.pre-tRNA-Gln-1 11.50002  9.748608  7.973428 13.27520  9.792214 10.93704
+5 2277.pre-tRNA-Glu-1 52.29683 38.632652 46.014786 44.91469 50.436455 40.25664
+6          mal_mito_3 30.59250 61.080128 49.676556 41.99607 25.372470 62.38873
+      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B   s_3D7B MaxArea_12B
+1 45.311433 25.04400 48.907304 21.92320 44.699360 26.13115    52.07122
+2 36.671160 24.93217 39.206748 23.91107 34.193970 28.92385    43.06044
+3 36.893847 24.57755 41.023094 22.25135 37.644203 25.63025    41.86042
+4  7.609124 13.12013  8.090639 10.25486  9.934242  8.41126    13.27520
+5 47.850637 42.84246 53.108539 38.20162 47.697896 43.61226    52.29683
+6 49.805504 37.95570 25.484634 62.83441 50.462696 37.85635    61.08013
+  MaxArea_10G MaxArea_3D7B
+1    48.00717     48.90730
+2    40.74579     39.20675
+3    41.13720     41.02309
+4    13.12013     10.25486
+5    50.43646     53.10854
+6    62.38873     62.83441
+</pre>
+</div>
+</div>
+
+<div id="outline-container-org6fb5e0f" class="outline-3">
+<h3 id="org6fb5e0f"><span class="section-number-3">1.2</span> Load RNA-Seq Data</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
+All data-sets are from RNA-Seq studies in the 3D7 strain.
+We are using 4 different data-sets:
+</p>
+<ul class="org-ul">
+<li>Otto et.al.</li>
+<li>Hoeijmakers et.al.</li>
+<li>Toenhake et.al.</li>
+<li>Bartfai et.al.</li>
+</ul>
+
+<pre class="example">
+        Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
+1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
+2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
+3 PF3D7_0100300        34.2         8.7         7.7         7.4      14.500
+4 PF3D7_0100400        50.3        18.3        11.3        37.4      29.325
+5 PF3D7_0100500        49.7        11.4        14.0        32.5      26.900
+6 PF3D7_0100600        18.5         7.8         2.3        12.1      10.175
+  StdDevPercent
+1     11.546942
+2      9.241313
+3     11.383980
+4     15.424068
+5     15.474657
+6      5.930167
+</pre>
+
+<p>
+We plot the standard deviation of the percentile values among different studies and we can see that for the vast majority of genes it doesn't go above 10.
+</p>
+
+<div class="figure">
+<p><img src="./Plots/rnaseq_perc_sd.png" alt="rnaseq_perc_sd.png" />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 31/03/2020</p>
+<p class="author">Author: Lucas Michel Todó</p>
+<p class="date">Created: 2020-04-09 Thu 17:15</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
