@@ -32,7 +32,6 @@ We will define 4 possible expresion states:
 
 library(readxl)
 library(tidyverse)
-library(reshape2)
 
 #### Max Dif function ####
 
@@ -54,8 +53,8 @@ We willl load the red signal and transform it into percentiles. For each gene we
 #### Red Signal DF ####
 
 ## Read translation table
-map <- read.csv('/Users/lucas/ISGlobal/PhD_Project/Data/oldnames_table.csv')
-excl <- "~/ISGlobal/Variantome_RoviraGraells/3D7_Variantome_AllData_withGam.xls"
+map <- read.csv('./Data/oldnames_table.csv')
+excl <- "./Data/3D7_Variantome_AllData_withGam.xls"
 
 ## Import Red Signal table
 red <- read_excel(excl, sheet = 4)
@@ -233,13 +232,13 @@ We are using 4 different data-sets:
 #+BEGIN_SRC R :results none
 #### Load Data-Sets ####
 
-otto <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %>%
+otto <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %>%
   select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)`)
-hoej <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %>%
+hoej <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %>%
   select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)`)
-toen <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %>%
+toen <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %>%
   select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)`)
-bart <- read_delim("./RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %>%
+bart <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %>%
   select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)`)
 
 ## Join DF
@@ -304,7 +303,7 @@ all_df <- select(red_df, Gene_id, contains('Percent')) %>%
 
 ## Add Vartiant Genes information
 
-cvg <- read_excel("./CVG_list_jan2020_final.xlsx", sheet = "Final")
+cvg <- read_excel("./Data/CVG_list_jan2020_final.xlsx", sheet = "Final")
 
 final_df <- cvg %>%
   select("Gene_id" = `Gene ID`, "Variant" = `Final Customized`) %>%
