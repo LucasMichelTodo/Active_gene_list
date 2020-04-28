@@ -1,4 +1,4 @@
-% Created 2020-04-09 Thu 17:15
+% Created 2020-04-27 Mon 12:21
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -29,8 +29,8 @@
 
 \maketitle
 \tableofcontents \clearpage
-\section{Actiev/Inactive Gene Lists}
-\label{sec:org750967f}
+\section{Active/Inactive Gene Lists}
+\label{sec:orgfc7675a}
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
 We will define 4 possible expresion states:
 \begin{itemize}
@@ -43,11 +43,11 @@ We will define 4 possible expresion states:
 \item Inactive
 \end{itemize}
 
-\subsection{Create microarrays DF}
-\label{sec:org4c7774d}
-We load our microarray data.
-We willl load the red signal and transform it into percentiles.
-We will also load the areas data to calculate FC among strains.
+\subsection{Load Packages and functions}
+\label{sec:org5a96bc7}
+\subsection{Microarray Data: Red Signal}
+\label{sec:org7e4ceb4}
+We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
 \begin{verbatim}
@@ -58,42 +58,53 @@ Red Signal DataFrame
 4  MAL7P1.142_oldname  5924.44167  5194.40000  5114.63333  75.4767353
 5  MAL8P1.310_oldname    37.21250    35.37917    33.24167   0.8581236
 6   MAL8P1.90_oldname    80.55417    46.18333    54.64167   4.1952708
-  Percent_10G Percent_3D7B
-1   98.474447   97.8832952
-2   20.861937   18.4591915
-3    5.053394    4.5194508
-4   72.444699   71.7200610
-5    1.115561    0.5911518
-6    2.002288    2.2501907
+  Percent_10G Percent_3D7B MaxRedPercentDif
+1   98.474447   97.8832952        2.4408848
+2   20.861937   18.4591915        2.8604119
+3    5.053394    4.5194508        1.6971777
+4   72.444699   71.7200610        3.7566743
+5    1.115561    0.5911518        0.5244088
+6    2.002288    2.2501907        2.1929825
 \end{verbatim}
+
+\subsection{Microarray Data: Areas}
+\label{sec:orgaa34bc4}
+We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
 \begin{verbatim}
-               Old_id    l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
-1 1396.pre-tRNA-Met-1 52.07122 26.697018 48.027987 30.74025 48.007175 22.34826
-2 1399.pre-tRNA-Gly-1 43.06044 27.673743 39.081224 31.65296 40.745787 20.85755
-3 1399.pre-tRNA-Leu-1 41.86042 22.593902 35.842097 28.61222 41.137203 20.33420
-4 1400.pre-tRNA-Gln-1 11.50002  9.748608  7.973428 13.27520  9.792214 10.93704
-5 2277.pre-tRNA-Glu-1 52.29683 38.632652 46.014786 44.91469 50.436455 40.25664
-6          mal_mito_3 30.59250 61.080128 49.676556 41.99607 25.372470 62.38873
-      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B   s_3D7B MaxArea_12B
-1 45.311433 25.04400 48.907304 21.92320 44.699360 26.13115    52.07122
-2 36.671160 24.93217 39.206748 23.91107 34.193970 28.92385    43.06044
-3 36.893847 24.57755 41.023094 22.25135 37.644203 25.63025    41.86042
-4  7.609124 13.12013  8.090639 10.25486  9.934242  8.41126    13.27520
-5 47.850637 42.84246 53.108539 38.20162 47.697896 43.61226    52.29683
-6 49.805504 37.95570 25.484634 62.83441 50.462696 37.85635    61.08013
-  MaxArea_10G MaxArea_3D7B
-1    48.00717     48.90730
-2    40.74579     39.20675
-3    41.13720     41.02309
-4    13.12013     10.25486
-5    50.43646     53.10854
-6    62.38873     62.83441
+              Gene_id     l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
+1          mal_mito_3 30.592496 61.080128 49.676556 41.99607 25.372470 62.38873
+2 MAL13P1.415_oldname  5.423269  8.488971  1.289779 12.62246  6.117132 10.59524
+3  MAL13P1.65_oldname 18.322430        NA 17.593468       NA 14.071128       NA
+4  MAL7P1.142_oldname  9.389247 12.807814 10.340803 11.85626 13.661078 14.52676
+5  MAL8P1.310_oldname        NA        NA        NA       NA        NA       NA
+6   MAL8P1.90_oldname        NA        NA        NA       NA        NA       NA
+      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B   MaxLeft   MinLeft
+1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349 30.592496 25.372470
+2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459  6.117132  1.789873
+3        NA       NA 19.333324       NA        NA        NA 19.333324 14.071128
+4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034 13.661078  7.099032
+5        NA       NA        NA       NA        NA        NA        NA        NA
+6        NA       NA        NA       NA        NA        NA        NA        NA
+  MaxRight  MinRight    MaxMid    MinMid MaxSides  MinSides  DifLeft DifRight
+1 62.83441 61.080128 50.462696 49.676556 41.99607 37.856349 5.220025 1.754283
+2 10.59524  8.488971  3.691753  1.289779 13.03616  8.610459 4.327259 2.106274
+3       NA        NA        NA        NA       NA        NA 5.262196       NA
+4 14.52676 12.807814 13.401610 10.340803 14.78623  8.403034 6.562046 1.718950
+5       NA        NA        NA        NA       NA        NA       NA       NA
+6       NA        NA        NA        NA       NA        NA       NA       NA
+     DifMid DifSides Interval      Dif
+1 0.7861401 4.139719  DifLeft 5.220025
+2 2.4019733 4.425700 DifSides 4.425700
+3        NA       NA  DifLeft 5.262196
+4 3.0608067 6.383199  DifLeft 6.562046
+5        NA       NA  No Data       NA
+6        NA       NA  No Data       NA
 \end{verbatim}
 
 \subsection{Load RNA-Seq Data}
-\label{sec:org2b487f8}
+\label{sec:orga3ddbf5}
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
@@ -105,6 +116,7 @@ We are using 4 different data-sets:
 \end{itemize}
 
 \begin{verbatim}
+
         Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
 1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
 2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
@@ -125,4 +137,27 @@ We plot the standard deviation of the percentile values among different studies 
 \begin{center}
 \includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
 \end{center}
+
+\subsection{Create Join DF}
+\label{sec:orgea12e9d}
+\begin{verbatim}
+org_babel_R_eoe
+\end{verbatim}
+
+\subsection{Create Lists according to thresholds}
+\label{sec:org88aded6}
+
+Now that we have all the data loaded in, we can star to set labels for each gene.
+
+We will jhave the following categories:
+\begin{itemize}
+\item Active : Mean percentile (from rna-seq experiments) >= 25\%
+\begin{itemize}
+\item Regular : Non-variant according to our variant genes list.
+\item Variant Active: Variant according to our variant genes list.
+\item Variant Repressed: Variant and red signal percentile differnce > 30\% and area diffrence > 1 (\textasciitilde{}2FC)
+\end{itemize}
+
+\item Inactive: Mean percentile (from rna-seq experiments) < 25\%
+\end{itemize}
 \end{document}

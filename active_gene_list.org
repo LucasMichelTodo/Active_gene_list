@@ -12,7 +12,7 @@
 #+DATE:   31/03/2020
 
 * Active/Inactive Gene Lists
-:PRO  PERTIES:
+:PROPERTIES:
 :header-args:R: :session active_gene_lists
 :header-args:R+: :tangle ./Scripts/active_gene_list.R
 :header-args:R+: :exports results
@@ -26,11 +26,7 @@ We will define 4 possible expresion states:
   - Variant Repressed
 - Inactive
 
-** Create microarrays DF
-We load our microarray data.
-We willl load the red signal and transform it into percentiles.
-We will also load the areas data to calculate FC among strains.
-
+** Load Packages and functions
 #+BEGIN_SRC R :results none
 #### Imports ####
 
@@ -50,7 +46,11 @@ max_dif <- function(vect){
   }
   return(md)
 }
+#+END_SRC
+** Microarray Data: Red Signal
+We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
+#+BEGIN_SRC R :results none
 #### Red Signal DF ####
 
 ## Read translation table
@@ -84,45 +84,6 @@ red_df <- red_df %>%
   mutate(MaxRedPercentDif= apply(select(., contains('Percent_')), 1, max_dif))
 
 print(red_df, width = 200)
-
-#### Areas DF ####
-
-# Import Areas table
-
-area <- read_excel(excl, sheet = 2)
-
-colnames(area)[1] <- "Old_id"
-
-area_df <- area %>%
-  select(Old_id,
-         l_12B = `left.1.2b`,
-         r_12B = `right.1.2b`,
-         m_12B = `mid.1.2b`,
-         s_12B = `sides.1.2b`,
-         l_10G = `left.10g`,
-         r_10G = `right.10g`,
-         m_10G = `mid.10g`,
-         s_10G = `sides.10g`,
-         l_3D7B = `left.3d7b`,
-         r_3D7B = `right.3d7b`,
-         m_3D7B = `mid.3d7b`,
-         s_3D7B = `sides.3d7b`) %>%
-
-  mutate_at(vars(-Old_id), as.numeric) %>%
-
-  mutate(MaxArea_12B = apply(select(., contains("12B")), 1, max)) %>%
-  mutate(MaxArea_10G = apply(select(., contains("10G")), 1, max)) %>%
-  mutate(MaxArea_3D7B = apply(select(., contains("3D7B")), 1, max)) %>%
-  mutate(MaxArea = apply(select(., contains('MaxArea_')), 1, max)) %>%
-  mutate(MinArea = apply(select(., contains('MaxArea_')), 1, min)) %>%
-  mutate(MaxAreaDif = apply(select(., contains('MaxArea_')), 1, max_dif)) %>%
-
-  left_join(map, by='Old_id') %>%
-  select(-Old_id) %>%
-  group_by(Gene_id) %>% summarize_all(list(mean))
-
-
-print(area_df, width = 200)
 #+END_SRC
 
 Red Signal DataFrame
@@ -148,6 +109,81 @@ head(as.data.frame(red_df))
 6    2.002288    2.2501907        2.1929825
 #+end_example
 
+** Microarray Data: Areas
+We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
+
+#+BEGIN_SRC R :results none
+#### Areas DF ####
+
+# Import Areas table
+
+area <- read_excel(excl, sheet = 2)
+
+colnames(area)[1] <- "Old_id"
+
+area_df <- area %>%
+  select(Old_id,
+         l_12B = `left.1.2b`,
+         r_12B = `right.1.2b`,
+         m_12B = `mid.1.2b`,
+         s_12B = `sides.1.2b`,
+         l_10G = `left.10g`,
+         r_10G = `right.10g`,
+         m_10G = `mid.10g`,
+         s_10G = `sides.10g`,
+         l_3D7B = `left.3d7b`,
+         r_3D7B = `right.3d7b`,
+         m_3D7B = `mid.3d7b`,
+         s_3D7B = `sides.3d7b`) %>%
+
+  mutate_at(vars(-Old_id), as.numeric) %>%
+
+
+  left_join(map, by='Old_id') %>%
+  select(-Old_id) %>%
+  group_by(Gene_id) %>% summarize_all(list(mean))
+
+
+print(area_df, width = 200)
+
+area_df <- area_df %>%
+  mutate(MaxLeft = apply(select(., contains('l_')), 1, max)) %>%
+  mutate(MinLeft = apply(select(., contains('l_')), 1, min)) %>%
+
+  mutate(MaxRight = apply(select(., contains('r_')), 1, max)) %>%
+  mutate(MinRight = apply(select(., contains('r_')), 1, min)) %>%
+
+  mutate(MaxMid = apply(select(., contains('m_')), 1, max)) %>%
+  mutate(MinMid = apply(select(., contains('m_')), 1, min)) %>%
+
+  mutate(MaxSides = apply(select(., contains('s_')), 1, max)) %>%
+  mutate(MinSides = apply(select(., contains('s_')), 1, min)) %>%
+
+  mutate(DifLeft = MaxLeft - MinLeft) %>%
+  mutate(DifRight = MaxRight - MinRight) %>%
+  mutate(DifMid = MaxMid - MinMid) %>%
+  mutate(DifSides = MaxSides - MinSides)
+
+print(area_df, width = 200)
+
+## Add max interval and difference
+
+maxinterval <- area_df %>%
+  select(Gene_id, contains('Dif')) %>%
+  pivot_longer(-Gene_id, names_to = 'Interval', values_to = 'Dif') %>%
+  group_by(Gene_id) %>%
+  filter(rank(-Dif, ties.method = "first") == 1) %>%
+  mutate(Interval = ifelse(is.na(Dif), 'No Data', Interval)) %>%
+  mutate(Dif_FC = Dif/13.45)
+
+maxinterval
+
+area_df <- area_df %>%
+  left_join(maxinterval, by = 'Gene_id')
+
+print(area_df, width = 200)
+#+END_SRC
+
 Areas DataFrame
 #+BEGIN_SRC R :results output
 head(as.data.frame(area_df))
@@ -162,20 +198,27 @@ head(as.data.frame(area_df))
 4  MAL7P1.142_oldname  9.389247 12.807814 10.340803 11.85626 13.661078 14.52676
 5  MAL8P1.310_oldname        NA        NA        NA       NA        NA       NA
 6   MAL8P1.90_oldname        NA        NA        NA       NA        NA       NA
-      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B MaxArea_12B
-1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349    61.08013
-2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459    12.62246
-3        NA       NA 19.333324       NA        NA        NA          NA
-4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034    12.80781
-5        NA       NA        NA       NA        NA        NA          NA
-6        NA       NA        NA       NA        NA        NA          NA
-  MaxArea_10G MaxArea_3D7B  MaxArea  MinArea MaxAreaDif
-1    62.38873     62.83441 62.83441 61.08013   1.754283
-2    13.03616     10.51234 13.03616 10.51234   2.523820
-3          NA           NA       NA       NA         NA
-4    14.78623     13.34518 14.78623 12.80781   1.978419
-5          NA           NA       NA       NA         NA
-6          NA           NA       NA       NA         NA
+      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B   MaxLeft   MinLeft
+1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349 30.592496 25.372470
+2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459  6.117132  1.789873
+3        NA       NA 19.333324       NA        NA        NA 19.333324 14.071128
+4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034 13.661078  7.099032
+5        NA       NA        NA       NA        NA        NA        NA        NA
+6        NA       NA        NA       NA        NA        NA        NA        NA
+  MaxRight  MinRight    MaxMid    MinMid MaxSides  MinSides  DifLeft DifRight
+1 62.83441 61.080128 50.462696 49.676556 41.99607 37.856349 5.220025 1.754283
+2 10.59524  8.488971  3.691753  1.289779 13.03616  8.610459 4.327259 2.106274
+3       NA        NA        NA        NA       NA        NA 5.262196       NA
+4 14.52676 12.807814 13.401610 10.340803 14.78623  8.403034 6.562046 1.718950
+5       NA        NA        NA        NA       NA        NA       NA       NA
+6       NA        NA        NA        NA       NA        NA       NA       NA
+     DifMid DifSides Interval      Dif
+1 0.7861401 4.139719  DifLeft 5.220025
+2 2.4019733 4.425700 DifSides 4.425700
+3        NA       NA  DifLeft 5.262196
+4 3.0608067 6.383199  DifLeft 6.562046
+5        NA       NA  No Data       NA
+6        NA       NA  No Data       NA
 #+end_example
 
 ** Load RNA-Seq Data
@@ -220,6 +263,7 @@ head(as.data.frame(rna_df))
 
 #+RESULTS:
 #+begin_example
+
         Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
 1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
 2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
@@ -251,16 +295,11 @@ print(p)
 ** Create Join DF
 #+BEGIN_SRC R :results none
 red_df
-area_df
+print(area_df, width = 200)
 rna_df
 
 all_df <- select(red_df, Gene_id, contains('Percent')) %>%
-  full_join(select(area_df,
-                   Gene_id,
-                   contains('MaxArea_'),
-                   MaxArea,
-                   MinArea,
-                   MaxAreaDif), by = 'Gene_id') %>%
+  full_join(select(area_df, Gene_id, Dif_FC), by = 'Gene_id') %>%
   full_join(select(rna_df, Gene_id, MeanPercent), by = 'Gene_id')
 
 ## Add Vartiant Genes information
