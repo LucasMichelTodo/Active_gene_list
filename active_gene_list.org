@@ -173,12 +173,41 @@ maxinterval <- area_df %>%
   group_by(Gene_id) %>%
   filter(rank(-Dif, ties.method = "first") == 1) %>%
   mutate(Interval = ifelse(is.na(Dif), 'No Data', Interval)) %>%
+  mutate(Interval = case_when(Interval == 'DifLeft' ~ 'Left',
+                              Interval == 'DifRight' ~ 'Right',
+                              Interval == 'DifMid' ~ 'Mid',
+                              Interval == 'DifSides' ~ 'Sides',
+                              Interval == 'No Data' ~ 'No Data')) %>%
   mutate(Dif_FC = Dif/13.45)
 
 maxinterval
 
 area_df <- area_df %>%
   left_join(maxinterval, by = 'Gene_id')
+
+print(area_df, width = 200)
+
+## Select appropiate area for each gene
+
+area_df <- area_df %>%
+  mutate(area_12B = case_when(
+           Interval == 'Left' ~ l_12B,
+           Interval == 'Right' ~ r_12B,
+           Interval == 'Mid' ~ m_12B,
+           Interval == 'Sides' ~ s_12B,
+           Interval == 'No Data' ~ NA_real_)) %>%
+  mutate(area_10G = case_when(
+           Interval == 'Left' ~ l_10G,
+           Interval == 'Right' ~ r_10G,
+           Interval == 'Mid' ~ m_10G,
+           Interval == 'Sides' ~ s_10G,
+           Interval == 'No Data' ~ NA_real_)) %>%
+  mutate(area_3D7B = case_when(
+           Interval == 'Left' ~ l_3D7B,
+           Interval == 'Right' ~ r_3D7B,
+           Interval == 'Mid' ~ m_3D7B,
+           Interval == 'Sides' ~ s_3D7B,
+           Interval == 'No Data' ~ NA_real_))
 
 print(area_df, width = 200)
 #+END_SRC
@@ -331,10 +360,40 @@ We will jhave the following categories:
 print(final_df, width = 200)
 
 th_rnapcnt <- 25
-th_redpcnt <- 30
-th_areadif <- 10
+th_redpcnt <- 25
+th_areaFC <- 1
 
 ## Set state for each gene and strain
+
+set_state <- function(df, outcol, redcol, areacol){
+  df <- df %>%
+    mutate(outcol = case_when(
+             !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
+             !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
+
+             Variant &
+             MeanPercent >= th_rnapcnt &
+             (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
+
+             Variant &
+             MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
+
+             Variant &
+             MaxRedPercentDif >= th_redpcnt &
+             MaxAreaDif >= th_areadif &
+             abs(MaxArea_12B - MaxArea) <= abs(MaxArea_12B - MinArea) ~ 'Var_Active',
+
+             Variant &
+             MaxRedPercentDif >= th_redpcnt &
+             MaxAreaDif >= th_areadif &
+             abs(MaxArea_12B - MaxArea) > abs(MaxArea_12B - MinArea) ~ 'Var_Respressed',
+
+             is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
+
+             TRUE ~ 'Wrong!'))
+  return(df)
+}
+
 
 state_df <- final_df %>%
   mutate(State_12B = case_when(
