@@ -169,25 +169,25 @@ print(area_df, width = 200)
 
 maxinterval <- area_df %>%
   select(Gene_id, contains('Dif')) %>%
-  pivot_longer(-Gene_id, names_to = 'Interval', values_to = 'Dif') %>%
+  pivot_longer(-Gene_id, names_to = 'Interval', values_to = 'MaxDif') %>%
   group_by(Gene_id) %>%
-  filter(rank(-Dif, ties.method = "first") == 1) %>%
-  mutate(Interval = ifelse(is.na(Dif), 'No Data', Interval)) %>%
+  filter(rank(-MaxDif, ties.method = "first") == 1) %>%
+  mutate(Interval = ifelse(is.na(MaxDif), 'No Data', Interval)) %>%
   mutate(Interval = case_when(Interval == 'DifLeft' ~ 'Left',
                               Interval == 'DifRight' ~ 'Right',
                               Interval == 'DifMid' ~ 'Mid',
                               Interval == 'DifSides' ~ 'Sides',
                               Interval == 'No Data' ~ 'No Data')) %>%
-  mutate(area_FC = Dif/13.45)
+  mutate(areaFC = MaxDif/13.45)
 
 maxinterval
 
 area_df <- area_df %>%
   left_join(maxinterval, by = 'Gene_id')
 
-print(area_df, width = 200)
+print(area_df, width = 400)
 
-## Select appropiate area for each gene
+## Select appropiate area for each gene and add max and min areas
 
 area_df <- area_df %>%
   mutate(area_12B = case_when(
@@ -207,9 +207,12 @@ area_df <- area_df %>%
            Interval == 'Right' ~ r_3D7B,
            Interval == 'Mid' ~ m_3D7B,
            Interval == 'Sides' ~ s_3D7B,
-           Interval == 'No Data' ~ NA_real_))
+           Interval == 'No Data' ~ NA_real_)) %>%
+  mutate(MaxArea = apply(select(., contains('area_')), 1, max)) %>%
+  mutate(MinArea = apply(select(., contains('area_')), 1, min))
 
-print(area_df, width = 200)
+
+print(area_df, width = 400)
 #+END_SRC
 
 Areas DataFrame
@@ -327,7 +330,7 @@ print(area_df, width = 200)
 rna_df
 
 all_df <- select(red_df, Gene_id, contains('Percent')) %>%
-  full_join(select(area_df, Gene_id, area_FC, Interval, contains('area')), by = 'Gene_id') %>%
+  full_join(select(area_df, Gene_id, Interval, contains('area')), by = 'Gene_id') %>%
   full_join(select(rna_df, Gene_id, MeanPercent), by = 'Gene_id')
 
 ## Add Vartiant Genes information
@@ -365,7 +368,7 @@ th_areaFC <- 1
 
 ## Set state for each gene and strain
 
-set_state <- function(df, outcol, redcol, areacol){
+set_state <- function(df, outcol, areacol){
   df <- df %>%
     mutate(outcol = case_when(
              !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
@@ -373,26 +376,33 @@ set_state <- function(df, outcol, redcol, areacol){
 
              Variant &
              MeanPercent >= th_rnapcnt &
-             (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
+             (MaxRedPercentDif < th_redpcnt | areaFC < th_areaFC) ~ 'Var_Active',
 
              Variant &
              MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
 
              Variant &
              MaxRedPercentDif >= th_redpcnt &
-             MaxAreaDif >= th_areadif &
-             abs(MaxArea_12B - MaxArea) <= abs(MaxArea_12B - MinArea) ~ 'Var_Active',
+             areaFC >= th_areaFC &
+             abs(areacol - MaxArea) <= abs(areacol - MinArea) ~ 'Var_Active',
 
              Variant &
              MaxRedPercentDif >= th_redpcnt &
-             MaxAreaDif >= th_areadif &
-             abs(MaxArea_12B - MaxArea) > abs(MaxArea_12B - MinArea) ~ 'Var_Respressed',
-
-             is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
+             areaFC >= th_areaFC &
+             abs(areacol - MaxArea) > abs(areacol - MinArea) ~ 'Var_Respressed',
+             
+             is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
 
              TRUE ~ 'Wrong!'))
   return(df)
 }
+
+x <- final_df
+
+set_state(x, 'state_12B', x$area_12B) %>%
+  print(width = 200)
+
+
 
 
 state_df <- final_df %>%
