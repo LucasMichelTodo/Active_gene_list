@@ -487,12 +487,12 @@ table(state_df$state_3D7B)
 table(state_df$state_12B)
 table(state_df$state_10G)
 
-write.csv(state_df, './Results_Tables/state_df_rna25_red30_area10.csv')
+write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
 
 print(state_df, width = 200)
 
 state_df %>%
-  filter(State_12B != State_10G) %>%
+  filter(state_12B != state_10G) %>%
   select(contains('12B'), contains('10G')) %>%
   write.csv('./Results_Tables/gens_dif12B_10G.csv')
 
@@ -500,8 +500,6 @@ state_df %>%
 state_df %>%
   filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200') %>%
   write.csv('./Results_Tables/clag_genes.csv')
-
-table(state_df$State_12B)
 #+END_SRC
 
 #+RESULTS:
