@@ -371,7 +371,7 @@ print(final_df, width = 200)
 th_rnapcnt <- 25
 th_redpcnt <- 25
 th_redrescue <- 40
-th_red_difpcnt <- 5
+th_red_difpcnt <- 0
 th_areaFC <- 1
 
 ## Set state for each gene and strain
@@ -435,7 +435,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 areaFC >= th_areaFC &
-                MaxRedPercentDif >= th_redpcnt &
+                MaxRedPercentDif >= th_red_difpcnt &
                 !! redcol >= th_redpcnt &
                 !! relcol == 'max' ~ 'Var_Active', # Variant, FC, redpcnt, max 
 
@@ -453,7 +453,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 areaFC >= th_areaFC &
-                MaxRedPercentDif >= th_redpcnt &
+                MaxRedPercentDif >= th_red_difpcnt &
                 !! redcol >= th_redpcnt &
                 !! relcol == 'min' ~ 'Var_Repressed', # Variant, FC, redpcnt, min 
 
