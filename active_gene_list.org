@@ -368,28 +368,36 @@ th_areaFC <- 1
 
 ## Set state for each gene and strain
 
+## Here we create a dplyr function. To be able to use variables (for colnames) we need
+## to use the special quote functions.
+## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
+## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
 set_state <- function(df, outcol, areacol){
+  
+  outcol <- enquo(outcol)
+  areacol <- enquo(areacol)
+
   df <- df %>%
-    mutate(outcol = case_when(
+    mutate(!! outcol := case_when(
              !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
              !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
-
+             
              Variant &
              MeanPercent >= th_rnapcnt &
              (MaxRedPercentDif < th_redpcnt | areaFC < th_areaFC) ~ 'Var_Active',
-
+             
              Variant &
              MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
-
+             
              Variant &
              MaxRedPercentDif >= th_redpcnt &
              areaFC >= th_areaFC &
-             abs(areacol - MaxArea) <= abs(areacol - MinArea) ~ 'Var_Active',
-
+             abs(!! areacol - MaxArea) <= abs(!! areacol - MinArea) ~ 'Var_Active',
+             
              Variant &
-             MaxRedPercentDif >= th_redpcnt &
-             areaFC >= th_areaFC &
-             abs(areacol - MaxArea) > abs(areacol - MinArea) ~ 'Var_Respressed',
+               MaxRedPercentDif >= th_redpcnt &
+               areaFC >= th_areaFC &
+               abs(!! areacol - MaxArea) > abs(!! areacol - MinArea) ~ 'Var_Respressed',
              
              is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
 
@@ -399,7 +407,7 @@ set_state <- function(df, outcol, areacol){
 
 x <- final_df
 
-set_state(x, 'state_12B', x$area_12B) %>%
+set_state(x, state_12B, area_12B) %>%
   print(width = 200)
 
 
