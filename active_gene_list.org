@@ -243,13 +243,20 @@ head(as.data.frame(area_df))
 4 14.52676 12.807814 13.401610 10.340803 14.78623  8.403034 6.562046 1.718950
 5       NA        NA        NA        NA       NA        NA       NA       NA
 6       NA        NA        NA        NA       NA        NA       NA       NA
-     DifMid DifSides Interval      Dif
-1 0.7861401 4.139719  DifLeft 5.220025
-2 2.4019733 4.425700 DifSides 4.425700
-3        NA       NA  DifLeft 5.262196
-4 3.0608067 6.383199  DifLeft 6.562046
-5        NA       NA  No Data       NA
-6        NA       NA  No Data       NA
+     DifMid DifSides Interval   MaxDif    areaFC  area_12B area_10G area_3D7B
+1 0.7861401 4.139719     Left 5.220025 0.3881060 30.592496 25.37247 25.484634
+2 2.4019733 4.425700    Sides 4.425700 0.3290483 12.622460 13.03616  8.610459
+3        NA       NA     Left 5.262196 0.3912413 18.322430 14.07113 19.333324
+4 3.0608067 6.383199     Left 6.562046 0.4878845  9.389247 13.66108  7.099032
+5        NA       NA  No Data       NA        NA        NA       NA        NA
+6        NA       NA  No Data       NA        NA        NA       NA        NA
+   MaxArea   MinArea
+1 30.59250 25.372470
+2 13.03616  8.610459
+3 19.33332 14.071128
+4 13.66108  7.099032
+5       NA        NA
+6       NA        NA
 #+end_example
 
 ** Load RNA-Seq Data
@@ -294,7 +301,6 @@ head(as.data.frame(rna_df))
 
 #+RESULTS:
 #+begin_example
-
         Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
 1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
 2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
@@ -370,6 +376,12 @@ th_areaFC <- 1
 
 ## Set state for each gene and strain
 
+## Here we create a couple of dplyr functions.
+##To be able to use variables (for colnames) we needto use the special quote functions.
+## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
+## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
+
+
 ## First create a col where we set categories for each gene according relative expression
 ## For each gene: gene-min----|---mid----|----gene-max
 
@@ -390,20 +402,19 @@ set_relexprs <- function(df, outcol, areacol){
     mutate(!! outcol := apply(select(., !! areacol, MaxArea, MinArea), 1, relexprs))
 }
 
-final_df %>%
+final_df <- final_df %>%
   set_relexprs(rel_12B, area_12B) %>%
-  print(width = 400)
+  set_relexprs(rel_10G, area_10G) %>%
+  set_relexprs(rel_3D7B, area_3D7B) 
 
+print(final_df, width = 200)
 
-## Here we create a dplyr function. To be able to use variables (for colnames) we need
-## to use the special quote functions.
-## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
-## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
-set_state <- function(df, statecol, redcol, areacol){
+## We now set each gene to it's state
+set_state <- function(df, statecol, redcol, relcol){
   
   statecol <- enquo(statecol)
   redcol <- enquo(redcol)
-  areacol <- enquo(areacol)
+  relcol <- enquo(relcol)
 
   df <- df %>%
     mutate(!! statecol := case_when(
@@ -420,121 +431,61 @@ set_state <- function(df, statecol, redcol, areacol){
                 Variant &
                 areaFC < th_areaFC &
                 MeanPercent < th_rnapcnt &
-                !! redcol >= th_redrescue ~ 'Var_Active', # noFCrescued
+                !! redcol >= th_redrescue ~ 'Var_Active', # noFC, rescued
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercentDif >= th_redpcnt &
                 !! redcol >= th_redpcnt &
-                cut(c(!! areacol, MinArea, MaxArea), 3, labels = labs)[1] == 'max' ~ 'Var_Active',
-               
+                !! relcol == 'max' ~ 'Var_Active', # Variant, FC, redpcnt, max 
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercentDif >= th_red_difpcnt &
+                !! redcol >= th_redpcnt &
+                !! relcol == 'mid' ~ 'Var_Semiactive', # Variant, FC, redpcnt, mid 
+
                 ## Var repressed
                 Variant &
                 areaFC < th_areaFC &
                 MeanPercent < th_rnapcnt &
-                !! redcol < th_redrescue ~ 'Var_Repressed', # noFC
+                !! redcol < th_redrescue ~ 'Var_Repressed', # noFC, noRescued
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercentDif >= th_redpcnt &
+                !! redcol >= th_redpcnt &
+                !! relcol == 'min' ~ 'Var_Repressed', # Variant, FC, redpcnt, min 
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercentDif >= th_red_difpcnt &
+                !! redcol < th_redpcnt ~ 'Var_Repressed', # Variant, FC, NOredpcnt 
 
                 ## Not settable
-                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
+                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable', 
 
                 TRUE ~ 'Wrong!'))
   return(df)
 }
 
 
-x <- final_df
-
-set_state(x, state_12B, area_12B) %>%
-  print(width = 200)
-
-
-x = c(2,8,6.1)
-cut(x, 3, labels=c('min', 'mid', 'max'))[3] == 'max'
-
-
-
 state_df <- final_df %>%
-  mutate(State_12B = case_when(
-           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
-           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
+  set_state(state_12B, Percent_12B, rel_12B) %>%
+  set_state(state_10G, Percent_10G, rel_10G) %>%
+  set_state(state_3D7B, Percent_3D7B, rel_3D7B)
 
-           Variant &
-           MeanPercent >= th_rnapcnt &
-           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
 
-           Variant &
-           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-           MaxAreaDif >= th_areadif &
-           abs(MaxArea_12B - MaxArea) <= abs(MaxArea_12B - MinArea) ~ 'Var_Active',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-           MaxAreaDif >= th_areadif &
-           abs(MaxArea_12B - MaxArea) > abs(MaxArea_12B - MinArea) ~ 'Var_Respressed',
-
-           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
-
-           TRUE ~ 'Wrong!')) %>%
-
-  mutate(State_10G = case_when(
-           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
-           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
-
-           Variant &
-           MeanPercent >= th_rnapcnt &
-           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
-
-           Variant &
-           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-           MaxAreaDif >= th_areadif &
-           abs(MaxArea_10G - MaxArea) <= abs(MaxArea_10G - MinArea) ~ 'Var_Active',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-           MaxAreaDif >= th_areadif &
-           abs(MaxArea_10G - MaxArea) > abs(MaxArea_10G - MinArea) ~ 'Var_Respressed',
-
-           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
-
-           TRUE ~ 'Wrong!')) %>% #
-
-  mutate(State_3D7B = case_when(
-           !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
-           !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
-
-           Variant &
-           MeanPercent >= th_rnapcnt &
-           (MaxRedPercentDif < th_redpcnt | MaxAreaDif < th_areadif) ~ 'Var_Active',
-
-           Variant &
-           MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-           MaxAreaDif >= th_areadif &
-           abs(MaxArea_3D7B - MaxArea) <= abs(MaxArea_3D7B - MinArea) ~ 'Var_Active',
-
-           Variant &
-           MaxRedPercentDif >= th_redpcnt &
-            MaxAreaDif >= th_areadif &
-           abs(MaxArea_3D7B - MaxArea) > abs(MaxArea_3D7B - MinArea) ~ 'Var_Respressed',
-
-           is.na(MaxAreaDif) | is.na(MeanPercent) ~ 'Not_settable',
-
-           TRUE ~ 'Wrong!')) # Check all rows are set.
+state_df %>%
+  filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
+  print(width = 200)
 
 ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
 ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
 
-table(state_df$State_3D7B)
-table(state_df$State_12B)
-table(state_df$State_10G)
+table(state_df$state_3D7B)
+table(state_df$state_12B)
+table(state_df$state_10G)
 
 write.csv(state_df, './Results_Tables/state_df_rna25_red30_area10.csv')
 
