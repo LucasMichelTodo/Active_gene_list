@@ -364,52 +364,92 @@ print(final_df, width = 200)
 
 th_rnapcnt <- 25
 th_redpcnt <- 25
+th_redrescue <- 40
+th_red_difpcnt <- 5
 th_areaFC <- 1
 
 ## Set state for each gene and strain
+
+## First create a col where we set categories for each gene according relative expression
+## For each gene: gene-min----|---mid----|----gene-max
+
+relexprs <- function(vect){
+  if (any(is.na(vect))){
+    return(NA)
+  } else {
+    labs = c('min', 'mid', 'max')
+    lab <- cut(vect, 3, labels = labs)[1]
+    return(as.character(lab))
+  }
+}
+
+set_relexprs <- function(df, outcol, areacol){
+  outcol <- enquo(outcol)
+  areacol <- enquo(areacol)
+  df %>%
+    mutate(!! outcol := apply(select(., !! areacol, MaxArea, MinArea), 1, relexprs))
+}
+
+final_df %>%
+  set_relexprs(rel_12B, area_12B) %>%
+  print(width = 400)
+
 
 ## Here we create a dplyr function. To be able to use variables (for colnames) we need
 ## to use the special quote functions.
 ## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
 ## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
-set_state <- function(df, outcol, areacol){
+set_state <- function(df, statecol, redcol, areacol){
   
-  outcol <- enquo(outcol)
+  statecol <- enquo(statecol)
+  redcol <- enquo(redcol)
   areacol <- enquo(areacol)
 
   df <- df %>%
-    mutate(!! outcol := case_when(
-             !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
-             !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
-             
-             Variant &
-             MeanPercent >= th_rnapcnt &
-             (MaxRedPercentDif < th_redpcnt | areaFC < th_areaFC) ~ 'Var_Active',
-             
-             Variant &
-             MeanPercent < th_rnapcnt  ~ 'Var_Inactive',
-             
-             Variant &
-             MaxRedPercentDif >= th_redpcnt &
-             areaFC >= th_areaFC &
-             abs(!! areacol - MaxArea) <= abs(!! areacol - MinArea) ~ 'Var_Active',
-             
-             Variant &
-               MaxRedPercentDif >= th_redpcnt &
-               areaFC >= th_areaFC &
-               abs(!! areacol - MaxArea) > abs(!! areacol - MinArea) ~ 'Var_Respressed',
-             
-             is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
+    mutate(!! statecol := case_when(
+                ## Actiu
+                !Variant & MeanPercent >= th_rnapcnt ~ 'Active',
+                ## Inactiu
+                !Variant & MeanPercent < th_rnapcnt ~ 'Inactive',
 
-             TRUE ~ 'Wrong!'))
+                ## Var actiu
+                Variant &
+                areaFC < th_areaFC &
+                MeanPercent >= th_rnapcnt ~ 'Var_Active', # noFC
+
+                Variant &
+                areaFC < th_areaFC &
+                MeanPercent < th_rnapcnt &
+                !! redcol >= th_redrescue ~ 'Var_Active', # noFCrescued
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercentDif >= th_redpcnt &
+                !! redcol >= th_redpcnt &
+                cut(c(!! areacol, MinArea, MaxArea), 3, labels = labs)[1] == 'max' ~ 'Var_Active',
+               
+                ## Var repressed
+                Variant &
+                areaFC < th_areaFC &
+                MeanPercent < th_rnapcnt &
+                !! redcol < th_redrescue ~ 'Var_Repressed', # noFC
+
+                ## Not settable
+                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
+
+                TRUE ~ 'Wrong!'))
   return(df)
 }
+
 
 x <- final_df
 
 set_state(x, state_12B, area_12B) %>%
   print(width = 200)
 
+
+x = c(2,8,6.1)
+cut(x, 3, labels=c('min', 'mid', 'max'))[3] == 'max'
 
 
 
