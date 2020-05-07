@@ -15,9 +15,23 @@
 :PROPERTIES:
 :header-args:R: :session active_gene_lists
 :header-args:R+: :exports results
+:header-args:R+: :results output
 :END:
-Red Signal
-#+BEGIN_SRC R :results output :session active_gene_lists
+
+Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
+We will define 5 possible expresion states:
+- Active
+  - Regular
+  - Variant Active
+  - Variant Repressed
+- Inactive
+- Not-Settable
+
+** Microarray Data: Red Signal
+We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
+
+Red Signal DataFrame
+#+BEGIN_SRC R 
 head(as.data.frame(red_df))
 #+END_SRC
 
@@ -38,20 +52,175 @@ head(as.data.frame(red_df))
 5    1.115561    0.5911518        0.5244088
 6    2.002288    2.2501907        2.1929825
 #+end_example
+
+** Microarray Data: Areas
+We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
+
+Areas DataFrame
+#+BEGIN_SRC R 
+head(as.data.frame(area_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id     l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
+1          mal_mito_3 30.592496 61.080128 49.676556 41.99607 25.372470 62.38873
+2 MAL13P1.415_oldname  5.423269  8.488971  1.289779 12.62246  6.117132 10.59524
+3  MAL13P1.65_oldname 18.322430        NA 17.593468       NA 14.071128       NA
+4  MAL7P1.142_oldname  9.389247 12.807814 10.340803 11.85626 13.661078 14.52676
+5  MAL8P1.310_oldname        NA        NA        NA       NA        NA       NA
+6   MAL8P1.90_oldname        NA        NA        NA       NA        NA       NA
+      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B   MaxLeft   MinLeft
+1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349 30.592496 25.372470
+2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459  6.117132  1.789873
+3        NA       NA 19.333324       NA        NA        NA 19.333324 14.071128
+4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034 13.661078  7.099032
+5        NA       NA        NA       NA        NA        NA        NA        NA
+6        NA       NA        NA       NA        NA        NA        NA        NA
+  MaxRight  MinRight    MaxMid    MinMid MaxSides  MinSides  DifLeft DifRight
+1 62.83441 61.080128 50.462696 49.676556 41.99607 37.856349 5.220025 1.754283
+2 10.59524  8.488971  3.691753  1.289779 13.03616  8.610459 4.327259 2.106274
+3       NA        NA        NA        NA       NA        NA 5.262196       NA
+4 14.52676 12.807814 13.401610 10.340803 14.78623  8.403034 6.562046 1.718950
+5       NA        NA        NA        NA       NA        NA       NA       NA
+6       NA        NA        NA        NA       NA        NA       NA       NA
+     DifMid DifSides Interval   MaxDif    areaFC  area_12B area_10G area_3D7B
+1 0.7861401 4.139719     Left 5.220025 0.3881060 30.592496 25.37247 25.484634
+2 2.4019733 4.425700    Sides 4.425700 0.3290483 12.622460 13.03616  8.610459
+3        NA       NA     Left 5.262196 0.3912413 18.322430 14.07113 19.333324
+4 3.0608067 6.383199     Left 6.562046 0.4878845  9.389247 13.66108  7.099032
+5        NA       NA  No Data       NA        NA        NA       NA        NA
+6        NA       NA  No Data       NA        NA        NA       NA        NA
+   MaxArea   MinArea
+1 30.59250 25.372470
+2 13.03616  8.610459
+3 19.33332 14.071128
+4 13.66108  7.099032
+5       NA        NA
+6       NA        NA
+#+end_example
+
+** Load RNA-Seq Data
+We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
+All data-sets are from RNA-Seq studies in the 3D7 strain.
+We are using 4 different data-sets:
+- Otto et.al.
+- Hoeijmakers et.al.
+- Toenhake et.al.
+- Bartfai et.al.
+
+RNA-Seq DataFrame
+#+BEGIN_SRC R 
+head(as.data.frame(rna_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+        Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
+1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
+2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
+3 PF3D7_0100300        34.2         8.7         7.7         7.4      14.500
+4 PF3D7_0100400        50.3        18.3        11.3        37.4      29.325
+5 PF3D7_0100500        49.7        11.4        14.0        32.5      26.900
+6 PF3D7_0100600        18.5         7.8         2.3        12.1      10.175
+  StdDevPercent
+1     11.546942
+2      9.241313
+3     11.383980
+4     15.424068
+5     15.474657
+6      5.930167
+#+end_example
+
+We plot the standard deviation of the percentile values among different studies and we can see that for the vast majority of genes it doesn't go above 10.
+#+BEGIN_SRC R :file ./Plots/rnaseq_perc_sd.png :exports results :results output graphics
+p <- ggplot(rna_df, aes(x=StdDevPercent)) +
+  geom_histogram() +
+  ggtitle("SD of Percent value (among different studies)")
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/rnaseq_perc_sd.png]]
+** Create Lists according to thresholds
+
+Now that we have all the data loaded in, we can star to set labels for each gene.
+
+We have set the following thresholds:
+- (rna_pcnt) RNA-Seq mean percentile: 25% 
+- (red_pcnt) Red Signal Percentile (by sample): 25%
+- (red_rescue) Red Signal Percentile (by sample) for "rescuing": 40%
+- (red_dif) Red Signal percentile diference: 0 (we are currently not using it but it is set, just in case)
+- (area_fc) Area log2 Fold-Change: 1
+
+In addition to these thresholds we will use 2 more columns to set the categories:
+- Variant: a column stating if gene is variant/non-variant
+- Relative Expression: a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
+
+We will have the following categories with the following logic:
+
+- Active :
+
+  - Regular
+    1. Non-Variant
+    2. > rna_pcnt
+
+  - Variant Active
+    - Case 1 (no area_fc):
+      1. Variant
+      2. < area_fc
+      3. > rna_pcnt
+    - Case 2 (no area_fc, rescued):
+      1. Variant
+      2. < area_fc
+      3. < rna_pcnt
+      4. > red_rescue
+    - Case 3 (area_fc, max):
+      1. Variant
+      2. > area_fc
+      3. > red_dif
+      4. > red_pcnt
+      5. rel_exprs = max
+    - Case 4 (area_fc, mid):
+      1. Variant
+      2. > area_fc
+      3. > red_dif
+      4. > red_pcnt
+      5. rel_exprs = mid
+
+  - Variant Repressed:
+    - Case 1 (no area_fc, no rescue):
+      1. Variant
+      2. < area_fc
+      3. < rna_pcnt
+      4. < red_rescue
+    - Case 2 (area_fc, rel_exprs = mid)
+      1. Variant
+      2. > area_fc
+      3. > red_dif
+      4. > red_pcnt
+      5. rel_exprs = min
+    - Case 3 (area_fc, low red_pcnt)
+      1. Variant
+      2. > area_fc
+      3. > red_dif
+      4. < red_pcnt
+
+- Inactive:
+  1. Non-Variant
+  2. < rna_pcnt
+
+- Not Settable:
+  1. area_fc OR rna_pcnt are not set (NA).
+
+
 * Code
 :PROPERTIES:
 :header-args:R: :session active_gene_lists
 :header-args:R+: :tangle ./Scripts/active_gene_list.R
-:header-args:R+: :exports results
+:header-args:R+: :results none
 :END:
-
-Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
-We will define 4 possible expresion states:
-- Active
-  - Regular
-  - Variant Active
-  - Variant Repressed
-- Inactive
 
 ** Load Packages and functions
 #+BEGIN_SRC R :results none
@@ -74,9 +243,7 @@ max_dif <- function(vect){
 }
 #+END_SRC
 ** Microarray Data: Red Signal
-We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
-#+name: red_df
 #+BEGIN_SRC R :results none
 #### Red Signal DF ####
 
@@ -112,33 +279,7 @@ red_df <- red_df %>%
 
 print(red_df, width = 200)
 #+END_SRC
-
-Red Signal DataFrame
-#+BEGIN_SRC R :results output
-head(as.data.frame(red_df))
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-              Gene_id     Red_12B     Red_10G    Red_3D7B Percent_12B
-1          mal_mito_3 22579.33333 36436.73333 30636.82500  96.0335622
-2 MAL13P1.415_oldname   770.82083   702.22292   640.11667  21.3196034
-3  MAL13P1.65_oldname   111.33333    87.05833    91.05833   6.2166285
-4  MAL7P1.142_oldname  5924.44167  5194.40000  5114.63333  75.4767353
-5  MAL8P1.310_oldname    37.21250    35.37917    33.24167   0.8581236
-6   MAL8P1.90_oldname    80.55417    46.18333    54.64167   4.1952708
-  Percent_10G Percent_3D7B MaxRedPercentDif
-1   98.474447   97.8832952        2.4408848
-2   20.861937   18.4591915        2.8604119
-3    5.053394    4.5194508        1.6971777
-4   72.444699   71.7200610        3.7566743
-5    1.115561    0.5911518        0.5244088
-6    2.002288    2.2501907        2.1929825
-#+end_example
-
 ** Microarray Data: Areas
-We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
-
 #+BEGIN_SRC R :results none
 #### Areas DF ####
 
@@ -242,59 +383,7 @@ area_df <- area_df %>%
 
 print(area_df, width = 400)
 #+END_SRC
-
-Areas DataFrame
-#+BEGIN_SRC R :results output
-head(as.data.frame(area_df))
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-              Gene_id     l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
-1          mal_mito_3 30.592496 61.080128 49.676556 41.99607 25.372470 62.38873
-2 MAL13P1.415_oldname  5.423269  8.488971  1.289779 12.62246  6.117132 10.59524
-3  MAL13P1.65_oldname 18.322430        NA 17.593468       NA 14.071128       NA
-4  MAL7P1.142_oldname  9.389247 12.807814 10.340803 11.85626 13.661078 14.52676
-5  MAL8P1.310_oldname        NA        NA        NA       NA        NA       NA
-6   MAL8P1.90_oldname        NA        NA        NA       NA        NA       NA
-      m_10G    s_10G    l_3D7B   r_3D7B    m_3D7B    s_3D7B   MaxLeft   MinLeft
-1 49.805504 37.95570 25.484634 62.83441 50.462696 37.856349 30.592496 25.372470
-2  3.676218 13.03616  1.789873 10.51234  3.691753  8.610459  6.117132  1.789873
-3        NA       NA 19.333324       NA        NA        NA 19.333324 14.071128
-4 13.401610 14.78623  7.099032 13.34518 12.041177  8.403034 13.661078  7.099032
-5        NA       NA        NA       NA        NA        NA        NA        NA
-6        NA       NA        NA       NA        NA        NA        NA        NA
-  MaxRight  MinRight    MaxMid    MinMid MaxSides  MinSides  DifLeft DifRight
-1 62.83441 61.080128 50.462696 49.676556 41.99607 37.856349 5.220025 1.754283
-2 10.59524  8.488971  3.691753  1.289779 13.03616  8.610459 4.327259 2.106274
-3       NA        NA        NA        NA       NA        NA 5.262196       NA
-4 14.52676 12.807814 13.401610 10.340803 14.78623  8.403034 6.562046 1.718950
-5       NA        NA        NA        NA       NA        NA       NA       NA
-6       NA        NA        NA        NA       NA        NA       NA       NA
-     DifMid DifSides Interval   MaxDif    areaFC  area_12B area_10G area_3D7B
-1 0.7861401 4.139719     Left 5.220025 0.3881060 30.592496 25.37247 25.484634
-2 2.4019733 4.425700    Sides 4.425700 0.3290483 12.622460 13.03616  8.610459
-3        NA       NA     Left 5.262196 0.3912413 18.322430 14.07113 19.333324
-4 3.0608067 6.383199     Left 6.562046 0.4878845  9.389247 13.66108  7.099032
-5        NA       NA  No Data       NA        NA        NA       NA        NA
-6        NA       NA  No Data       NA        NA        NA       NA        NA
-   MaxArea   MinArea
-1 30.59250 25.372470
-2 13.03616  8.610459
-3 19.33332 14.071128
-4 13.66108  7.099032
-5       NA        NA
-6       NA        NA
-#+end_example
-
 ** Load RNA-Seq Data
-We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
-All data-sets are from RNA-Seq studies in the 3D7 strain.
-We are using 4 different data-sets:
-- Otto et.al.
-- Hoeijmakers et.al.
-- Toenhake et.al.
-- Bartfai et.al.
 
 #+BEGIN_SRC R :results none
 #### Load Data-Sets ####
@@ -323,40 +412,6 @@ rna_df <- rna_df %>%
 print(rna_df, width=200)
 #+END_SRC
 
-#+BEGIN_SRC R :results output
-head(as.data.frame(rna_df))
-#+END_SRC
-
-#+RESULTS:
-#+begin_example
-        Gene_id MaxPercOtto MaxPercHoej MaxPercToen MaxPercBart MeanPercent
-1 PF3D7_0100100        57.2        54.3        33.9        31.7      44.275
-2 PF3D7_0100200        29.4        50.5        26.6        36.0      35.625
-3 PF3D7_0100300        34.2         8.7         7.7         7.4      14.500
-4 PF3D7_0100400        50.3        18.3        11.3        37.4      29.325
-5 PF3D7_0100500        49.7        11.4        14.0        32.5      26.900
-6 PF3D7_0100600        18.5         7.8         2.3        12.1      10.175
-  StdDevPercent
-1     11.546942
-2      9.241313
-3     11.383980
-4     15.424068
-5     15.474657
-6      5.930167
-#+end_example
-
-We plot the standard deviation of the percentile values among different studies and we can see that for the vast majority of genes it doesn't go above 10.
-#+BEGIN_SRC R :file ./Plots/rnaseq_perc_sd.png :exports results :results output graphics
-p <- ggplot(rna_df, aes(x=StdDevPercent)) +
-  geom_histogram() +
-  ggtitle("SD of Percent value (among different studies)")
-
-print(p)
-#+END_SRC
-
-#+RESULTS:
-[[file:./Plots/rnaseq_perc_sd.png]]
-
 ** Create Join DF
 #+BEGIN_SRC R :results none
 red_df
@@ -378,21 +433,7 @@ final_df <- cvg %>%
 
 print(final_df, width = 200)
 #+END_SRC
-
-#+RESULTS:
-: org_babel_R_eoe
-
 ** Create Lists according to thresholds
-
-Now that we have all the data loaded in, we can star to set labels for each gene.
-
-We will jhave the following categories:
-- Active : Mean percentile (from rna-seq experiments) >= 25%
-  - Regular : Non-variant according to our variant genes list.
-  - Variant Active: Variant according to our variant genes list.
-  - Variant Repressed: Variant and red signal percentile differnce > 30% and area diffrence > 1 (~2FC)
-
-- Inactive: Mean percentile (from rna-seq experiments) < 25%
 #+BEGIN_SRC R
 print(final_df, width = 200)
 
@@ -529,5 +570,3 @@ state_df %>%
   filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200') %>%
   write.csv('./Results_Tables/clag_genes.csv')
 #+END_SRC
-
-#+RESULTS:
