@@ -1,4 +1,4 @@
-% Created 2020-05-07 jue 11:04
+% Created 2020-05-07 jue 12:00
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -32,9 +32,9 @@
 
 
 \section{Active/Inactive Gene lists}
-\label{sec:org3f14d4c}
+\label{sec:orgb7f7728}
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
-We will define 4 possible expresion states:
+We will define 5 possible expresion states:
 \begin{itemize}
 \item Active
 \begin{itemize}
@@ -43,10 +43,11 @@ We will define 4 possible expresion states:
 \item Variant Repressed
 \end{itemize}
 \item Inactive
+\item Not-Settable
 \end{itemize}
 
 \subsection{Microarray Data: Red Signal}
-\label{sec:org01c354a}
+\label{sec:org971d93b}
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
@@ -68,7 +69,7 @@ Red Signal DataFrame
 \end{verbatim}
 
 \subsection{Microarray Data: Areas}
-\label{sec:org653972a}
+\label{sec:orgc7979cb}
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
@@ -111,7 +112,7 @@ Areas DataFrame
 \end{verbatim}
 
 \subsection{Load RNA-Seq Data}
-\label{sec:org8657e6b}
+\label{sec:org6c5afe8}
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
@@ -144,45 +145,177 @@ We plot the standard deviation of the percentile values among different studies 
 \begin{center}
 \includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
 \end{center}
+\subsection{Create table for classification}
+\label{sec:org40939d6}
+Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
+
+Final DataFrame
+\begin{verbatim}
+              Gene_id Variant Percent_12B Percent_10G Percent_3D7B
+1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
+2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
+3  MAL13P1.65_oldname   FALSE   6.2166285    5.053394    4.5194508
+4  MAL7P1.142_oldname   FALSE  75.4767353   72.444699   71.7200610
+5  MAL8P1.310_oldname   FALSE   0.8581236    1.115561    0.5911518
+6   MAL8P1.90_oldname   FALSE   4.1952708    2.002288    2.2501907
+  MaxRedPercentDif Interval    areaFC  area_12B area_10G area_3D7B  MaxArea
+1        2.4408848     Left 0.3881060 30.592496 25.37247 25.484634 30.59250
+2        2.8604119    Sides 0.3290483 12.622460 13.03616  8.610459 13.03616
+3        1.6971777     Left 0.3912413 18.322430 14.07113 19.333324 19.33332
+4        3.7566743     Left 0.4878845  9.389247 13.66108  7.099032 13.66108
+5        0.5244088  No Data        NA        NA       NA        NA       NA
+6        2.1929825  No Data        NA        NA       NA        NA       NA
+    MinArea MeanPercent rel_12B rel_10G rel_3D7B
+1 25.372470      95.975     max     min      min
+2  8.610459          NA     max     max      min
+3 14.071128          NA     max     min      max
+4  7.099032          NA     mid     max      min
+5        NA          NA      NA      NA       NA
+6        NA          NA      NA      NA       NA
+\end{verbatim}
+
 \subsection{Create Lists according to thresholds}
-\label{sec:org619cff9}
+\label{sec:org3698ebe}
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
-We will jhave the following categories:
+We have set the following thresholds:
 \begin{itemize}
-\item Active : Mean percentile (from rna-seq experiments) >= 25\%
-\begin{itemize}
-\item Regular : Non-variant according to our variant genes list.
-\item Variant Active: Variant according to our variant genes list.
-\item Variant Repressed: Variant and red signal percentile differnce > 30\% and area diffrence > 1 (\textasciitilde{}2FC)
+\item (rna\_pcnt) RNA-Seq mean percentile: 25\%
+\item (red\_pcnt) Red Signal Percentile (by sample): 25\%
+\item (red\_rescue) Red Signal Percentile (by sample) for "rescuing": 40\%
+\item (red\_dif) Red Signal percentile diference: 0 (we are currently not using it but it is set, just in case)
+\item (area\_fc) Area log2 Fold-Change: 1
 \end{itemize}
 
-\item Inactive: Mean percentile (from rna-seq experiments) < 25\%
+In addition to these thresholds we will use 2 more columns to set the categories:
+\begin{itemize}
+\item Variant: a column stating if gene is variant/non-variant
+\item Relative Expression (by strain): a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
 \end{itemize}
 
-th\_rnapcnt <- 25
-th\_redpcnt <- 25
-th\_redrescue <- 40
-th\_red\_difpcnt <- 0
-th\_areaFC <- 1
+We will have the following categories with the following logic:
 
-\section{Code}
-\label{sec:org586b077}
-Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
-We will define 4 possible expresion states:
 \begin{itemize}
-\item Active
+\item Active :
+
 \begin{itemize}
 \item Regular
+\begin{enumerate}
+\item Non-Variant
+\item > rna\_pcnt
+\end{enumerate}
+
 \item Variant Active
-\item Variant Repressed
-\end{itemize}
-\item Inactive
+\begin{itemize}
+\item Case 1 (no area\_fc):
+\begin{enumerate}
+\item Variant
+\item < area\_fc
+\item > rna\_pcnt
+\end{enumerate}
+\item Case 2 (no area\_fc, rescued):
+\begin{enumerate}
+\item Variant
+\item < area\_fc
+\item < rna\_pcnt
+\item > red\_rescue
+\end{enumerate}
+\item Case 3 (area\_fc, max):
+\begin{enumerate}
+\item Variant
+\item > area\_fc
+\item > red\_dif
+\item > red\_pcnt
+\item rel\_exprs = max
+\end{enumerate}
+\item Case 4 (area\_fc, mid):
+\begin{enumerate}
+\item Variant
+\item > area\_fc
+\item > red\_dif
+\item > red\_pcnt
+\item rel\_exprs = mid
+\end{enumerate}
 \end{itemize}
 
+\item Variant Repressed:
+\begin{itemize}
+\item Case 1 (no area\_fc, no rescue):
+\begin{enumerate}
+\item Variant
+\item < area\_fc
+\item < rna\_pcnt
+\item < red\_rescue
+\end{enumerate}
+\item Case 2 (area\_fc, rel\_exprs = mid)
+\begin{enumerate}
+\item Variant
+\item > area\_fc
+\item > red\_dif
+\item > red\_pcnt
+\item rel\_exprs = min
+\end{enumerate}
+\item Case 3 (area\_fc, low red\_pcnt)
+\begin{enumerate}
+\item Variant
+\item > area\_fc
+\item > red\_dif
+\item < red\_pcnt
+\end{enumerate}
+\end{itemize}
+\end{itemize}
+
+\item Inactive:
+\begin{enumerate}
+\item Non-Variant
+\item < rna\_pcnt
+\end{enumerate}
+
+\item Not Settable:
+\begin{enumerate}
+\item area\_fc OR rna\_pcnt are not set (NA).
+\end{enumerate}
+\end{itemize}
+
+Using these classification logic we get the following table:
+
+Gene-State DataFrame
+\begin{verbatim}
+              Gene_id Variant Percent_12B Percent_10G Percent_3D7B
+1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
+2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
+3  MAL13P1.65_oldname   FALSE   6.2166285    5.053394    4.5194508
+4  MAL7P1.142_oldname   FALSE  75.4767353   72.444699   71.7200610
+5  MAL8P1.310_oldname   FALSE   0.8581236    1.115561    0.5911518
+6   MAL8P1.90_oldname   FALSE   4.1952708    2.002288    2.2501907
+  MaxRedPercentDif Interval    areaFC  area_12B area_10G area_3D7B  MaxArea
+1        2.4408848     Left 0.3881060 30.592496 25.37247 25.484634 30.59250
+2        2.8604119    Sides 0.3290483 12.622460 13.03616  8.610459 13.03616
+3        1.6971777     Left 0.3912413 18.322430 14.07113 19.333324 19.33332
+4        3.7566743     Left 0.4878845  9.389247 13.66108  7.099032 13.66108
+5        0.5244088  No Data        NA        NA       NA        NA       NA
+6        2.1929825  No Data        NA        NA       NA        NA       NA
+    MinArea MeanPercent rel_12B rel_10G rel_3D7B    state_12B    state_10G
+1 25.372470      95.975     max     min      min       Active       Active
+2  8.610459          NA     max     max      min Not_settable Not_settable
+3 14.071128          NA     max     min      max Not_settable Not_settable
+4  7.099032          NA     mid     max      min Not_settable Not_settable
+5        NA          NA      NA      NA       NA Not_settable Not_settable
+6        NA          NA      NA      NA       NA Not_settable Not_settable
+    state_3D7B
+1       Active
+2 Not_settable
+3 Not_settable
+4 Not_settable
+5 Not_settable
+6 Not_settable
+\end{verbatim}
+
+\section{Code}
+\label{sec:orgc1172ce}
 \subsection{Load Packages and functions}
-\label{sec:orgac7187e}
+\label{sec:orgf8726c9}
 \begin{minted}[]{r}
 #### Imports ####
 
@@ -203,8 +336,7 @@ max_dif <- function(vect){
 }
 \end{minted}
 \subsection{Microarray Data: Red Signal}
-\label{sec:org806235c}
-We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
+\label{sec:orgcf7f3c9}
 
 \begin{minted}[]{r}
 #### Red Signal DF ####
@@ -241,16 +373,8 @@ red_df <- red_df %>%
 
 print(red_df, width = 200)
 \end{minted}
-
-Red Signal DataFrame
-\begin{minted}[]{r}
-head(as.data.frame(red_df))
-\end{minted}
-
 \subsection{Microarray Data: Areas}
-\label{sec:orge01dae2}
-We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
-
+\label{sec:org1da4b99}
 \begin{minted}[]{r}
 #### Areas DF ####
 
@@ -354,23 +478,8 @@ area_df <- area_df %>%
 
 print(area_df, width = 400)
 \end{minted}
-
-Areas DataFrame
-\begin{minted}[]{r}
-head(as.data.frame(area_df))
-\end{minted}
-
 \subsection{Load RNA-Seq Data}
-\label{sec:orgf9833ca}
-We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
-All data-sets are from RNA-Seq studies in the 3D7 strain.
-We are using 4 different data-sets:
-\begin{itemize}
-\item Otto et.al.
-\item Hoeijmakers et.al.
-\item Toenhake et.al.
-\item Bartfai et.al.
-\end{itemize}
+\label{sec:org75b23b3}
 
 \begin{minted}[]{r}
 #### Load Data-Sets ####
@@ -399,17 +508,8 @@ rna_df <- rna_df %>%
 print(rna_df, width=200)
 \end{minted}
 
-\begin{minted}[]{r}
-head(as.data.frame(rna_df))
-\end{minted}
-
-We plot the standard deviation of the percentile values among different studies and we can see that for the vast majority of genes it doesn't go above 10.
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
-\end{center}
-
 \subsection{Create Join DF}
-\label{sec:orgbd15704}
+\label{sec:orgf5a24b2}
 \begin{minted}[]{r}
 red_df
 print(area_df, width = 200)
@@ -429,36 +529,8 @@ final_df <- cvg %>%
   mutate(Variant = recode(Variant, YES = TRUE, NO = FALSE, .missing = FALSE))
 
 print(final_df, width = 200)
-\end{minted}
 
-\subsection{Create Lists according to thresholds}
-\label{sec:orgd7a28e3}
-
-Now that we have all the data loaded in, we can star to set labels for each gene.
-
-We will jhave the following categories:
-\begin{itemize}
-\item Active : Mean percentile (from rna-seq experiments) >= 25\%
-\begin{itemize}
-\item Regular : Non-variant according to our variant genes list.
-\item Variant Active: Variant according to our variant genes list.
-\item Variant Repressed: Variant and red signal percentile differnce > 30\% and area diffrence > 1 (\textasciitilde{}2FC)
-\end{itemize}
-
-\item Inactive: Mean percentile (from rna-seq experiments) < 25\%
-\end{itemize}
-\begin{minted}[]{r}
-print(final_df, width = 200)
-
-th_rnapcnt <- 25
-th_redpcnt <- 25
-th_redrescue <- 40
-th_red_difpcnt <- 0
-th_areaFC <- 1
-
-## Set state for each gene and strain
-
-## Here we create a couple of dplyr functions.
+## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
 ## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
 ## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
@@ -490,8 +562,23 @@ final_df <- final_df %>%
   set_relexprs(rel_3D7B, area_3D7B)
 
 print(final_df, width = 200)
+\end{minted}
+\subsection{Create Lists according to thresholds}
+\label{sec:org76cdbb5}
+\begin{minted}[]{r}
+print(final_df, width = 200)
 
-## We now set each gene to it's state
+th_rnapcnt <- 25
+th_redpcnt <- 25
+th_redrescue <- 40
+th_red_difpcnt <- 0
+th_areaFC <- 1
+
+## Here we create a dplyr function.
+##To be able to use variables (for colnames) we needto use the special quote functions.
+## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
+## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
+
 set_state <- function(df, statecol, redcol, relcol){
 
   statecol <- enquo(statecol)
@@ -548,22 +635,24 @@ set_state <- function(df, statecol, redcol, relcol){
                 is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
 
                 TRUE ~ 'Wrong!'))
+
+  ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
+  ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
+
   return(df)
 }
 
+## We now set each gene to it's state
 
 state_df <- final_df %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
   set_state(state_3D7B, Percent_3D7B, rel_3D7B)
 
-
+## We check no rows are set to "Wrong!"
 state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
   print(width = 200)
-
-## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
-## Here we use it to make sure all rows are set (no "Wrong!" appearing)
 
 table(state_df$state_3D7B)
 table(state_df$state_12B)

@@ -143,6 +143,44 @@ print(p)
 
 #+RESULTS:
 [[file:./Plots/rnaseq_perc_sd.png]]
+** TODO Create table for classification
+(Explanation of max/mid/min)
+Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
+
+Final DataFrame
+#+BEGIN_SRC R 
+## NA's dont print well when in a "character" col.
+x <- final_df %>%
+  replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
+
+head(as.data.frame(x))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id Variant Percent_12B Percent_10G Percent_3D7B
+1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
+2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
+3  MAL13P1.65_oldname   FALSE   6.2166285    5.053394    4.5194508
+4  MAL7P1.142_oldname   FALSE  75.4767353   72.444699   71.7200610
+5  MAL8P1.310_oldname   FALSE   0.8581236    1.115561    0.5911518
+6   MAL8P1.90_oldname   FALSE   4.1952708    2.002288    2.2501907
+  MaxRedPercentDif Interval    areaFC  area_12B area_10G area_3D7B  MaxArea
+1        2.4408848     Left 0.3881060 30.592496 25.37247 25.484634 30.59250
+2        2.8604119    Sides 0.3290483 12.622460 13.03616  8.610459 13.03616
+3        1.6971777     Left 0.3912413 18.322430 14.07113 19.333324 19.33332
+4        3.7566743     Left 0.4878845  9.389247 13.66108  7.099032 13.66108
+5        0.5244088  No Data        NA        NA       NA        NA       NA
+6        2.1929825  No Data        NA        NA       NA        NA       NA
+    MinArea MeanPercent rel_12B rel_10G rel_3D7B
+1 25.372470      95.975     max     min      min
+2  8.610459          NA     max     max      min
+3 14.071128          NA     max     min      max
+4  7.099032          NA     mid     max      min
+5        NA          NA      NA      NA       NA
+6        NA          NA      NA      NA       NA
+#+end_example
+
 ** Create Lists according to thresholds
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
@@ -156,7 +194,7 @@ We have set the following thresholds:
 
 In addition to these thresholds we will use 2 more columns to set the categories:
 - Variant: a column stating if gene is variant/non-variant
-- Relative Expression: a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
+- Relative Expression (by strain): a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
 
 We will have the following categories with the following logic:
 
@@ -214,6 +252,47 @@ We will have the following categories with the following logic:
 - Not Settable:
   1. area_fc OR rna_pcnt are not set (NA).
 
+Using these classification logic we get the following table:
+
+Gene-State DataFrame
+#+BEGIN_SRC R 
+x <- state_df %>%
+  replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
+
+head(as.data.frame(x))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id Variant Percent_12B Percent_10G Percent_3D7B
+1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
+2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
+3  MAL13P1.65_oldname   FALSE   6.2166285    5.053394    4.5194508
+4  MAL7P1.142_oldname   FALSE  75.4767353   72.444699   71.7200610
+5  MAL8P1.310_oldname   FALSE   0.8581236    1.115561    0.5911518
+6   MAL8P1.90_oldname   FALSE   4.1952708    2.002288    2.2501907
+  MaxRedPercentDif Interval    areaFC  area_12B area_10G area_3D7B  MaxArea
+1        2.4408848     Left 0.3881060 30.592496 25.37247 25.484634 30.59250
+2        2.8604119    Sides 0.3290483 12.622460 13.03616  8.610459 13.03616
+3        1.6971777     Left 0.3912413 18.322430 14.07113 19.333324 19.33332
+4        3.7566743     Left 0.4878845  9.389247 13.66108  7.099032 13.66108
+5        0.5244088  No Data        NA        NA       NA        NA       NA
+6        2.1929825  No Data        NA        NA       NA        NA       NA
+    MinArea MeanPercent rel_12B rel_10G rel_3D7B    state_12B    state_10G
+1 25.372470      95.975     max     min      min       Active       Active
+2  8.610459          NA     max     max      min Not_settable Not_settable
+3 14.071128          NA     max     min      max Not_settable Not_settable
+4  7.099032          NA     mid     max      min Not_settable Not_settable
+5        NA          NA      NA      NA       NA Not_settable Not_settable
+6        NA          NA      NA      NA       NA Not_settable Not_settable
+    state_3D7B
+1       Active
+2 Not_settable
+3 Not_settable
+4 Not_settable
+5 Not_settable
+6 Not_settable
+#+end_example
 
 * Code
 :PROPERTIES:
@@ -432,20 +511,8 @@ final_df <- cvg %>%
   mutate(Variant = recode(Variant, YES = TRUE, NO = FALSE, .missing = FALSE))
 
 print(final_df, width = 200)
-#+END_SRC
-** Create Lists according to thresholds
-#+BEGIN_SRC R
-print(final_df, width = 200)
 
-th_rnapcnt <- 25
-th_redpcnt <- 25
-th_redrescue <- 40
-th_red_difpcnt <- 0
-th_areaFC <- 1
-
-## Set state for each gene and strain
-
-## Here we create a couple of dplyr functions.
+## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
 ## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
 ## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
@@ -477,8 +544,22 @@ final_df <- final_df %>%
   set_relexprs(rel_3D7B, area_3D7B) 
 
 print(final_df, width = 200)
+#+END_SRC
+** Create Lists according to thresholds
+#+BEGIN_SRC R
+print(final_df, width = 200)
 
-## We now set each gene to it's state
+th_rnapcnt <- 25
+th_redpcnt <- 25
+th_redrescue <- 40
+th_red_difpcnt <- 0
+th_areaFC <- 1
+
+## Here we create a dplyr function.
+##To be able to use variables (for colnames) we needto use the special quote functions.
+## Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.
+## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
+
 set_state <- function(df, statecol, redcol, relcol){
   
   statecol <- enquo(statecol)
@@ -535,22 +616,24 @@ set_state <- function(df, statecol, redcol, relcol){
                 is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable', 
 
                 TRUE ~ 'Wrong!'))
+
+  ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
+  ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
+
   return(df)
 }
 
+## We now set each gene to it's state
 
 state_df <- final_df %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
   set_state(state_3D7B, Percent_3D7B, rel_3D7B)
 
-
+## We check no rows are set to "Wrong!"
 state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
   print(width = 200)
-
-## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
-## Here we use it to make sure all rows are set (no "Wrong!" appearing)
 
 table(state_df$state_3D7B)
 table(state_df$state_12B)
