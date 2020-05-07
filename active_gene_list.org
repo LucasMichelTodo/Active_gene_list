@@ -11,7 +11,34 @@
 #+EMAIL:  lucas.michel@isglobal.org
 #+DATE:   31/03/2020
 
-* Active/Inactive Gene Lists
+* Active/Inactive Gene lists
+:PROPERTIES:
+:header-args:R: :session active_gene_lists
+:header-args:R+: :exports results
+:END:
+Red Signal
+#+BEGIN_SRC R :results output :session active_gene_lists
+head(as.data.frame(red_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+              Gene_id     Red_12B     Red_10G    Red_3D7B Percent_12B
+1          mal_mito_3 22579.33333 36436.73333 30636.82500  96.0335622
+2 MAL13P1.415_oldname   770.82083   702.22292   640.11667  21.3196034
+3  MAL13P1.65_oldname   111.33333    87.05833    91.05833   6.2166285
+4  MAL7P1.142_oldname  5924.44167  5194.40000  5114.63333  75.4767353
+5  MAL8P1.310_oldname    37.21250    35.37917    33.24167   0.8581236
+6   MAL8P1.90_oldname    80.55417    46.18333    54.64167   4.1952708
+  Percent_10G Percent_3D7B MaxRedPercentDif
+1   98.474447   97.8832952        2.4408848
+2   20.861937   18.4591915        2.8604119
+3    5.053394    4.5194508        1.6971777
+4   72.444699   71.7200610        3.7566743
+5    1.115561    0.5911518        0.5244088
+6    2.002288    2.2501907        2.1929825
+#+end_example
+* Code
 :PROPERTIES:
 :header-args:R: :session active_gene_lists
 :header-args:R+: :tangle ./Scripts/active_gene_list.R
@@ -49,6 +76,7 @@ max_dif <- function(vect){
 ** Microarray Data: Red Signal
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
+#+name: red_df
 #+BEGIN_SRC R :results none
 #### Red Signal DF ####
 
