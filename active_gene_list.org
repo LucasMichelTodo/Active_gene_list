@@ -31,7 +31,7 @@ We will define 5 possible expresion states:
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
-#+BEGIN_SRC R 
+#+BEGIN_SRC R
 head(as.data.frame(red_df))
 #+END_SRC
 
@@ -57,7 +57,7 @@ head(as.data.frame(red_df))
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
-#+BEGIN_SRC R 
+#+BEGIN_SRC R
 head(as.data.frame(area_df))
 #+END_SRC
 
@@ -110,7 +110,7 @@ We are using 4 different data-sets:
 - Bartfai et.al.
 
 RNA-Seq DataFrame
-#+BEGIN_SRC R 
+#+BEGIN_SRC R
 head(as.data.frame(rna_df))
 #+END_SRC
 
@@ -143,12 +143,17 @@ print(p)
 
 #+RESULTS:
 [[file:./Plots/rnaseq_perc_sd.png]]
-** TODO Create table for classification
-(Explanation of max/mid/min)
+** Create table for classification
+
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
 
+To classify genes, we add a colum for each strain were we classify genes according to their expression relative to other strains.
+To create this column we have taken the maximum and minimum area value for each gene and divided this interval in 3 equal regions. Each strain then gets a value of man/mid/max according to which region it falls.
+
+~gene-min----|---mid----|----gene-max~
+
 Final DataFrame
-#+BEGIN_SRC R 
+#+BEGIN_SRC R
 ## NA's dont print well when in a "character" col.
 x <- final_df %>%
   replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
@@ -158,6 +163,7 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -186,7 +192,7 @@ head(as.data.frame(x))
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
 We have set the following thresholds:
-- (rna_pcnt) RNA-Seq mean percentile: 25% 
+- (rna_pcnt) RNA-Seq mean percentile: 25%
 - (red_pcnt) Red Signal Percentile (by sample): 25%
 - (red_rescue) Red Signal Percentile (by sample) for "rescuing": 40%
 - (red_dif) Red Signal percentile diference: 0 (we are currently not using it but it is set, just in case)
@@ -255,7 +261,7 @@ We will have the following categories with the following logic:
 Using these classification logic we get the following table:
 
 Gene-State DataFrame
-#+BEGIN_SRC R 
+#+BEGIN_SRC R
 x <- state_df %>%
   replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
 
@@ -264,6 +270,7 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -294,6 +301,39 @@ head(as.data.frame(x))
 6 Not_settable
 #+end_example
 
+** Some results
+This is a table with the number of genes in each state for each strain.
+
+States Table
+#+begin_src R :results value :colnames yes
+state_table
+#+end_src
+
+#+RESULTS:
+| Strain | Active | Inactive | Not_settable | Var_Active | Var_Repressed | Var_Semiactive |
+|--------+--------+----------+--------------+------------+---------------+----------------|
+| 12B    |   8302 |      306 |          246 |        167 |           265 |              1 |
+| 10G    |   8302 |      306 |          246 |        164 |           269 |              0 |
+| 3D7B   |   8302 |      306 |          246 |        249 |           184 |              0 |
+
+And this are the Clag genes
+
+States Table
+#+begin_src R
+as.data.frame(clags)
+#+end_src
+
+#+RESULTS:
+:         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
+: 1 PF3D7_0302200    TRUE    78.69947    99.58047     42.37223         57.20824
+: 2 PF3D7_0302500    TRUE    98.81770    84.40122     98.98932         14.58810
+:   Interval   areaFC  area_12B area_10G area_3D7B   MaxArea  MinArea MeanPercent
+: 1    Right 4.823089  37.32948 88.19577  23.32522  88.19577 23.32522       85.35
+: 2    Right 3.452270 100.12065 53.68762  99.58767 100.12065 53.68762       94.90
+:   rel_12B rel_10G rel_3D7B     state_12B     state_10G    state_3D7B
+: 1     min     max      min Var_Repressed    Var_Active Var_Repressed
+: 2     max     min      max    Var_Active Var_Repressed    Var_Active
+
 * Code
 :PROPERTIES:
 :header-args:R: :session active_gene_lists
@@ -321,6 +361,7 @@ max_dif <- function(vect){
   return(md)
 }
 #+END_SRC
+
 ** Microarray Data: Red Signal
 
 #+BEGIN_SRC R :results none
@@ -541,7 +582,7 @@ set_relexprs <- function(df, outcol, areacol){
 final_df <- final_df %>%
   set_relexprs(rel_12B, area_12B) %>%
   set_relexprs(rel_10G, area_10G) %>%
-  set_relexprs(rel_3D7B, area_3D7B) 
+  set_relexprs(rel_3D7B, area_3D7B)
 
 print(final_df, width = 200)
 #+END_SRC
@@ -561,7 +602,7 @@ th_areaFC <- 1
 ## Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=
 
 set_state <- function(df, statecol, redcol, relcol){
-  
+
   statecol <- enquo(statecol)
   redcol <- enquo(redcol)
   relcol <- enquo(relcol)
@@ -587,13 +628,13 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC >= th_areaFC &
                 MaxRedPercentDif >= th_red_difpcnt &
                 !! redcol >= th_redpcnt &
-                !! relcol == 'max' ~ 'Var_Active', # Variant, FC, redpcnt, max 
+                !! relcol == 'max' ~ 'Var_Active', # Variant, FC, redpcnt, max
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercentDif >= th_red_difpcnt &
                 !! redcol >= th_redpcnt &
-                !! relcol == 'mid' ~ 'Var_Semiactive', # Variant, FC, redpcnt, mid 
+                !! relcol == 'mid' ~ 'Var_Semiactive', # Variant, FC, redpcnt, mid
 
                 ## Var repressed
                 Variant &
@@ -605,15 +646,15 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC >= th_areaFC &
                 MaxRedPercentDif >= th_red_difpcnt &
                 !! redcol >= th_redpcnt &
-                !! relcol == 'min' ~ 'Var_Repressed', # Variant, FC, redpcnt, min 
+                !! relcol == 'min' ~ 'Var_Repressed', # Variant, FC, redpcnt, min
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercentDif >= th_red_difpcnt &
-                !! redcol < th_redpcnt ~ 'Var_Repressed', # Variant, FC, NOredpcnt 
+                !! redcol < th_redpcnt ~ 'Var_Repressed', # Variant, FC, NOredpcnt
 
                 ## Not settable
-                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable', 
+                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
 
                 TRUE ~ 'Wrong!'))
 
@@ -635,21 +676,27 @@ state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
   print(width = 200)
 
-table(state_df$state_3D7B)
-table(state_df$state_12B)
-table(state_df$state_10G)
-
+## Save results
 write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
 
-print(state_df, width = 200)
+## Create a table with number of each state per strain
+state_table <-  bind_rows(table(state_df$state_12B),
+                          table(state_df$state_10G),
+                          table(state_df$state_3D7B)) %>%
+  replace_na(list(Var_Semiactive = 0)) %>%
+  mutate(Strain = c('12B', '10G', '3D7B')) %>%
+  select(Strain, everything())
 
-state_df %>%
+## Create a table with differences between 12B and 10G
+dif12B_10G <- state_df %>%
   filter(state_12B != state_10G) %>%
-  select(contains('12B'), contains('10G')) %>%
-  write.csv('./Results_Tables/gens_dif12B_10G.csv')
+  select(contains('12B'), contains('10G'))
 
+write.csv(dif12B_10G, './Results_Tables/gens_dif12B_10G.csv')
 
-state_df %>%
-  filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200') %>%
-  write.csv('./Results_Tables/clag_genes.csv')
+## Check Clags
+clags <- state_df %>%
+  filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200')
+
+ write.csv(clags, './Results_Tables/clag_genes.csv')
 #+END_SRC

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-05-07 jue 12:00 -->
+<!-- 2020-05-07 jue 16:03 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Creation of active gene-lists</title>
@@ -255,31 +255,32 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0d62b5b">1. Active/Inactive Gene lists</a>
+<li><a href="#org733ddee">1. Active/Inactive Gene lists</a>
 <ul>
-<li><a href="#orgf16eb57">1.1. Microarray Data: Red Signal</a></li>
-<li><a href="#org05fd3e2">1.2. Microarray Data: Areas</a></li>
-<li><a href="#orgea742d7">1.3. Load RNA-Seq Data</a></li>
-<li><a href="#org535ec11">1.4. Create table for classification</a></li>
-<li><a href="#orgf797940">1.5. Create Lists according to thresholds</a></li>
+<li><a href="#org3be7e0d">1.1. Microarray Data: Red Signal</a></li>
+<li><a href="#org1da494c">1.2. Microarray Data: Areas</a></li>
+<li><a href="#orgbb0aa98">1.3. Load RNA-Seq Data</a></li>
+<li><a href="#org7b3b59e">1.4. Create table for classification</a></li>
+<li><a href="#org1de9fdd">1.5. Create Lists according to thresholds</a></li>
+<li><a href="#orgb8274ce">1.6. Some results</a></li>
 </ul>
 </li>
-<li><a href="#orgb21e7b9">2. Code</a>
+<li><a href="#orgf490c8d">2. Code</a>
 <ul>
-<li><a href="#orga17163b">2.1. Load Packages and functions</a></li>
-<li><a href="#org96ab776">2.2. Microarray Data: Red Signal</a></li>
-<li><a href="#orgb9d7bde">2.3. Microarray Data: Areas</a></li>
-<li><a href="#org030c590">2.4. Load RNA-Seq Data</a></li>
-<li><a href="#orgd968b04">2.5. Create Join DF</a></li>
-<li><a href="#org5855cab">2.6. Create Lists according to thresholds</a></li>
+<li><a href="#org0008eb6">2.1. Load Packages and functions</a></li>
+<li><a href="#org4840f44">2.2. Microarray Data: Red Signal</a></li>
+<li><a href="#orgfa9e653">2.3. Microarray Data: Areas</a></li>
+<li><a href="#orgef861a1">2.4. Load RNA-Seq Data</a></li>
+<li><a href="#org252c1f6">2.5. Create Join DF</a></li>
+<li><a href="#org9c4e6b4">2.6. Create Lists according to thresholds</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-org0d62b5b" class="outline-2">
-<h2 id="org0d62b5b"><span class="section-number-2">1</span> Active/Inactive Gene lists</h2>
+<div id="outline-container-org733ddee" class="outline-2">
+<h2 id="org733ddee"><span class="section-number-2">1</span> Active/Inactive Gene lists</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
@@ -297,8 +298,8 @@ We will define 5 possible expresion states:
 </ul>
 </div>
 
-<div id="outline-container-orgf16eb57" class="outline-3">
-<h3 id="orgf16eb57"><span class="section-number-3">1.1</span> Microarray Data: Red Signal</h3>
+<div id="outline-container-org3be7e0d" class="outline-3">
+<h3 id="org3be7e0d"><span class="section-number-3">1.1</span> Microarray Data: Red Signal</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
@@ -326,8 +327,8 @@ Red Signal DataFrame
 </div>
 </div>
 
-<div id="outline-container-org05fd3e2" class="outline-3">
-<h3 id="org05fd3e2"><span class="section-number-3">1.2</span> Microarray Data: Areas</h3>
+<div id="outline-container-org1da494c" class="outline-3">
+<h3 id="org1da494c"><span class="section-number-3">1.2</span> Microarray Data: Areas</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
@@ -376,8 +377,8 @@ Areas DataFrame
 </div>
 </div>
 
-<div id="outline-container-orgea742d7" class="outline-3">
-<h3 id="orgea742d7"><span class="section-number-3">1.3</span> Load RNA-Seq Data</h3>
+<div id="outline-container-orgbb0aa98" class="outline-3">
+<h3 id="orgbb0aa98"><span class="section-number-3">1.3</span> Load RNA-Seq Data</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
@@ -421,17 +422,27 @@ We plot the standard deviation of the percentile values among different studies 
 </div>
 </div>
 </div>
-<div id="outline-container-org535ec11" class="outline-3">
-<h3 id="org535ec11"><span class="section-number-3">1.4</span> Create table for classification</h3>
+<div id="outline-container-org7b3b59e" class="outline-3">
+<h3 id="org7b3b59e"><span class="section-number-3">1.4</span> Create table for classification</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
 </p>
 
 <p>
+To classify genes, we add a colum for each strain were we classify genes according to their expression relative to other strains.
+To create this column we have taken the maximum and minimum area value for each gene and divided this interval in 3 equal regions. Each strain then gets a value of man/mid/max according to which region it falls.
+</p>
+
+<p>
+<code>gene-min----|---mid----|----gene-max</code>
+</p>
+
+<p>
 Final DataFrame
 </p>
 <pre class="example">
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -457,8 +468,8 @@ Final DataFrame
 </div>
 </div>
 
-<div id="outline-container-orgf797940" class="outline-3">
-<h3 id="orgf797940"><span class="section-number-3">1.5</span> Create Lists according to thresholds</h3>
+<div id="outline-container-org1de9fdd" class="outline-3">
+<h3 id="org1de9fdd"><span class="section-number-3">1.5</span> Create Lists according to thresholds</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 Now that we have all the data loaded in, we can star to set labels for each gene.
@@ -577,6 +588,7 @@ Using these classification logic we get the following table:
 Gene-State DataFrame
 </p>
 <pre class="example">
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -608,15 +620,108 @@ Gene-State DataFrame
 </pre>
 </div>
 </div>
+
+<div id="outline-container-orgb8274ce" class="outline-3">
+<h3 id="orgb8274ce"><span class="section-number-3">1.6</span> Some results</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+This is a table with the number of genes in each state for each strain.
+</p>
+
+<p>
+States Table
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">Strain</th>
+<th scope="col" class="org-right">Active</th>
+<th scope="col" class="org-right">Inactive</th>
+<th scope="col" class="org-right">Not_settable</th>
+<th scope="col" class="org-right">Var_Active</th>
+<th scope="col" class="org-right">Var_Repressed</th>
+<th scope="col" class="org-right">Var_Semiactive</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">12B</td>
+<td class="org-right">8302</td>
+<td class="org-right">306</td>
+<td class="org-right">246</td>
+<td class="org-right">167</td>
+<td class="org-right">265</td>
+<td class="org-right">1</td>
+</tr>
+
+<tr>
+<td class="org-left">10G</td>
+<td class="org-right">8302</td>
+<td class="org-right">306</td>
+<td class="org-right">246</td>
+<td class="org-right">164</td>
+<td class="org-right">269</td>
+<td class="org-right">0</td>
+</tr>
+
+<tr>
+<td class="org-left">3D7B</td>
+<td class="org-right">8302</td>
+<td class="org-right">306</td>
+<td class="org-right">246</td>
+<td class="org-right">249</td>
+<td class="org-right">184</td>
+<td class="org-right">0</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+And this are the Clag genes
+</p>
+
+<p>
+States Table
+</p>
+<pre class="example">
+        Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
+1 PF3D7_0302200    TRUE    78.69947    99.58047     42.37223         57.20824
+2 PF3D7_0302500    TRUE    98.81770    84.40122     98.98932         14.58810
+  Interval   areaFC  area_12B area_10G area_3D7B   MaxArea  MinArea MeanPercent
+1    Right 4.823089  37.32948 88.19577  23.32522  88.19577 23.32522       85.35
+2    Right 3.452270 100.12065 53.68762  99.58767 100.12065 53.68762       94.90
+  rel_12B rel_10G rel_3D7B     state_12B     state_10G    state_3D7B
+1     min     max      min Var_Repressed    Var_Active Var_Repressed
+2     max     min      max    Var_Active Var_Repressed    Var_Active
+</pre>
+</div>
+</div>
 </div>
 
-<div id="outline-container-orgb21e7b9" class="outline-2">
-<h2 id="orgb21e7b9"><span class="section-number-2">2</span> Code</h2>
+<div id="outline-container-orgf490c8d" class="outline-2">
+<h2 id="orgf490c8d"><span class="section-number-2">2</span> Code</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 
-<div id="outline-container-orga17163b" class="outline-3">
-<h3 id="orga17163b"><span class="section-number-3">2.1</span> Load Packages and functions</h3>
+<div id="outline-container-org0008eb6" class="outline-3">
+<h3 id="org0008eb6"><span class="section-number-3">2.1</span> Load Packages and functions</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Imports ####</span>
@@ -640,8 +745,9 @@ Gene-State DataFrame
 </div>
 </div>
 </div>
-<div id="outline-container-org96ab776" class="outline-3">
-<h3 id="org96ab776"><span class="section-number-3">2.2</span> Microarray Data: Red Signal</h3>
+
+<div id="outline-container-org4840f44" class="outline-3">
+<h3 id="org4840f44"><span class="section-number-3">2.2</span> Microarray Data: Red Signal</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Red Signal DF ####</span>
@@ -681,8 +787,8 @@ print(red_df, width = 200)
 </div>
 </div>
 </div>
-<div id="outline-container-orgb9d7bde" class="outline-3">
-<h3 id="orgb9d7bde"><span class="section-number-3">2.3</span> Microarray Data: Areas</h3>
+<div id="outline-container-orgfa9e653" class="outline-3">
+<h3 id="orgfa9e653"><span class="section-number-3">2.3</span> Microarray Data: Areas</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Areas DF ####</span>
@@ -790,8 +896,8 @@ print(area_df, width = 400)
 </div>
 </div>
 </div>
-<div id="outline-container-org030c590" class="outline-3">
-<h3 id="org030c590"><span class="section-number-3">2.4</span> Load RNA-Seq Data</h3>
+<div id="outline-container-orgef861a1" class="outline-3">
+<h3 id="orgef861a1"><span class="section-number-3">2.4</span> Load RNA-Seq Data</h3>
 <div class="outline-text-3" id="text-2-4">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Load Data-Sets ####</span>
@@ -823,8 +929,8 @@ print(rna_df, width=200)
 </div>
 </div>
 
-<div id="outline-container-orgd968b04" class="outline-3">
-<h3 id="orgd968b04"><span class="section-number-3">2.5</span> Create Join DF</h3>
+<div id="outline-container-org252c1f6" class="outline-3">
+<h3 id="org252c1f6"><span class="section-number-3">2.5</span> Create Join DF</h3>
 <div class="outline-text-3" id="text-2-5">
 <div class="org-src-container">
 <pre class="src src-R">red_df
@@ -882,8 +988,8 @@ print(final_df, width = 200)
 </div>
 </div>
 </div>
-<div id="outline-container-org5855cab" class="outline-3">
-<h3 id="org5855cab"><span class="section-number-3">2.6</span> Create Lists according to thresholds</h3>
+<div id="outline-container-org9c4e6b4" class="outline-3">
+<h3 id="org9c4e6b4"><span class="section-number-3">2.6</span> Create Lists according to thresholds</h3>
 <div class="outline-text-3" id="text-2-6">
 <div class="org-src-container">
 <pre class="src src-R">print(final_df, width = 200)
@@ -926,13 +1032,13 @@ th_areaFC <span style="color: #BFEBBF;">&lt;-</span> 1
                 areaFC &gt;= th_areaFC &amp;
                 MaxRedPercentDif &gt;= th_red_difpcnt &amp;
                 !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, max </span>
+                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, max</span>
 
                 Variant &amp;
                 areaFC &gt;= th_areaFC &amp;
                 MaxRedPercentDif &gt;= th_red_difpcnt &amp;
                 !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, mid </span>
+                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, mid</span>
 
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Var repressed</span>
                 Variant &amp;
@@ -944,12 +1050,12 @@ th_areaFC <span style="color: #BFEBBF;">&lt;-</span> 1
                 areaFC &gt;= th_areaFC &amp;
                 MaxRedPercentDif &gt;= th_red_difpcnt &amp;
                 !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, min </span>
+                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, min</span>
 
                 Variant &amp;
                 areaFC &gt;= th_areaFC &amp;
                 MaxRedPercentDif &gt;= th_red_difpcnt &amp;
-                !! redcol &lt; th_redpcnt ~ <span style="color: #CC9393;">'Var_Repressed'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, NOredpcnt </span>
+                !! redcol &lt; th_redpcnt ~ <span style="color: #CC9393;">'Var_Repressed'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, NOredpcnt</span>
 
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Not settable</span>
                 is.na(areaFC) | is.na(MeanPercent) ~ <span style="color: #CC9393;">'Not_settable'</span>,
@@ -974,23 +1080,29 @@ state_df <span style="color: #BFEBBF;">%&gt;%</span>
   filter(state_12B == <span style="color: #CC9393;">'Wrong!'</span> | state_10G == <span style="color: #CC9393;">'Wrong!'</span> | state_3D7B == <span style="color: #CC9393;">'Wrong!'</span>) <span style="color: #BFEBBF;">%&gt;%</span>
   print(width = 200)
 
-table(state_df$state_3D7B)
-table(state_df$state_12B)
-table(state_df$state_10G)
-
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Save results</span>
 write.csv(state_df, <span style="color: #CC9393;">'./Results_Tables/state_df_rna25_red25_reddif0_area1.csv'</span>)
 
-print(state_df, width = 200)
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Create a table with number of each state per strain</span>
+state_table <span style="color: #BFEBBF;">&lt;-</span>  bind_rows(table(state_df$state_12B),
+                          table(state_df$state_10G),
+                          table(state_df$state_3D7B)) <span style="color: #BFEBBF;">%&gt;%</span>
+  replace_na(list(Var_Semiactive = 0)) <span style="color: #BFEBBF;">%&gt;%</span>
+  mutate(Strain = c(<span style="color: #CC9393;">'12B'</span>, <span style="color: #CC9393;">'10G'</span>, <span style="color: #CC9393;">'3D7B'</span>)) <span style="color: #BFEBBF;">%&gt;%</span>
+  select(Strain, everything())
 
-state_df <span style="color: #BFEBBF;">%&gt;%</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Create a table with differences between 12B and 10G</span>
+dif12B_10G <span style="color: #BFEBBF;">&lt;-</span> state_df <span style="color: #BFEBBF;">%&gt;%</span>
   filter(state_12B != state_10G) <span style="color: #BFEBBF;">%&gt;%</span>
-  select(contains(<span style="color: #CC9393;">'12B'</span>), contains(<span style="color: #CC9393;">'10G'</span>)) <span style="color: #BFEBBF;">%&gt;%</span>
-  write.csv(<span style="color: #CC9393;">'./Results_Tables/gens_dif12B_10G.csv'</span>)
+  select(contains(<span style="color: #CC9393;">'12B'</span>), contains(<span style="color: #CC9393;">'10G'</span>))
 
+write.csv(dif12B_10G, <span style="color: #CC9393;">'./Results_Tables/gens_dif12B_10G.csv'</span>)
 
-state_df <span style="color: #BFEBBF;">%&gt;%</span>
-  filter(Gene_id == <span style="color: #CC9393;">'PF3D7_0302500'</span> | Gene_id == <span style="color: #CC9393;">'PF3D7_0302200'</span>) <span style="color: #BFEBBF;">%&gt;%</span>
-  write.csv(<span style="color: #CC9393;">'./Results_Tables/clag_genes.csv'</span>)
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Check Clags</span>
+clags <span style="color: #BFEBBF;">&lt;-</span> state_df <span style="color: #BFEBBF;">%&gt;%</span>
+  filter(Gene_id == <span style="color: #CC9393;">'PF3D7_0302500'</span> | Gene_id == <span style="color: #CC9393;">'PF3D7_0302200'</span>)
+
+ write.csv(clags, <span style="color: #CC9393;">'./Results_Tables/clag_genes.csv'</span>)
 </pre>
 </div>
 </div>
@@ -1000,7 +1112,7 @@ state_df <span style="color: #BFEBBF;">%&gt;%</span>
 <div id="postamble" class="status">
 <p class="date">Date: 31/03/2020</p>
 <p class="author">Author: Lucas Michel Todó</p>
-<p class="date">Created: 2020-05-07 jue 12:00</p>
+<p class="date">Created: 2020-05-07 jue 16:03</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>

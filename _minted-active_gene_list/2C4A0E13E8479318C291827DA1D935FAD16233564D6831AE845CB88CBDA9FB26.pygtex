@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nf}{head}\PYG{p}{(}\PYG{n+nf}{as.data.frame}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{p}{))}
+\end{Verbatim}

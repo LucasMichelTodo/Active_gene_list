@@ -1,4 +1,4 @@
-% Created 2020-05-07 jue 12:00
+% Created 2020-05-07 jue 16:03
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -28,11 +28,9 @@
 \begin{document}
 
 \maketitle
-\tableofcontents
-
-
+\tableofcontents \clearpage
 \section{Active/Inactive Gene lists}
-\label{sec:orgb7f7728}
+\label{sec:orgaf23e2d}
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
 We will define 5 possible expresion states:
 \begin{itemize}
@@ -47,7 +45,7 @@ We will define 5 possible expresion states:
 \end{itemize}
 
 \subsection{Microarray Data: Red Signal}
-\label{sec:org971d93b}
+\label{sec:org7e2c45e}
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
@@ -69,7 +67,7 @@ Red Signal DataFrame
 \end{verbatim}
 
 \subsection{Microarray Data: Areas}
-\label{sec:orgc7979cb}
+\label{sec:org2b83d95}
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
@@ -112,7 +110,7 @@ Areas DataFrame
 \end{verbatim}
 
 \subsection{Load RNA-Seq Data}
-\label{sec:org6c5afe8}
+\label{sec:orgc0dc0bc}
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
@@ -146,11 +144,17 @@ We plot the standard deviation of the percentile values among different studies 
 \includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
 \end{center}
 \subsection{Create table for classification}
-\label{sec:org40939d6}
+\label{sec:orgb90221d}
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
+
+To classify genes, we add a colum for each strain were we classify genes according to their expression relative to other strains.
+To create this column we have taken the maximum and minimum area value for each gene and divided this interval in 3 equal regions. Each strain then gets a value of man/mid/max according to which region it falls.
+
+\texttt{gene-min-{}--{}-|-{}--mid-{}--{}-|-{}--{}-gene-max}
 
 Final DataFrame
 \begin{verbatim}
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -175,7 +179,7 @@ Final DataFrame
 \end{verbatim}
 
 \subsection{Create Lists according to thresholds}
-\label{sec:org3698ebe}
+\label{sec:orgd76c737}
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
@@ -282,6 +286,7 @@ Using these classification logic we get the following table:
 
 Gene-State DataFrame
 \begin{verbatim}
+
               Gene_id Variant Percent_12B Percent_10G Percent_3D7B
 1          mal_mito_3   FALSE  96.0335622   98.474447   97.8832952
 2 MAL13P1.415_oldname   FALSE  21.3196034   20.861937   18.4591915
@@ -312,10 +317,40 @@ Gene-State DataFrame
 6 Not_settable
 \end{verbatim}
 
+\subsection{Some results}
+\label{sec:org9e02f67}
+This is a table with the number of genes in each state for each strain.
+
+States Table
+\begin{center}
+\begin{tabular}{lrrrrrr}
+Strain & Active & Inactive & Not\_settable & Var\_Active & Var\_Repressed & Var\_Semiactive\\
+\hline
+12B & 8302 & 306 & 246 & 167 & 265 & 1\\
+10G & 8302 & 306 & 246 & 164 & 269 & 0\\
+3D7B & 8302 & 306 & 246 & 249 & 184 & 0\\
+\end{tabular}
+\end{center}
+
+And this are the Clag genes
+
+States Table
+\begin{verbatim}
+        Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
+1 PF3D7_0302200    TRUE    78.69947    99.58047     42.37223         57.20824
+2 PF3D7_0302500    TRUE    98.81770    84.40122     98.98932         14.58810
+  Interval   areaFC  area_12B area_10G area_3D7B   MaxArea  MinArea MeanPercent
+1    Right 4.823089  37.32948 88.19577  23.32522  88.19577 23.32522       85.35
+2    Right 3.452270 100.12065 53.68762  99.58767 100.12065 53.68762       94.90
+  rel_12B rel_10G rel_3D7B     state_12B     state_10G    state_3D7B
+1     min     max      min Var_Repressed    Var_Active Var_Repressed
+2     max     min      max    Var_Active Var_Repressed    Var_Active
+\end{verbatim}
+
 \section{Code}
-\label{sec:orgc1172ce}
+\label{sec:orgbb87fb8}
 \subsection{Load Packages and functions}
-\label{sec:orgf8726c9}
+\label{sec:orgce85e72}
 \begin{minted}[]{r}
 #### Imports ####
 
@@ -335,8 +370,9 @@ max_dif <- function(vect){
   return(md)
 }
 \end{minted}
+
 \subsection{Microarray Data: Red Signal}
-\label{sec:orgcf7f3c9}
+\label{sec:org0755341}
 
 \begin{minted}[]{r}
 #### Red Signal DF ####
@@ -374,7 +410,7 @@ red_df <- red_df %>%
 print(red_df, width = 200)
 \end{minted}
 \subsection{Microarray Data: Areas}
-\label{sec:org1da4b99}
+\label{sec:orgb716e54}
 \begin{minted}[]{r}
 #### Areas DF ####
 
@@ -479,7 +515,7 @@ area_df <- area_df %>%
 print(area_df, width = 400)
 \end{minted}
 \subsection{Load RNA-Seq Data}
-\label{sec:org75b23b3}
+\label{sec:org32b8871}
 
 \begin{minted}[]{r}
 #### Load Data-Sets ####
@@ -509,7 +545,7 @@ print(rna_df, width=200)
 \end{minted}
 
 \subsection{Create Join DF}
-\label{sec:orgf5a24b2}
+\label{sec:orgf312f5e}
 \begin{minted}[]{r}
 red_df
 print(area_df, width = 200)
@@ -564,7 +600,7 @@ final_df <- final_df %>%
 print(final_df, width = 200)
 \end{minted}
 \subsection{Create Lists according to thresholds}
-\label{sec:org76cdbb5}
+\label{sec:org9efce79}
 \begin{minted}[]{r}
 print(final_df, width = 200)
 
@@ -654,22 +690,28 @@ state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
   print(width = 200)
 
-table(state_df$state_3D7B)
-table(state_df$state_12B)
-table(state_df$state_10G)
-
+## Save results
 write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
 
-print(state_df, width = 200)
+## Create a table with number of each state per strain
+state_table <-  bind_rows(table(state_df$state_12B),
+                          table(state_df$state_10G),
+                          table(state_df$state_3D7B)) %>%
+  replace_na(list(Var_Semiactive = 0)) %>%
+  mutate(Strain = c('12B', '10G', '3D7B')) %>%
+  select(Strain, everything())
 
-state_df %>%
+## Create a table with differences between 12B and 10G
+dif12B_10G <- state_df %>%
   filter(state_12B != state_10G) %>%
-  select(contains('12B'), contains('10G')) %>%
-  write.csv('./Results_Tables/gens_dif12B_10G.csv')
+  select(contains('12B'), contains('10G'))
 
+write.csv(dif12B_10G, './Results_Tables/gens_dif12B_10G.csv')
 
-state_df %>%
-  filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200') %>%
-  write.csv('./Results_Tables/clag_genes.csv')
+## Check Clags
+clags <- state_df %>%
+  filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200')
+
+ write.csv(clags, './Results_Tables/clag_genes.csv')
 \end{minted}
 \end{document}
