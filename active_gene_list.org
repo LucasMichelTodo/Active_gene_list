@@ -334,6 +334,7 @@ as.data.frame(clags)
 : 1     min     max      min Var_Repressed    Var_Active Var_Repressed
 : 2     max     min      max    Var_Active Var_Repressed    Var_Active
 
+
 * Code
 :PROPERTIES:
 :header-args:R: :session active_gene_lists
@@ -690,7 +691,7 @@ state_table <-  bind_rows(table(state_df$state_12B),
 ## Create a table with differences between 12B and 10G
 dif12B_10G <- state_df %>%
   filter(state_12B != state_10G) %>%
-  select(contains('12B'), contains('10G'))
+  select(Gene_id, contains('12B'), contains('10G'))
 
 write.csv(dif12B_10G, './Results_Tables/gens_dif12B_10G.csv')
 
