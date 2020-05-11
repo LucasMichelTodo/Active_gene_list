@@ -348,6 +348,7 @@ as.data.frame(clags)
 
 library(readxl)
 library(tidyverse)
+library(eulerr)
 
 #### Max Dif function ####
 
@@ -672,6 +673,10 @@ state_df <- final_df %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
   set_state(state_3D7B, Percent_3D7B, rel_3D7B)
 
+
+#+END_SRC
+** Some checks and results
+#+BEGIN_SRC R
 ## We check no rows are set to "Wrong!"
 state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
@@ -700,4 +705,88 @@ clags <- state_df %>%
   filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200')
 
  write.csv(clags, './Results_Tables/clag_genes.csv')
+
+state_table
+summary(rna_df)
+
+#+END_SRC
+** Venn Diagram of results
+#+BEGIN_SRC R
+customEuler <- function(a,b,c, name){
+
+  v12b <- a
+  v10g <- b
+  v3d7b <- c
+
+  v12b_10g <- intersect(v12b, v10g)
+  v12b_3d7b <- intersect(v12b, v3d7b)
+  v10g_3d7b <- intersect(v10g, v3d7b)
+  v12b_10g_3d7b <- intersect(v12b_10g, v3d7b)
+
+  abc <- length(v12b_10g_3d7b)
+  ab <- length(v12b_10g[!v12b_10g %in% v12b_10g_3d7b])
+  ac <- length(v12b_3d7b[!v12b_3d7b %in% v12b_10g_3d7b])
+  bc <- length(v10g_3d7b[!v10g_3d7b %in% v12b_10g_3d7b])
+
+  a <- length(v12b) -ab -ac -abc
+  b <- length(v10g) -ab -bc -abc
+  c <- length(v3d7b) -ac -bc -abc
+
+  print(c(a, b, c, ab, ac, bc, abc))
+
+  fit <- euler(c(A=a, B=b, C=c, "A&B"=ab, "A&C"=ac, "B&C"=bc, "A&B&C" = abc))
+
+  d <- plot(fit, fills = list(fill = c("#619CFF", "#F8766D", "#00BA38"), alpha = 0.5),
+            edges = list(lwd = 0.1), quantities = list(quantities = T),
+            labels = list(labels=c("12B", "10G", "3D7B")),
+            main = name)
+
+  ggsave(d, filename = paste0('./Plots/', "venn_", name, ".pdf"),
+         device = "pdf", dpi = "retina",
+         width = 4, height = 4, units = "cm")
+
+  plot(d)
+  print(fit)
+}
+
+
+## Var active
+
+va_12B <- state_df %>%
+  filter(state_12B == "Var_Active") %>%
+  select(Gene_id) %>%
+  pull()
+
+va_10G <- state_df %>%
+  filter(state_10G == "Var_Active") %>%
+  select(Gene_id) %>%
+  pull()
+
+va_3D7B <- state_df %>%
+  filter(state_3D7B == "Var_Active") %>%
+  select(Gene_id) %>%
+  pull()
+
+
+customEuler(va_12B, va_10G, va_3D7B, 'Var_Active_Genes')
+
+## Var inactive
+
+vi_12B <- state_df %>%
+  filter(state_12B == "Var_Repressed") %>%
+  select(Gene_id) %>%
+  pull()
+
+vi_10G <- state_df %>%
+  filter(state_10G == "Var_Repressed") %>%
+  select(Gene_id) %>%
+  pull()
+
+vi_3D7B <- state_df %>%
+  filter(state_3D7B == "Var_Repressed") %>%
+  select(Gene_id) %>%
+  pull()
+
+
+customEuler(vi_12B, vi_10G, vi_3D7B, 'Var_Repressed_Genes')
 #+END_SRC
