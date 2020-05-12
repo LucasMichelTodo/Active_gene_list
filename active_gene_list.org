@@ -370,7 +370,7 @@ max_dif <- function(vect){
 #### Red Signal DF ####
 
 ## Read translation table
-map <- read.csv('./Data/oldnames_table.csv')
+map <- read.csv('./Data/oldnames_table.csv', stringsAsFactors = F)
 excl <- "./Data/3D7_Variantome_AllData_withGam.xls"
 
 ## Import Red Signal table
@@ -383,9 +383,22 @@ red_df <- red %>%
          Red_12B = `Aver.2Higher1.2B.`,
          Red_10G = `Aver.2Higher10G.`,
          Red_3D7B = `Aver.2Higher3D7-B.`) %>%
-  left_join(map, by='Old_id') %>%
+  left_join(map, by='Old_id')
+
+## Manually add gene ids that do not appear on map (we blasted the probes to assign them)
+red_df <- red_df %>%
+  mutate(Gene_id = ifelse(Old_id == 'MAL8P1.310', 'PF3D7_0830200', Gene_id)) %>%
+  mutate(Gene_id = ifelse(Old_id == 'PFI0905W', 'PF3D7_0918500', Gene_id)) %>%
+  mutate(Gene_id = ifelse(Old_id == 'PFL1580W', 'PF3D7_1232700', Gene_id))
+
+## Collapse gene ids that appear more than once (mean expression)
+red_df <- red_df %>%
   select(-Old_id) %>%
   group_by(Gene_id) %>% summarize_all(list(mean))
+
+## Filter out rows with untranslated gene ids (marked by '_oldname')
+red_df <- red_df %>%
+  filter(!grepl('_oldname', Gene_id))
 
 ## Transform into percentiles
 
