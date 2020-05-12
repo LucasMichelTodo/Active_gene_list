@@ -712,29 +712,34 @@ summary(rna_df)
 #+END_SRC
 ** Venn Diagram of results
 #+BEGIN_SRC R
+makeIntersects <- function(a,b,c){
+
+  a_b <- intersect(a, b)
+  a_c <- intersect(a, c)
+  b_c <- intersect(b, c)
+  a_b_c <- intersect(a_b, c)
+
+  abc <- a_b_c
+  ab <- a_b[!a_b %in% a_b_c]
+  ac <- a_c[!a_c %in% a_b_c]
+  bc <- b_c[!b_c %in% a_b_c]
+
+  a <- a[!a %in% ab & !a %in% ac & !a %in% abc]
+  b <- b[!b %in% ab & !b %in% bc & !b %in% abc]
+  c <- c[!c %in% ac & !c %in% bc & !c %in% abc]
+
+  return(list(a = a, b = b, c = c, ab = ab, bc = bc, ac = ac, abc = abc))
+
+}
+
 customEuler <- function(a,b,c, name){
 
-  v12b <- a
-  v10g <- b
-  v3d7b <- c
+  intersects <- makeIntersects(a,b,c)
+  areas <- lapply(intersects, function(x) length(x))
 
-  v12b_10g <- intersect(v12b, v10g)
-  v12b_3d7b <- intersect(v12b, v3d7b)
-  v10g_3d7b <- intersect(v10g, v3d7b)
-  v12b_10g_3d7b <- intersect(v12b_10g, v3d7b)
-
-  abc <- length(v12b_10g_3d7b)
-  ab <- length(v12b_10g[!v12b_10g %in% v12b_10g_3d7b])
-  ac <- length(v12b_3d7b[!v12b_3d7b %in% v12b_10g_3d7b])
-  bc <- length(v10g_3d7b[!v10g_3d7b %in% v12b_10g_3d7b])
-
-  a <- length(v12b) -ab -ac -abc
-  b <- length(v10g) -ab -bc -abc
-  c <- length(v3d7b) -ac -bc -abc
-
-  print(c(a, b, c, ab, ac, bc, abc))
-
-  fit <- euler(c(A=a, B=b, C=c, "A&B"=ab, "A&C"=ac, "B&C"=bc, "A&B&C" = abc))
+  fit <- euler(c(A=areas$a, B=areas$b, C=areas$c,
+                 "A&B"=areas$ab, "A&C"=areas$ac, "B&C"=areas$bc,
+                 "A&B&C" = areas$abc))
 
   d <- plot(fit, fills = list(fill = c("#619CFF", "#F8766D", "#00BA38"), alpha = 0.5),
             edges = list(lwd = 0.1), quantities = list(quantities = T),
@@ -789,4 +794,39 @@ vi_3D7B <- state_df %>%
 
 
 customEuler(vi_12B, vi_10G, vi_3D7B, 'Var_Repressed_Genes')
+
+## Same category
+## We fuse the gene_id with it's state so that genes with same state will be exactly the same while genes with different state will be different.
+
+print(state_df, width = 400)
+
+genestate <- state_df %>%
+  mutate(gs_12B = paste(Gene_id, state_12B, sep = "_")) %>%
+  mutate(gs_10G = paste(Gene_id, state_10G, sep = "_")) %>%
+  mutate(gs_3D7B = paste(Gene_id, state_3D7B, sep = "_")) %>%
+  select(Gene_id,
+         state_12B, state_10G, state_3D7B,
+         gs_12B, gs_10G, gs_3D7B)
+
+customEuler(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B, 'Same_State')
+
+
+a <- c(1,4,6,7)
+b <- c(2,4,5,7)
+c <- c(3,5,6,7)
+
+x <- makeIntersects(a,b,c)
+areas <- lapply(x, function(x) length(x))
+
+
+f <- euler(c(A=areas$a, B=areas$b, C=areas$c,
+        "A&B"=areas$ab, "A&C"=areas$ac, "B&C"=areas$bc,
+        "A&B&C" = areas$abc))
+
+plot(f)
+
+
+x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)
+
+for (i in x){print(length(i))}
 #+END_SRC
