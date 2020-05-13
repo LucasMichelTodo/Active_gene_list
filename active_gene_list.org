@@ -546,7 +546,15 @@ rna_df <- rna_df %>%
 
 print(rna_df, width=200)
 #+END_SRC
+** Load Annotation
+#+BEGIN_SRC R
+annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
+  select(Gene_id = `Gene ID`,
+         Gene_name = `Gene Name or Symbol`,
+         Annot = `Product Description`)
 
+print(annot_df, width=200)
+#+END_SRC
 ** Create Join DF
 #+BEGIN_SRC R :results none
 red_df
@@ -600,6 +608,9 @@ final_df <- final_df %>%
   set_relexprs(rel_3D7B, area_3D7B)
 
 print(final_df, width = 200)
+
+## Add annotation
+final_df <- left_join(final_df, annot_df, by = 'Gene_id')
 #+END_SRC
 ** Create Lists according to thresholds
 #+BEGIN_SRC R
@@ -709,7 +720,7 @@ state_table <-  bind_rows(table(state_df$state_12B),
 ## Create a table with differences between 12B and 10G
 dif12B_10G <- state_df %>%
   filter(state_12B != state_10G) %>%
-  select(Gene_id, contains('12B'), contains('10G'))
+  select(Gene_id, contains('12B'), contains('10G'), Gene_name, Annot)
 
 write.csv(dif12B_10G, './Results_Tables/gens_dif12B_10G.csv')
 
@@ -721,7 +732,25 @@ clags <- state_df %>%
 
 state_table
 summary(rna_df)
+#+END_SRC
+** Comparison of 12B vs 10G differences
+#+BEGIN_SRC R
+excl <- "./Data/10Gvs1p2B.xlsx"
 
+## Import 12B vs 10G differences by transcription table
+trans_difs <- read_delim('./Data/transDif_12Bvs10G.csv', delim = ';') %>%
+  rename(Old_id = X1) %>%
+  left_join(map, by = 'Old_id')
+
+print(trans_difs, width = 400)
+
+trans_difs %>%
+  select(Old_id, Gene_id)
+
+dif12B_10G
+
+table(trans_difs$Gene_id %in% dif12B_10G$Gene_id)
+table(dif12B_10G$Gene_id %in% trans_difs$Gene_id)
 #+END_SRC
 ** Venn Diagram of results
 #+BEGIN_SRC R
@@ -823,23 +852,5 @@ genestate <- state_df %>%
 
 customEuler(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B, 'Same_State')
 
-
-a <- c(1,4,6,7)
-b <- c(2,4,5,7)
-c <- c(3,5,6,7)
-
-x <- makeIntersects(a,b,c)
-areas <- lapply(x, function(x) length(x))
-
-
-f <- euler(c(A=areas$a, B=areas$b, C=areas$c,
-        "A&B"=areas$ab, "A&C"=areas$ac, "B&C"=areas$bc,
-        "A&B&C" = areas$abc))
-
-plot(f)
-
-
-x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)
-
-for (i in x){print(length(i))}
+x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)}
 #+END_SRC
