@@ -521,20 +521,87 @@ print(area_df, width = 400)
 ** Load RNA-Seq Data
 
 #+BEGIN_SRC R :results none
-#### Load Data-Sets ####
+## #### Old approax ####
+## Select max percentile directly
 
-otto <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %>%
-  select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)`)
-hoej <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %>%
-  select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)`)
-toen <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %>%
-  select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)`)
-bart <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %>%
-  select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)`)
+## otto <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %>%
+##   select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)`)
+## hoej <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %>%
+##   select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)`)
+## toen <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %>%
+##   select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)`)
+## bart <- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %>%
+##   select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)`)
+
+
+## Otto Data-Set
+
+csv <- './Data/RNA_Seq_Percentiles/rnaseq_otto_normvals.csv'
+
+otto <- read_delim(csv, delim=";") %>%
+  select(Gene_id = `Gene ID`, contains('unique'))
+
+otto <- otto %>%
+  mutate(Max = apply(select(., contains('unique')), 1, max)) %>%
+  mutate(Otto_Max_pcnt = (rank(Max)/length(Max))*100)
+
+otto <- otto %>% select(Gene_id, Otto_Max_pcnt)
+otto
+
+hist(otto$Otto_Max_pcnt)
+
+## Hoeijmakers Data-Set
+
+csv <- './Data/RNA_Seq_Percentiles/rnaseq_hoeijmakers_normvals.csv'
+
+hoeij <- read_delim(csv, delim=";") %>%
+  select(Gene_id = `Gene ID`, contains('scaled'))
+
+hoeij <- hoeij %>%
+  mutate(Max = apply(select(., contains('scaled')), 1, max)) %>%
+  mutate(Hoeij_Max_pcnt = (rank(Max)/length(Max))*100)
+
+hoeij <- hoeij %>% select(Gene_id, Hoeij_Max_pcnt)
+hoeij
+
+hist(hoeij$Hoeij_Max_pcnt)
+
+## Toenhake Data-Sets
+
+csv <- './Data/RNA_Seq_Percentiles/rnaseq_toen_normvals.csv'
+
+toen <- read_delim(csv, delim=",") %>%
+  select(Gene_id = `Gene ID`, contains('unique'))
+
+toen <- toen %>%
+  mutate(Max = apply(select(., contains('unique')), 1, max)) %>%
+  mutate(Toen_Max_pcnt = (rank(Max)/length(Max))*100)
+
+toen <- toen %>% select(Gene_id, Toen_Max_pcnt)
+toen
+
+hist(toen$Toen_Max_pcnt)
+
+## Bartfai Data-Sets
+
+csv <- './Data/RNA_Seq_Percentiles/rnaseq_bartfai_normvals.csv'
+
+bart <- read_delim(csv, delim=",") %>%
+  select(Gene_id = `Gene ID`, contains('scaled'))
+
+bart <- bart %>%
+  mutate(Max = apply(select(., contains('scaled')), 1, max)) %>%
+  mutate(Bart_Max_pcnt = (rank(Max)/length(Max))*100)
+
+bart <- bart %>% select(Gene_id, Bart_Max_pcnt)
+bart
+
+hist(bart$Bart_Max_pcnt)
+
 
 ## Join DF
-rna_df <- full_join(otto, hoej) %>%
-  full_join(hoej) %>%
+rna_df <- otto %>%
+  full_join(hoeij) %>%
   full_join(toen) %>%
   full_join(bart)
 
@@ -545,6 +612,9 @@ rna_df <- rna_df %>%
 
 
 print(rna_df, width=200)
+
+hist(rna_df$MeanPercent, breaks = 20)
+hist(rna_df$StdDevPercent, breaks = 100)
 #+END_SRC
 ** Load Annotation
 #+BEGIN_SRC R
