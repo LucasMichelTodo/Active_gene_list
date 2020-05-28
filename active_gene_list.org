@@ -531,6 +531,7 @@ area_df <- area_df %>%
 
 
 print(area_df, width = 400)
+table(duplicated(area_df$Gene_id))
 #+END_SRC
 ** Load RNA-Seq Data
 
@@ -560,7 +561,11 @@ otto <- otto %>%
   mutate(Otto_Max_pcnt = (rank(Max)/length(Max))*100)
 
 otto <- otto %>% select(Gene_id, Otto_Max_pcnt)
-otto
+otto <- otto %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
+table(duplicated(otto$Gene_id))
+otto %>% filter(duplicated(otto$Gene_id)) %>% print(width = 400)
+otto %>% filter(Gene_id == 'PF3D7_0108400') %>% print(width = 400)
 
 hist(otto$Otto_Max_pcnt)
 
@@ -576,6 +581,7 @@ hoeij <- hoeij %>%
   mutate(Hoeij_Max_pcnt = (rank(Max)/length(Max))*100)
 
 hoeij <- hoeij %>% select(Gene_id, Hoeij_Max_pcnt)
+hoeij <- hoeij %>% group_by(Gene_id) %>% summarize_all(list(mean))
 hoeij
 
 hist(hoeij$Hoeij_Max_pcnt)
@@ -592,6 +598,8 @@ toen <- toen %>%
   mutate(Toen_Max_pcnt = (rank(Max)/length(Max))*100)
 
 toen <- toen %>% select(Gene_id, Toen_Max_pcnt)
+toen <- toen %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
 toen
 
 hist(toen$Toen_Max_pcnt)
@@ -608,6 +616,8 @@ bart <- bart %>%
   mutate(Bart_Max_pcnt = (rank(Max)/length(Max))*100)
 
 bart <- bart %>% select(Gene_id, Bart_Max_pcnt)
+bart <- bart %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
 bart
 
 hist(bart$Bart_Max_pcnt)
@@ -629,6 +639,7 @@ print(rna_df, width=200)
 
 hist(rna_df$MeanPercent, breaks = 20)
 hist(rna_df$StdDevPercent, breaks = 100)
+table(duplicated(rna_df$Gene_id))
 #+END_SRC
 **
 ** Load Annotation
@@ -636,9 +647,11 @@ hist(rna_df$StdDevPercent, breaks = 100)
 annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
   select(Gene_id = `Gene ID`,
          Gene_name = `Gene Name or Symbol`,
-         Annot = `Product Description`)
+         Annot = `Product Description`) %>%
+  distinct() # remove duplicated rows
 
 print(annot_df, width=200)
+table(duplicated(annot_df$Gene_id))
 #+END_SRC
 ** Create Join DF
 #+BEGIN_SRC R :results none
