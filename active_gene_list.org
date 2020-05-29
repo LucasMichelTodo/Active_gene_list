@@ -914,11 +914,9 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC >= th_areaFC &
                 !! redcol < th_redpcnt ~ 'Var_Repressed_FC_noredpcnt', # Variant, FC, NOredpcnt
 
-                ## Not settable
-                ##is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable', #First set them all
+                ###### Not settable
 
-                ## Then exceptions
-                ## FC NA but microarray data
+                ## FC NA
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent < th_rnapcnt &
@@ -928,6 +926,16 @@ set_state <- function(df, statecol, redcol, relcol){
                 is.na(areaFC) &
                 MeanPercent >= th_rnapcnt &
                 MeanRedPercent >= th_reddown ~ 'Active_FCna',
+
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent >= th_rnapcnt &
+                is.na(MeanRedPercent) ~ 'Active_FCna_Redna',
+
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent < th_rnapcnt &
+                is.na(MeanRedPercent) ~ 'Inactive_FCna_Redna',
 
                 Variant &
                 is.na(areaFC) &
@@ -996,13 +1004,8 @@ set_state <- function(df, statecol, redcol, relcol){
                 MeanRedPercent >= th_redrescue &
                 !! relcol == 'min' ~ 'Var_Repressed_RNASeqNA_rescue_FC_min',
 
-                ## Microarrays NA
-                !Variant &
-                is.na(MeanRedPercent) &
-                MeanPercent > th_rnapcnt ~ 'Active_noVar_noMicroarray',
 
-
-                TRUE ~ 'Wrong!'))
+                TRUE ~ 'Not_Settable'))
 
   ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
   ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
@@ -1060,10 +1063,30 @@ set_category <- function(df, statecol, categorycol){
                 !! statecol == 'Active_FCna' ~ 'Active',
                 !! statecol == 'Active_noVar_noMicroarray' ~ 'Active',
 
+                ## With NAs
+                !! statecol == 'Inactive_FCna' ~ 'Inactive',
+                !! statecol == 'Active_FCna' ~ 'Active',
+                !! statecol == 'Inactive_FCna_Redna' ~ 'Inactive',
+                !! statecol == 'Active_FCna_Redna' ~ 'Active',
 
-                !! statecol == 'Not_settable' ~ 'Not_settable',
+                !! statecol == 'Var_Repressed_FCna' ~ 'Var_Repressed',
+                !! statecol == 'Var_Active_FCna' ~ 'Var_Active',
 
-                TRUE ~ 'No_Category!'))
+                !! statecol == 'Active_RNASeqNA_rescue' ~ 'Active',
+                !! statecol == 'Inactive_RNASeqNA_reddown' ~ 'Inactive',
+
+                !! statecol == 'Active_RNASeqNA_rescue_FC_max' ~ 'Active',
+                !! statecol == 'Semiactive_RNASeqNA_rescue_FC_mid' ~ 'Active',
+                !! statecol == 'Inactive_RNASeqNA_rescue_FC_min' ~ 'Inactive',
+
+                !! statecol == 'Var_Active_RNASeqNA_rescue' ~ 'Var_Active',
+                !! statecol == 'Var_Repressed_RNASeqNA_reddown' ~ 'Var_Repressed',
+
+                !! statecol == 'Var_Active_RNASeqNA_rescue_FC_max' ~ 'Var_Active',
+                !! statecol == 'Var_Semiactive_RNASeqNA_rescue_FC_mid' ~ 'Var_Semiactive',
+                !! statecol == 'Var_Repressed_RNASeqNA_rescue_FC_min' ~ 'Var_Repressed',
+
+                TRUE ~ 'No_Category'))
   return(df)
 }
 
@@ -1079,7 +1102,7 @@ state_df <- final_df %>%
 
 print(state_df, width = 400)
 
-table(state_df$category_12B)
+table(state_df$state_12B)
 
 state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 
@@ -1088,7 +1111,9 @@ state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 #+BEGIN_SRC R
 ## We check no rows are set to "Wrong!"
 state_df %>%
-  filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
+  filter(state_12B == 'Not_Settable' |
+         state_10G == 'Not_Settable' |
+         state_3D7B == 'Not_Settable') %>%
   print(width = 400)
 
 state_df %>%
