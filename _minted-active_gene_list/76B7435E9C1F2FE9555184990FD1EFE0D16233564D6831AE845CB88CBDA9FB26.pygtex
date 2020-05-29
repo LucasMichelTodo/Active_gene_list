@@ -1,0 +1,104 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{} Areas DF \PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+
+\PYG{c+c1}{\PYGZsh{} Import Areas table}
+
+\PYG{n}{area} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}excel}\PYG{p}{(}\PYG{n}{excl}\PYG{p}{,} \PYG{n}{sheet} \PYG{o}{=} \PYG{l+m}{2}\PYG{p}{)}
+
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{area}\PYG{p}{)}\PYG{n}{[1]} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZdq{}Old\PYGZus{}id\PYGZdq{}}
+
+\PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{area} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Old\PYGZus{}id}\PYG{p}{,}
+         \PYG{n}{l\PYGZus{}12B} \PYG{o}{=} \PYG{n}{`left.1.2b`}\PYG{p}{,}
+         \PYG{n}{r\PYGZus{}12B} \PYG{o}{=} \PYG{n}{`right.1.2b`}\PYG{p}{,}
+         \PYG{n}{m\PYGZus{}12B} \PYG{o}{=} \PYG{n}{`mid.1.2b`}\PYG{p}{,}
+         \PYG{n}{s\PYGZus{}12B} \PYG{o}{=} \PYG{n}{`sides.1.2b`}\PYG{p}{,}
+         \PYG{n}{l\PYGZus{}10G} \PYG{o}{=} \PYG{n}{`left.10g`}\PYG{p}{,}
+         \PYG{n}{r\PYGZus{}10G} \PYG{o}{=} \PYG{n}{`right.10g`}\PYG{p}{,}
+         \PYG{n}{m\PYGZus{}10G} \PYG{o}{=} \PYG{n}{`mid.10g`}\PYG{p}{,}
+         \PYG{n}{s\PYGZus{}10G} \PYG{o}{=} \PYG{n}{`sides.10g`}\PYG{p}{,}
+         \PYG{n}{l\PYGZus{}3D7B} \PYG{o}{=} \PYG{n}{`left.3d7b`}\PYG{p}{,}
+         \PYG{n}{r\PYGZus{}3D7B} \PYG{o}{=} \PYG{n}{`right.3d7b`}\PYG{p}{,}
+         \PYG{n}{m\PYGZus{}3D7B} \PYG{o}{=} \PYG{n}{`mid.3d7b`}\PYG{p}{,}
+         \PYG{n}{s\PYGZus{}3D7B} \PYG{o}{=} \PYG{n}{`sides.3d7b`}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+  \PYG{n+nf}{mutate\PYGZus{}at}\PYG{p}{(}\PYG{n+nf}{vars}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{Old\PYGZus{}id}\PYG{p}{),} \PYG{n}{as.numeric}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+
+  \PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{map}\PYG{p}{,} \PYG{n}{by}\PYG{o}{=}\PYG{l+s}{\PYGZsq{}Old\PYGZus{}id\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{Old\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{summarize\PYGZus{}all}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{))}
+
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{200}\PYG{p}{)}
+
+\PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxLeft} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}l\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MinLeft} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}l\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{min}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxRight} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}r\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MinRight} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}r\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{min}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxMid} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}m\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MinMid} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}m\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{min}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxSides} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}s\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MinSides} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}s\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{min}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{DifLeft} \PYG{o}{=} \PYG{n}{MaxLeft} \PYG{o}{\PYGZhy{}} \PYG{n}{MinLeft}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{DifRight} \PYG{o}{=} \PYG{n}{MaxRight} \PYG{o}{\PYGZhy{}} \PYG{n}{MinRight}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{DifMid} \PYG{o}{=} \PYG{n}{MaxMid} \PYG{o}{\PYGZhy{}} \PYG{n}{MinMid}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{DifSides} \PYG{o}{=} \PYG{n}{MaxSides} \PYG{o}{\PYGZhy{}} \PYG{n}{MinSides}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{200}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Add max interval and difference}
+
+\PYG{n}{maxinterval} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Dif\PYGZsq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pivot\PYGZus{}longer}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{names\PYGZus{}to} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Interval\PYGZsq{}}\PYG{p}{,} \PYG{n}{values\PYGZus{}to} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}MaxDif\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{MaxDif}\PYG{p}{,} \PYG{n}{ties.method} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}first\PYGZdq{}}\PYG{p}{)} \PYG{o}{==} \PYG{l+m}{1}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Interval} \PYG{o}{=} \PYG{n+nf}{ifelse}\PYG{p}{(}\PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MaxDif}\PYG{p}{),} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}}\PYG{p}{,} \PYG{n}{Interval}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Interval} \PYG{o}{=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}\PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}DifLeft\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Left\PYGZsq{}}\PYG{p}{,}
+                              \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}DifRight\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Right\PYGZsq{}}\PYG{p}{,}
+                              \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}DifMid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Mid\PYGZsq{}}\PYG{p}{,}
+                              \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}DifSides\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Sides\PYGZsq{}}\PYG{p}{,}
+                              \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{areaFC} \PYG{o}{=} \PYG{n}{MaxDif}\PYG{o}{/}\PYG{l+m}{13.45}\PYG{p}{)}
+
+\PYG{n}{maxinterval}
+
+\PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{maxinterval}\PYG{p}{,} \PYG{n}{by} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Gene\PYGZus{}id\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Select appropiate area for each gene and add max and min areas}
+
+\PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{area\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{area\PYGZus{}12B} \PYG{o}{=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Left\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{l\PYGZus{}12B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Right\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{r\PYGZus{}12B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{m\PYGZus{}12B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Sides\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{s\PYGZus{}12B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{k+kc}{NA\PYGZus{}real\PYGZus{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{area\PYGZus{}10G} \PYG{o}{=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Left\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{l\PYGZus{}10G}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Right\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{r\PYGZus{}10G}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{m\PYGZus{}10G}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Sides\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{s\PYGZus{}10G}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{k+kc}{NA\PYGZus{}real\PYGZus{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{area\PYGZus{}3D7B} \PYG{o}{=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Left\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{l\PYGZus{}3D7B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Right\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{r\PYGZus{}3D7B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{m\PYGZus{}3D7B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Sides\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{n}{s\PYGZus{}3D7B}\PYG{p}{,}
+           \PYG{n}{Interval} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No Data\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{k+kc}{NA\PYGZus{}real\PYGZus{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxArea} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}area\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MinArea} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}area\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{min}\PYG{p}{))}
+
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n+nf}{duplicated}\PYG{p}{(}\PYG{n}{area\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))}
+\end{Verbatim}

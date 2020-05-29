@@ -1,0 +1,100 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{makeIntersects} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,}\PYG{n}{b}\PYG{p}{,}\PYG{n}{c}\PYG{p}{)\PYGZob{}}
+
+  \PYG{n}{a\PYGZus{}b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,} \PYG{n}{b}\PYG{p}{)}
+  \PYG{n}{a\PYGZus{}c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,} \PYG{n}{c}\PYG{p}{)}
+  \PYG{n}{b\PYGZus{}c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{b}\PYG{p}{,} \PYG{n}{c}\PYG{p}{)}
+  \PYG{n}{a\PYGZus{}b\PYGZus{}c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{a\PYGZus{}b}\PYG{p}{,} \PYG{n}{c}\PYG{p}{)}
+
+  \PYG{n}{abc} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c}
+  \PYG{n}{ab} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}b[}\PYG{o}{!}\PYG{n}{a\PYGZus{}b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
+  \PYG{n}{ac} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}c[}\PYG{o}{!}\PYG{n}{a\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
+  \PYG{n}{bc} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b\PYGZus{}c[}\PYG{o}{!}\PYG{n}{b\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
+
+  \PYG{n}{a} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a[}\PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
+  \PYG{n}{b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b[}\PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
+  \PYG{n}{c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{c[}\PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
+
+  \PYG{n+nf}{return}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{a} \PYG{o}{=} \PYG{n}{a}\PYG{p}{,} \PYG{n}{b} \PYG{o}{=} \PYG{n}{b}\PYG{p}{,} \PYG{n}{c} \PYG{o}{=} \PYG{n}{c}\PYG{p}{,} \PYG{n}{ab} \PYG{o}{=} \PYG{n}{ab}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{n}{bc}\PYG{p}{,} \PYG{n}{ac} \PYG{o}{=} \PYG{n}{ac}\PYG{p}{,} \PYG{n}{abc} \PYG{o}{=} \PYG{n}{abc}\PYG{p}{))}
+
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n}{customEuler} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,}\PYG{n}{b}\PYG{p}{,}\PYG{n}{c}\PYG{p}{,} \PYG{n}{name}\PYG{p}{)\PYGZob{}}
+
+  \PYG{n}{intersects} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{makeIntersects}\PYG{p}{(}\PYG{n}{a}\PYG{p}{,}\PYG{n}{b}\PYG{p}{,}\PYG{n}{c}\PYG{p}{)}
+  \PYG{n}{areas} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{lapply}\PYG{p}{(}\PYG{n}{intersects}\PYG{p}{,} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)} \PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{x}\PYG{p}{))}
+
+  \PYG{n}{fit} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{euler}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{A}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{a}\PYG{p}{,} \PYG{n}{B}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{b}\PYG{p}{,} \PYG{n}{C}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{c}\PYG{p}{,}
+                 \PYG{l+s}{\PYGZdq{}A\PYGZam{}B\PYGZdq{}}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{ab}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}A\PYGZam{}C\PYGZdq{}}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{ac}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}B\PYGZam{}C\PYGZdq{}}\PYG{o}{=}\PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{bc}\PYG{p}{,}
+                 \PYG{l+s}{\PYGZdq{}A\PYGZam{}B\PYGZam{}C\PYGZdq{}} \PYG{o}{=} \PYG{n}{areas}\PYG{o}{\PYGZdl{}}\PYG{n}{abc}\PYG{p}{))}
+
+  \PYG{n}{d} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{plot}\PYG{p}{(}\PYG{n}{fit}\PYG{p}{,} \PYG{n}{fills} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{fill} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}\PYGZsh{}619CFF\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}\PYGZsh{}F8766D\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}\PYGZsh{}00BA38\PYGZdq{}}\PYG{p}{),} \PYG{n}{alpha} \PYG{o}{=} \PYG{l+m}{0.5}\PYG{p}{),}
+            \PYG{n}{edges} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{lwd} \PYG{o}{=} \PYG{l+m}{0.1}\PYG{p}{),} \PYG{n}{quantities} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{quantities} \PYG{o}{=} \PYG{n+nb+bp}{T}\PYG{p}{),}
+            \PYG{n}{labels} \PYG{o}{=} \PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{labels}\PYG{o}{=}\PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}12B\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}10G\PYGZdq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}3D7B\PYGZdq{}}\PYG{p}{)),}
+            \PYG{n}{main} \PYG{o}{=} \PYG{n}{name}\PYG{p}{)}
+
+  \PYG{n+nf}{ggsave}\PYG{p}{(}\PYG{n}{d}\PYG{p}{,} \PYG{n}{filename} \PYG{o}{=} \PYG{n+nf}{paste0}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}./Plots/\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}venn\PYGZus{}\PYGZdq{}}\PYG{p}{,} \PYG{n}{name}\PYG{p}{,} \PYG{l+s}{\PYGZdq{}.png\PYGZdq{}}\PYG{p}{),}
+         \PYG{n}{device} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}png\PYGZdq{}}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{10}\PYG{p}{,} \PYG{n}{height} \PYG{o}{=} \PYG{l+m}{10}\PYG{p}{,} \PYG{n}{units} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}cm\PYGZdq{}}\PYG{p}{)}
+
+  \PYG{n+nf}{plot}\PYG{p}{(}\PYG{n}{d}\PYG{p}{)}
+  \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{fit}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Var active}
+
+\PYG{n}{va\PYGZus{}12B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}12B} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Active\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+\PYG{n}{va\PYGZus{}10G} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}10G} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Active\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+\PYG{n}{va\PYGZus{}3D7B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}3D7B} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Active\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+
+\PYG{n+nf}{customEuler}\PYG{p}{(}\PYG{n}{va\PYGZus{}12B}\PYG{p}{,} \PYG{n}{va\PYGZus{}10G}\PYG{p}{,} \PYG{n}{va\PYGZus{}3D7B}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}Genes\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Var inactive}
+
+\PYG{n}{vi\PYGZus{}12B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}12B} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Repressed\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+\PYG{n}{vi\PYGZus{}10G} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}10G} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Repressed\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+\PYG{n}{vi\PYGZus{}3D7B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}3D7B} \PYG{o}{==} \PYG{l+s}{\PYGZdq{}Var\PYGZus{}Repressed\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{pull}\PYG{p}{()}
+
+
+\PYG{n+nf}{customEuler}\PYG{p}{(}\PYG{n}{vi\PYGZus{}12B}\PYG{p}{,} \PYG{n}{vi\PYGZus{}10G}\PYG{p}{,} \PYG{n}{vi\PYGZus{}3D7B}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}Genes\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Same category}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} We fuse the gene\PYGZus{}id with it\PYGZsq{}s state so that genes with same state will be exactly the same while genes with different state will be different.}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{n}{genestate} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{gs\PYGZus{}12B} \PYG{o}{=} \PYG{n+nf}{paste}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{category\PYGZus{}12B}\PYG{p}{,} \PYG{n}{sep} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}\PYGZus{}\PYGZdq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{gs\PYGZus{}10G} \PYG{o}{=} \PYG{n+nf}{paste}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{category\PYGZus{}10G}\PYG{p}{,} \PYG{n}{sep} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}\PYGZus{}\PYGZdq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{gs\PYGZus{}3D7B} \PYG{o}{=} \PYG{n+nf}{paste}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{category\PYGZus{}3D7B}\PYG{p}{,} \PYG{n}{sep} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}\PYGZus{}\PYGZdq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,}
+         \PYG{n}{category\PYGZus{}12B}\PYG{p}{,} \PYG{n}{category\PYGZus{}10G}\PYG{p}{,} \PYG{n}{category\PYGZus{}3D7B}\PYG{p}{,}
+         \PYG{n}{gs\PYGZus{}12B}\PYG{p}{,} \PYG{n}{gs\PYGZus{}10G}\PYG{p}{,} \PYG{n}{gs\PYGZus{}3D7B}\PYG{p}{)}
+
+\PYG{n+nf}{customEuler}\PYG{p}{(}\PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}12B}\PYG{p}{,} \PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}10G}\PYG{p}{,} \PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}3D7B}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}Same\PYGZus{}State\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n}{x} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{makeIntersects}\PYG{p}{(}\PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}12B}\PYG{p}{,} \PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}10G}\PYG{p}{,} \PYG{n}{genestate}\PYG{o}{\PYGZdl{}}\PYG{n}{gs\PYGZus{}3D7B}\PYG{p}{)\PYGZcb{}}
+\end{Verbatim}

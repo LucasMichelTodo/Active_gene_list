@@ -1,0 +1,38 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} We check no rows are set to \PYGZdq{}Wrong!\PYGZdq{}}
+\PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{state\PYGZus{}12B} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Not\PYGZus{}Settable\PYGZsq{}} \PYG{o}{|}
+         \PYG{n}{state\PYGZus{}10G} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Not\PYGZus{}Settable\PYGZsq{}} \PYG{o}{|}
+         \PYG{n}{state\PYGZus{}3D7B} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Not\PYGZus{}Settable\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}12B} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No\PYGZus{}Category\PYGZsq{}} \PYG{o}{|}
+         \PYG{n}{category\PYGZus{}10G} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No\PYGZus{}Category\PYGZsq{}} \PYG{o}{|}
+         \PYG{n}{category\PYGZus{}3D7B} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No\PYGZus{}Category\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Save results}
+\PYG{n+nf}{write.csv}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}./Results\PYGZus{}Tables/state\PYGZus{}df\PYGZus{}rna25\PYGZus{}red25\PYGZus{}reddif0\PYGZus{}area1.csv\PYGZsq{}}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Create a table with number of each state per strain}
+\PYG{n}{state\PYGZus{}table} \PYG{o}{\PYGZlt{}\PYGZhy{}}  \PYG{n+nf}{bind\PYGZus{}rows}\PYG{p}{(}\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{state\PYGZus{}12B}\PYG{p}{),}
+                          \PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{state\PYGZus{}10G}\PYG{p}{),}
+                          \PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{state\PYGZus{}3D7B}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{replace\PYGZus{}na}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{Var\PYGZus{}Semiactive} \PYG{o}{=} \PYG{l+m}{0}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Strain} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}12B\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}10G\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}3D7B\PYGZsq{}}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Strain}\PYG{p}{,} \PYG{n+nf}{everything}\PYG{p}{())}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Create a table with differences between 12B and 10G}
+\PYG{n}{dif12B\PYGZus{}10G} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{state\PYGZus{}12B} \PYG{o}{!=} \PYG{n}{state\PYGZus{}10G}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}12B\PYGZsq{}}\PYG{p}{),} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}10G\PYGZsq{}}\PYG{p}{),} \PYG{n}{Gene\PYGZus{}name}\PYG{p}{,} \PYG{n}{Annot}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Check Clags}
+\PYG{n}{clags} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}PF3D7\PYGZus{}0302500\PYGZsq{}} \PYG{o}{|} \PYG{n}{Gene\PYGZus{}id} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}PF3D7\PYGZus{}0302200\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n+nf}{write.csv}\PYG{p}{(}\PYG{n}{clags}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}./Results\PYGZus{}Tables/clag\PYGZus{}genes.csv\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{state\PYGZus{}table}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{200}\PYG{p}{)}
+\PYG{n+nf}{summary}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{p}{)}
+\end{Verbatim}

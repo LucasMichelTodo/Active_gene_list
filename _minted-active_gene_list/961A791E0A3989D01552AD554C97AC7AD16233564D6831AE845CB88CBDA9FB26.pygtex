@@ -1,0 +1,35 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{excl} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZdq{}./Data/10Gvs1p2B.xlsx\PYGZdq{}}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Import 12B vs 10G differences by transcription table}
+\PYG{n}{trans\PYGZus{}difs} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}./Data/transDif\PYGZus{}12Bvs10G.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{delim} \PYG{o}{=} \PYG{l+s}{\PYGZsq{};\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{rename}\PYG{p}{(}\PYG{n}{Old\PYGZus{}id} \PYG{o}{=} \PYG{n}{X1}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{left\PYGZus{}join}\PYG{p}{(}\PYG{n}{map}\PYG{p}{,} \PYG{n}{by} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}Old\PYGZus{}id\PYGZsq{}}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{trans\PYGZus{}difs}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{n}{trans\PYGZus{}difs} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Old\PYGZus{}id}\PYG{p}{,} \PYG{n}{Gene\PYGZus{}id}\PYG{p}{)}
+
+\PYG{n}{dif12B\PYGZus{}10G}
+
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{trans\PYGZus{}difs}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{dif12B\PYGZus{}10G}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)}
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{dif12B\PYGZus{}10G}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{trans\PYGZus{}difs}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)}
+
+\PYG{n}{allids} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{unique}\PYG{p}{(}\PYG{n+nf}{c}\PYG{p}{(}\PYG{n}{dif12B\PYGZus{}10G}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{trans\PYGZus{}difs}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))}
+
+\PYG{n}{compare\PYGZus{}12Bvs10G} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{allids}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,}
+         \PYG{n}{Variant}\PYG{p}{,} \PYG{n}{areaFC}\PYG{p}{,}
+         \PYG{n}{MeanRedPercent}\PYG{p}{,}
+         \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}12B\PYGZsq{}}\PYG{p}{),}
+         \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}10G\PYGZsq{}}\PYG{p}{),}
+         \PYG{n}{Gene\PYGZus{}name}\PYG{p}{,}
+         \PYG{n}{Annot}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{TransDif} \PYG{o}{=} \PYG{n}{Gene\PYGZus{}id} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{trans\PYGZus{}difs}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Dif\PYGZus{}state} \PYG{o}{=} \PYG{n}{category\PYGZus{}12B} \PYG{o}{!=} \PYG{n}{category\PYGZus{}10G}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{compare\PYGZus{}12Bvs10G}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+\PYG{n+nf}{write.csv}\PYG{p}{(}\PYG{n}{compare\PYGZus{}12Bvs10G}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}./Results\PYGZus{}Tables/gens\PYGZus{}dif12B\PYGZus{}10G.csv\PYGZsq{}}\PYG{p}{)}
+\end{Verbatim}
