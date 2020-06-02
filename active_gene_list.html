@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-05-14 Thu 15:43 -->
+<!-- 2020-05-14 Thu 15:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Creation of active gene-lists</title>
@@ -242,37 +242,37 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orgb8d20cb">1. Active/Inactive Gene lists</a>
+<li><a href="#org7700f8f">1. Active/Inactive Gene lists</a>
 <ul>
-<li><a href="#orga8c1860">1.1. Microarray Data: Red Signal</a></li>
-<li><a href="#org52936d3">1.2. Microarray Data: Areas</a></li>
-<li><a href="#orga84739d">1.3. Load RNA-Seq Data</a></li>
-<li><a href="#org4ac2ad3">1.4. Create table for classification</a></li>
-<li><a href="#org18c52a6">1.5. Create Lists according to thresholds</a></li>
-<li><a href="#org8e0f395">1.6. Some results</a></li>
-<li><a href="#orgdd863fb">1.7. Venn Diagrams</a></li>
+<li><a href="#org8507f4a">1.1. Microarray Data: Red Signal</a></li>
+<li><a href="#org55d5958">1.2. Microarray Data: Areas</a></li>
+<li><a href="#org00769f0">1.3. Load RNA-Seq Data</a></li>
+<li><a href="#orgd9d90c8">1.4. Create table for classification</a></li>
+<li><a href="#org99892a8">1.5. Create Lists according to thresholds</a></li>
+<li><a href="#org51b69d9">1.6. Some results</a></li>
+<li><a href="#org777bf59">1.7. Venn Diagrams</a></li>
 </ul>
 </li>
-<li><a href="#orgaea15e3">2. Code</a>
+<li><a href="#orge17b67c">2. Code</a>
 <ul>
-<li><a href="#org52e04d8">2.1. Load Packages and functions</a></li>
-<li><a href="#org45f4f5a">2.2. Microarray Data: Red Signal</a></li>
-<li><a href="#orgfc33a48">2.3. Microarray Data: Areas</a></li>
-<li><a href="#orgb5ca1ea">2.4. Load RNA-Seq Data</a></li>
-<li><a href="#org1309ec3">2.5. Load Annotation</a></li>
-<li><a href="#orge51750c">2.6. Create Join DF</a></li>
-<li><a href="#org356aa01">2.7. Create Lists according to thresholds</a></li>
-<li><a href="#orga4fc9cf">2.8. Some checks and results</a></li>
-<li><a href="#org4ac106c">2.9. Comparison of 12B vs 10G differences</a></li>
-<li><a href="#orgd66dec8">2.10. Venn Diagram of results</a></li>
+<li><a href="#org7f57839">2.1. Load Packages and functions</a></li>
+<li><a href="#orga6bbbb0">2.2. Microarray Data: Red Signal</a></li>
+<li><a href="#orgdb4b728">2.3. Microarray Data: Areas</a></li>
+<li><a href="#org048526e">2.4. Load RNA-Seq Data</a></li>
+<li><a href="#org726bca8">2.5. Load Annotation</a></li>
+<li><a href="#orga92515f">2.6. Create Join DF</a></li>
+<li><a href="#org543f609">2.7. Create Lists according to thresholds</a></li>
+<li><a href="#org63ff96c">2.8. Some checks and results</a></li>
+<li><a href="#orga2d19cb">2.9. Comparison of 12B vs 10G differences</a></li>
+<li><a href="#org122d593">2.10. Venn Diagram of results</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgb8d20cb" class="outline-2">
-<h2 id="orgb8d20cb"><span class="section-number-2">1</span> Active/Inactive Gene lists</h2>
+<div id="outline-container-org7700f8f" class="outline-2">
+<h2 id="org7700f8f"><span class="section-number-2">1</span> Active/Inactive Gene lists</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
@@ -290,8 +290,8 @@ We will define 5 possible expresion states:
 </ul>
 </div>
 
-<div id="outline-container-orga8c1860" class="outline-3">
-<h3 id="orga8c1860"><span class="section-number-3">1.1</span> Microarray Data: Red Signal</h3>
+<div id="outline-container-org8507f4a" class="outline-3">
+<h3 id="org8507f4a"><span class="section-number-3">1.1</span> Microarray Data: Red Signal</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
@@ -319,8 +319,8 @@ Red Signal DataFrame
 </div>
 </div>
 
-<div id="outline-container-org52936d3" class="outline-3">
-<h3 id="org52936d3"><span class="section-number-3">1.2</span> Microarray Data: Areas</h3>
+<div id="outline-container-org55d5958" class="outline-3">
+<h3 id="org55d5958"><span class="section-number-3">1.2</span> Microarray Data: Areas</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
@@ -369,8 +369,8 @@ Areas DataFrame
 </div>
 </div>
 
-<div id="outline-container-orga84739d" class="outline-3">
-<h3 id="orga84739d"><span class="section-number-3">1.3</span> Load RNA-Seq Data</h3>
+<div id="outline-container-org00769f0" class="outline-3">
+<h3 id="org00769f0"><span class="section-number-3">1.3</span> Load RNA-Seq Data</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
@@ -430,8 +430,8 @@ We plot the standard deviation of the percentile values among different Data-Set
 </div>
 </div>
 </div>
-<div id="outline-container-org4ac2ad3" class="outline-3">
-<h3 id="org4ac2ad3"><span class="section-number-3">1.4</span> Create table for classification</h3>
+<div id="outline-container-orgd9d90c8" class="outline-3">
+<h3 id="orgd9d90c8"><span class="section-number-3">1.4</span> Create table for classification</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
@@ -483,8 +483,8 @@ Final DataFrame
 </div>
 </div>
 
-<div id="outline-container-org18c52a6" class="outline-3">
-<h3 id="org18c52a6"><span class="section-number-3">1.5</span> Create Lists according to thresholds</h3>
+<div id="outline-container-org99892a8" class="outline-3">
+<h3 id="org99892a8"><span class="section-number-3">1.5</span> Create Lists according to thresholds</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 Now that we have all the data loaded in, we can star to set labels for each gene.
@@ -573,8 +573,8 @@ Gene-State DataFrame
 </div>
 </div>
 
-<div id="outline-container-org8e0f395" class="outline-3">
-<h3 id="org8e0f395"><span class="section-number-3">1.6</span> Some results</h3>
+<div id="outline-container-org51b69d9" class="outline-3">
+<h3 id="org51b69d9"><span class="section-number-3">1.6</span> Some results</h3>
 <div class="outline-text-3" id="text-1-6">
 <p>
 This is a table with the number of genes in each state for each strain.
@@ -621,8 +621,8 @@ And this are the Clag genes
 </div>
 </div>
 
-<div id="outline-container-orgdd863fb" class="outline-3">
-<h3 id="orgdd863fb"><span class="section-number-3">1.7</span> Venn Diagrams</h3>
+<div id="outline-container-org777bf59" class="outline-3">
+<h3 id="org777bf59"><span class="section-number-3">1.7</span> Venn Diagrams</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
 Here we plon Venn diagrams to visualize how the strains compare.
@@ -657,13 +657,13 @@ Then we make venn diagrams for the "Var_active" and "Var_Repressed" states.
 </div>
 </div>
 
-<div id="outline-container-orgaea15e3" class="outline-2">
-<h2 id="orgaea15e3"><span class="section-number-2">2</span> Code</h2>
+<div id="outline-container-orge17b67c" class="outline-2">
+<h2 id="orge17b67c"><span class="section-number-2">2</span> Code</h2>
 <div class="outline-text-2" id="text-2">
 </div>
 
-<div id="outline-container-org52e04d8" class="outline-3">
-<h3 id="org52e04d8"><span class="section-number-3">2.1</span> Load Packages and functions</h3>
+<div id="outline-container-org7f57839" class="outline-3">
+<h3 id="org7f57839"><span class="section-number-3">2.1</span> Load Packages and functions</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Imports ####</span>
@@ -689,8 +689,8 @@ Then we make venn diagrams for the "Var_active" and "Var_Repressed" states.
 </div>
 </div>
 
-<div id="outline-container-org45f4f5a" class="outline-3">
-<h3 id="org45f4f5a"><span class="section-number-3">2.2</span> Microarray Data: Red Signal</h3>
+<div id="outline-container-orga6bbbb0" class="outline-3">
+<h3 id="orga6bbbb0"><span class="section-number-3">2.2</span> Microarray Data: Red Signal</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Red Signal DF ####</span>
@@ -745,8 +745,8 @@ hist(red_df$MeanRedPercent)
 </div>
 </div>
 </div>
-<div id="outline-container-orgfc33a48" class="outline-3">
-<h3 id="orgfc33a48"><span class="section-number-3">2.3</span> Microarray Data: Areas</h3>
+<div id="outline-container-orgdb4b728" class="outline-3">
+<h3 id="orgdb4b728"><span class="section-number-3">2.3</span> Microarray Data: Areas</h3>
 <div class="outline-text-3" id="text-2-3">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">#### </span><span style="color: #7F9F7F;">Areas DF ####</span>
@@ -854,8 +854,8 @@ print(area_df, width = 400)
 </div>
 </div>
 </div>
-<div id="outline-container-orgb5ca1ea" class="outline-3">
-<h3 id="orgb5ca1ea"><span class="section-number-3">2.4</span> Load RNA-Seq Data</h3>
+<div id="outline-container-org048526e" class="outline-3">
+<h3 id="org048526e"><span class="section-number-3">2.4</span> Load RNA-Seq Data</h3>
 <div class="outline-text-3" id="text-2-4">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">#### Old approax ####</span>
@@ -959,8 +959,8 @@ hist(rna_df$StdDevPercent, breaks = 100)
 </p>
 </div>
 </div>
-<div id="outline-container-org1309ec3" class="outline-3">
-<h3 id="org1309ec3"><span class="section-number-3">2.5</span> Load Annotation</h3>
+<div id="outline-container-org726bca8" class="outline-3">
+<h3 id="org726bca8"><span class="section-number-3">2.5</span> Load Annotation</h3>
 <div class="outline-text-3" id="text-2-5">
 <div class="org-src-container">
 <pre class="src src-R">annot_df <span style="color: #BFEBBF;">&lt;-</span> read_delim(<span style="color: #CC9393;">'./Data/plasmoDB_geneAnnot.csv'</span>, delim = <span style="color: #CC9393;">';'</span>) <span style="color: #BFEBBF;">%&gt;%</span>
@@ -973,8 +973,8 @@ print(annot_df, width=200)
 </div>
 </div>
 </div>
-<div id="outline-container-orge51750c" class="outline-3">
-<h3 id="orge51750c"><span class="section-number-3">2.6</span> Create Join DF</h3>
+<div id="outline-container-orga92515f" class="outline-3">
+<h3 id="orga92515f"><span class="section-number-3">2.6</span> Create Join DF</h3>
 <div class="outline-text-3" id="text-2-6">
 <div class="org-src-container">
 <pre class="src src-R">print(red_df, width = 200)
@@ -1035,8 +1035,8 @@ print(final_df, width = 200)
 </div>
 </div>
 </div>
-<div id="outline-container-org356aa01" class="outline-3">
-<h3 id="org356aa01"><span class="section-number-3">2.7</span> Create Lists according to thresholds</h3>
+<div id="outline-container-org543f609" class="outline-3">
+<h3 id="org543f609"><span class="section-number-3">2.7</span> Create Lists according to thresholds</h3>
 <div class="outline-text-3" id="text-2-7">
 <div class="org-src-container">
 <pre class="src src-R">print(final_df, width = 200)
@@ -1163,8 +1163,8 @@ print(state_df, width = 400)
 </div>
 </div>
 </div>
-<div id="outline-container-orga4fc9cf" class="outline-3">
-<h3 id="orga4fc9cf"><span class="section-number-3">2.8</span> Some checks and results</h3>
+<div id="outline-container-org63ff96c" class="outline-3">
+<h3 id="org63ff96c"><span class="section-number-3">2.8</span> Some checks and results</h3>
 <div class="outline-text-3" id="text-2-8">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">We check no rows are set to "Wrong!"</span>
@@ -1205,8 +1205,8 @@ summary(rna_df)
 </div>
 </div>
 </div>
-<div id="outline-container-org4ac106c" class="outline-3">
-<h3 id="org4ac106c"><span class="section-number-3">2.9</span> Comparison of 12B vs 10G differences</h3>
+<div id="outline-container-orga2d19cb" class="outline-3">
+<h3 id="orga2d19cb"><span class="section-number-3">2.9</span> Comparison of 12B vs 10G differences</h3>
 <div class="outline-text-3" id="text-2-9">
 <div class="org-src-container">
 <pre class="src src-R">excl <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #CC9393;">"./Data/10Gvs1p2B.xlsx"</span>
@@ -1246,8 +1246,8 @@ write.csv(compare_12Bvs10G, <span style="color: #CC9393;">'./Results_Tables/gens
 </div>
 </div>
 </div>
-<div id="outline-container-orgd66dec8" class="outline-3">
-<h3 id="orgd66dec8"><span class="section-number-3">2.10</span> Venn Diagram of results</h3>
+<div id="outline-container-org122d593" class="outline-3">
+<h3 id="org122d593"><span class="section-number-3">2.10</span> Venn Diagram of results</h3>
 <div class="outline-text-3" id="text-2-10">
 <div class="org-src-container">
 <pre class="src src-R"><span style="color: #93E0E3;">makeIntersects</span> <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #F0DFAF; font-weight: bold;">function</span>(a,b,c){
@@ -1357,7 +1357,7 @@ x <span style="color: #BFEBBF;">&lt;-</span> makeIntersects(genestate$gs_12B, ge
 <div id="postamble" class="status">
 <p class="date">Date: 31/03/2020</p>
 <p class="author">Author: Lucas Michel Todó</p>
-<p class="date">Created: 2020-05-14 Thu 15:43</p>
+<p class="date">Created: 2020-05-14 Thu 15:47</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
