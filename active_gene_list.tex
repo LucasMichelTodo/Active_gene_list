@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 % Created 2020-05-14 Thu 15:48
+=======
+% Created 2020-05-29 vie 16:53
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -30,22 +34,40 @@
 \maketitle
 \tableofcontents \clearpage
 \section{Active/Inactive Gene lists}
+<<<<<<< HEAD
 \label{sec:org8b7b1a7}
+=======
+\label{sec:orgb8ba823}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
 We will define 5 possible expresion states:
+
 \begin{itemize}
 \item Active
 \begin{itemize}
 \item Active (no-variant genes)
 \item Variant Active
+\item Variant Semiactive (vairant genes with an intermediate state)
+\end{itemize}
+
+\item Inactive (no-variant genes)
+\begin{itemize}
 \item Variant Repressed
 \end{itemize}
+<<<<<<< HEAD
 \item Inactive (no-variant genes)
+=======
+
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \item Not-Settable
 \end{itemize}
 
 \subsection{Microarray Data: Red Signal}
+<<<<<<< HEAD
 \label{sec:org0bb25cd}
+=======
+\label{sec:org25656e2}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
@@ -57,6 +79,7 @@ Red Signal DataFrame
 4 PF3D7_0100300   283.98333   291.69583  7540.9042  12.5668449  12.9870130
 5 PF3D7_0100400   193.77500    35.01250   161.0833   9.8930481   1.0504202
 6 PF3D7_0100600    31.58333    33.40417    31.5250   0.2291826   0.4392666
+<<<<<<< HEAD
   Percent_3D7B MaxRedPercentDif MeanRedPercent
 1   97.8800611         2.425516     97.4662592
 2   11.1153552         5.423988      9.2564298
@@ -68,6 +91,19 @@ Red Signal DataFrame
 
 \subsection{Microarray Data: Areas}
 \label{sec:org292c843}
+=======
+  Percent_3D7B MaxRedPercentDif MeanRedPercent MaxRedPercent
+1   97.8800611         2.425516     97.4662592    98.4721161
+2   11.1153552         5.423988      9.2564298    11.1153552
+3   19.9006875        25.744843     17.8889738    29.7555386
+4   81.3407181        68.773873     35.6315253    81.3407181
+5    8.0595875         8.842628      6.3343519     9.8930481
+6    0.2387319         0.210084      0.3023937     0.4392666
+\end{verbatim}
+
+\subsection{Microarray Data: Areas}
+\label{sec:orgf9faa78}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
@@ -110,7 +146,11 @@ Areas DataFrame
 \end{verbatim}
 
 \subsection{Load RNA-Seq Data}
+<<<<<<< HEAD
 \label{sec:org3bb7944}
+=======
+\label{sec:orge943a5f}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
@@ -128,6 +168,7 @@ For each Data-Set we first create a column representing the maxium value among t
 RNA-Seq DataFrame
 \begin{verbatim}
         Gene_id Otto_Max_pcnt Hoeij_Max_pcnt Toen_Max_pcnt Bart_Max_pcnt
+<<<<<<< HEAD
 1 PF3D7_0100100     26.104032      24.855996     17.577239     18.240531
 2 PF3D7_0100200      7.366032      25.693838     13.833130     18.764182
 3 PF3D7_0100300     22.045732       3.587013      2.469890      1.885146
@@ -141,6 +182,21 @@ RNA-Seq DataFrame
 4   14.607698      2.356468
 5   18.975825      6.664638
 6    4.789230      1.873182
+=======
+1    mal_mito_1     97.695933      66.259382      69.20929     80.520161
+2    mal_mito_2     98.079944      88.776401      85.12829     94.728574
+3    mal_mito_3     97.835573      92.249956      89.99825     90.190260
+4 PF3D7_0100100     26.104032      24.855996      17.57724     18.240531
+5 PF3D7_0100200      7.366032      25.693838      13.83313     18.764182
+6 PF3D7_0100300     22.045732       3.587013       2.46989      1.885146
+  MeanPercent StdDevPercent
+1   78.421190     12.335823
+2   91.678303      5.040060
+3   92.568511      3.166454
+4   21.694449      3.818402
+5   16.414296      6.711285
+6    7.496945      8.421970
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \end{verbatim}
 
 We plot the resulting distribution of percentiles (it should be almost flat).
@@ -154,7 +210,11 @@ We plot the standard deviation of the percentile values among different Data-Set
 \includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
 \end{center}
 \subsection{Create table for classification}
+<<<<<<< HEAD
 \label{sec:orged8a6d3}
+=======
+\label{sec:org01967d0}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
 
@@ -173,6 +233,7 @@ Final DataFrame
 4 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
 5 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
 6 PF3D7_0100600    TRUE   0.2291826   0.4392666    0.2387319         0.210084
+<<<<<<< HEAD
   MeanRedPercent Interval    areaFC area_12B  area_10G area_3D7B  MaxArea
 1     97.4662592     Left 0.3881060 30.59250 25.372470  25.48463 30.59250
 2      9.2564298     Left 0.8879945 31.76998 43.713503  38.29839 43.71350
@@ -187,6 +248,22 @@ Final DataFrame
 4 31.789080    7.496945     min     min      max       VAR
 5  7.706832   14.607698     mid     min      max       RIF
 6        NA    4.789230      NA      NA       NA       RIF
+=======
+  MeanRedPercent MaxRedPercent Interval    areaFC area_12B  area_10G area_3D7B
+1     97.4662592    98.4721161     Left 0.3881060 30.59250 25.372470  25.48463
+2      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
+3     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
+4     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
+5      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+6      0.3023937     0.4392666  No Data        NA       NA        NA        NA
+   MaxArea   MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
+1 30.59250 25.372470   92.568511     max     min      min      null
+2 43.71350 31.769976   21.694449     min     max      mid       VAR
+3 52.33320  5.237266   16.414296     max     min      max       RIF
+4 77.46213 31.789080    7.496945     min     min      max       VAR
+5 35.50954  7.706832   14.607698     mid     min      max       RIF
+6       NA        NA    4.789230      NA      NA       NA       RIF
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
                                    Annot
 1                    unspecified product
 2 erythrocyte membrane protein 1, PfEMP1
@@ -197,7 +274,11 @@ Final DataFrame
 \end{verbatim}
 
 \subsection{Create Lists according to thresholds}
+<<<<<<< HEAD
 \label{sec:org5b85d47}
+=======
+\label{sec:org4ed0248}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
@@ -218,10 +299,27 @@ In addition to these thresholds we will use 2 more columns to set the categories
 We will have the following categories with the following logic:
 
 \begin{center}
+<<<<<<< HEAD
 \includegraphics[width=.9\linewidth]{./Plots/decision_tree.jpg}
 \end{center}
 
 Genes that lack either an areaFC value or a RNA-Seq mean percentile are currently set to "Non-Settable".
+=======
+\includegraphics[width=.9\linewidth]{./Plots/Decision_Tree.jpg}
+\end{center}
+
+\href{./Plots/Decision\_Tree.jpg}{Make bigger}
+
+
+Genes that have NA values in any of the classification columns are classified according to the following tree.
+\begin{center}
+\includegraphics[width=.9\linewidth]{./Plots/active_genes_NAs.jpg}
+\end{center}
+
+\href{Plots/active\_genes\_NAs.jpg}{Make bigger}
+
+Using this criteria we construct the following DataFrame:
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 Gene-State DataFrame
 \begin{verbatim}
@@ -233,6 +331,7 @@ Gene-State DataFrame
 4 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
 5 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
 6 PF3D7_0100600    TRUE   0.2291826   0.4392666    0.2387319         0.210084
+<<<<<<< HEAD
   MeanRedPercent Interval    areaFC area_12B  area_10G area_3D7B  MaxArea
 1     97.4662592     Left 0.3881060 30.59250 25.372470  25.48463 30.59250
 2      9.2564298     Left 0.8879945 31.76998 43.713503  38.29839 43.71350
@@ -247,35 +346,68 @@ Gene-State DataFrame
 4 31.789080    7.496945     min     min      max       VAR
 5  7.706832   14.607698     mid     min      max       RIF
 6        NA    4.789230      NA      NA       NA       RIF
+=======
+  MeanRedPercent MaxRedPercent Interval    areaFC area_12B  area_10G area_3D7B
+1     97.4662592    98.4721161     Left 0.3881060 30.59250 25.372470  25.48463
+2      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
+3     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
+4     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
+5      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+6      0.3023937     0.4392666  No Data        NA       NA        NA        NA
+   MaxArea   MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
+1 30.59250 25.372470   92.568511     max     min      min      null
+2 43.71350 31.769976   21.694449     min     max      mid       VAR
+3 52.33320  5.237266   16.414296     max     min      max       RIF
+4 77.46213 31.789080    7.496945     min     min      max       VAR
+5 35.50954  7.706832   14.607698     mid     min      max       RIF
+6       NA        NA    4.789230      NA      NA       NA       RIF
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
                                    Annot                  state_12B
 1                    unspecified product                     Active
 2 erythrocyte membrane protein 1, PfEMP1         Var_Repressed_noFC
 3                                  rifin              Var_Active_FC
 4 erythrocyte membrane protein 1, PfEMP1 Var_Repressed_FC_noredpcnt
 5                                  rifin Var_Repressed_FC_noredpcnt
+<<<<<<< HEAD
 6                                  rifin               Not_settable
+=======
+6                                  rifin         Var_Repressed_FCna
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
                    state_10G                 state_3D7B  category_12B
 1                     Active                     Active        Active
 2         Var_Repressed_noFC         Var_Repressed_noFC Var_Repressed
 3 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt    Var_Active
 4 Var_Repressed_FC_noredpcnt              Var_Active_FC Var_Repressed
 5 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt Var_Repressed
+<<<<<<< HEAD
 6               Not_settable               Not_settable  Not_settable
+=======
+6         Var_Repressed_FCna         Var_Repressed_FCna Var_Repressed
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
    category_10G category_3D7B
 1        Active        Active
 2 Var_Repressed Var_Repressed
 3 Var_Repressed Var_Repressed
 4 Var_Repressed    Var_Active
 5 Var_Repressed Var_Repressed
+<<<<<<< HEAD
 6  Not_settable  Not_settable
 \end{verbatim}
 
 \subsection{Some results}
 \label{sec:orgee930da}
+=======
+6 Var_Repressed Var_Repressed
+\end{verbatim}
+
+\subsection{Some results}
+\label{sec:org2d1ca63}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 This is a table with the number of genes in each state for each strain.
 
 States Table
 \begin{verbatim}
+<<<<<<< HEAD
   Strain Active Active_FC Inactive Inactive_FC Not_settable Var_Active_FC
 1    12B   7025        29     1110          36          655             8
 2    10G   7025        29     1110          36          655             7
@@ -288,6 +420,36 @@ States Table
 1                        168                128                 1
 2                        172                128                NA
 3                         92                128                NA
+=======
+  Strain Active Active_FC Active_FC_Dif_max Active_FCna Active_FCna_Redna
+1    12B   3944        20                 2           1               191
+2    10G   3944        20                 2           1               191
+3   3D7B   3944        20                 2           1               191
+  Active_rescued Active_RNASeqNA_rescue Inactive Inactive_FC
+1             53                      6      660          36
+2             53                      6      660          36
+3             53                      6      660          36
+  Inactive_FC_Dif_min Inactive_FC_reddown Inactive_FCna Inactive_FCna_Redna
+1                   2                   5            30                  89
+2                   2                   5            30                  89
+3                   2                   5            30                  89
+  Inactive_reddown Not_Settable Var_Active_FC Var_Active_noFC
+1               36          152             8              52
+2               36          152             7              52
+3               36          152            58              52
+  Var_Active_noFC_rescued Var_Active_RNASeqNA_rescue Var_Repressed_FC
+1                       3                          1                7
+2                       3                          1                5
+3                       3                          1                3
+  Var_Repressed_FC_noredpcnt Var_Repressed_FCna Var_Repressed_noFC
+1                        137                 92                128
+2                        141                 92                128
+3                         92                 92                128
+  Var_Repressed_noFC_reddown Var_Semiactive_FC
+1                          4                 1
+2                          4                NA
+3                          4                NA
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \end{verbatim}
 
 And this are the Clag genes
@@ -295,12 +457,21 @@ And this are the Clag genes
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0302200    TRUE    78.68602    99.57983     42.32238         57.25745
 2 PF3D7_0302500    TRUE    98.81589    84.39649     98.98778         14.59129
+<<<<<<< HEAD
   MeanRedPercent Interval   areaFC  area_12B area_10G area_3D7B   MaxArea
 1       73.52941    Right 4.823089  37.32948 88.19577  23.32522  88.19577
 2       94.06672    Right 3.452270 100.12065 53.68762  99.58767 100.12065
    MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
 1 23.32522    76.36804     min     max      min   CLAG3.2
 2 53.68762    88.72404     max     min      max   CLAG3.1
+=======
+  MeanRedPercent MaxRedPercent Interval   areaFC  area_12B area_10G area_3D7B
+1       73.52941      99.57983    Right 4.823089  37.32948 88.19577  23.32522
+2       94.06672      98.98778    Right 3.452270 100.12065 53.68762  99.58767
+    MaxArea  MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
+1  88.19577 23.32522    76.36804     min     max      min   CLAG3.2
+2 100.12065 53.68762    88.72404     max     min      max   CLAG3.1
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
                                      Annot        state_12B        state_10G
 1 cytoadherence linked asexual protein 3.2 Var_Repressed_FC    Var_Active_FC
 2 cytoadherence linked asexual protein 3.1    Var_Active_FC Var_Repressed_FC
@@ -310,7 +481,11 @@ And this are the Clag genes
 \end{verbatim}
 
 \subsection{Venn Diagrams}
+<<<<<<< HEAD
 \label{sec:org02cbd66}
+=======
+\label{sec:orgde82d5d}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 Here we plon Venn diagrams to visualize how the strains compare.
 
 First we check how many genes share the same "state" among strains:
@@ -330,9 +505,15 @@ Then we make venn diagrams for the "Var\_active" and "Var\_Repressed" states.
 \end{center}
 
 \section{Code}
+<<<<<<< HEAD
 \label{sec:orgcb925b1}
 \subsection{Load Packages and functions}
 \label{sec:org834e412}
+=======
+\label{sec:org862a98b}
+\subsection{Load Packages and functions}
+\label{sec:org6f0fca3}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 #### Imports ####
 
@@ -355,7 +536,11 @@ max_dif <- function(vect){
 \end{minted}
 
 \subsection{Microarray Data: Red Signal}
+<<<<<<< HEAD
 \label{sec:org614a51c}
+=======
+\label{sec:org74fa92d}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 \begin{minted}[]{r}
 #### Red Signal DF ####
@@ -402,13 +587,22 @@ red_df <- red_df %>%
 
 red_df <- red_df %>%
   mutate(MaxRedPercentDif= apply(select(., contains('Percent_')), 1, max_dif)) %>%
+<<<<<<< HEAD
   mutate(MeanRedPercent = apply(select(., contains('Percent_')), 1, mean))
+=======
+  mutate(MeanRedPercent = apply(select(., contains('Percent_')), 1, mean)) %>%
+  mutate(MaxRedPercent = apply(select(., contains('Percent_')), 1, max))
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 print(red_df, width = 200)
 hist(red_df$MeanRedPercent)
 \end{minted}
 \subsection{Microarray Data: Areas}
+<<<<<<< HEAD
 \label{sec:orgbf2fbbd}
+=======
+\label{sec:orgf685e88}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 #### Areas DF ####
 
@@ -511,9 +705,14 @@ area_df <- area_df %>%
 
 
 print(area_df, width = 400)
+table(duplicated(area_df$Gene_id))
 \end{minted}
 \subsection{Load RNA-Seq Data}
+<<<<<<< HEAD
 \label{sec:org637246a}
+=======
+\label{sec:org8bca27d}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 \begin{minted}[]{r}
 ## #### Old approax ####
@@ -541,7 +740,15 @@ otto <- otto %>%
   mutate(Otto_Max_pcnt = (rank(Max)/length(Max))*100)
 
 otto <- otto %>% select(Gene_id, Otto_Max_pcnt)
+<<<<<<< HEAD
 otto
+=======
+otto <- otto %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
+table(duplicated(otto$Gene_id))
+otto %>% filter(duplicated(otto$Gene_id)) %>% print(width = 400)
+otto %>% filter(Gene_id == 'PF3D7_0108400') %>% print(width = 400)
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
 hist(otto$Otto_Max_pcnt)
 
@@ -557,6 +764,10 @@ hoeij <- hoeij %>%
   mutate(Hoeij_Max_pcnt = (rank(Max)/length(Max))*100)
 
 hoeij <- hoeij %>% select(Gene_id, Hoeij_Max_pcnt)
+<<<<<<< HEAD
+=======
+hoeij <- hoeij %>% group_by(Gene_id) %>% summarize_all(list(mean))
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 hoeij
 
 hist(hoeij$Hoeij_Max_pcnt)
@@ -573,6 +784,11 @@ toen <- toen %>%
   mutate(Toen_Max_pcnt = (rank(Max)/length(Max))*100)
 
 toen <- toen %>% select(Gene_id, Toen_Max_pcnt)
+<<<<<<< HEAD
+=======
+toen <- toen %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 toen
 
 hist(toen$Toen_Max_pcnt)
@@ -589,6 +805,11 @@ bart <- bart %>%
   mutate(Bart_Max_pcnt = (rank(Max)/length(Max))*100)
 
 bart <- bart %>% select(Gene_id, Bart_Max_pcnt)
+<<<<<<< HEAD
+=======
+bart <- bart %>% group_by(Gene_id) %>% summarize_all(list(mean))
+
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 bart
 
 hist(bart$Bart_Max_pcnt)
@@ -607,6 +828,7 @@ rna_df <- rna_df %>%
 
 
 print(rna_df, width=200)
+<<<<<<< HEAD
 
 hist(rna_df$MeanPercent, breaks = 20)
 hist(rna_df$StdDevPercent, breaks = 100)
@@ -624,6 +846,28 @@ print(annot_df, width=200)
 \end{minted}
 \subsection{Create Join DF}
 \label{sec:orge1c5bb9}
+=======
+
+hist(rna_df$MeanPercent, breaks = 20)
+hist(rna_df$StdDevPercent, breaks = 100)
+table(duplicated(rna_df$Gene_id))
+\end{minted}
+**
+\subsection{Load Annotation}
+\label{sec:orgd1ab4a0}
+\begin{minted}[]{r}
+annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
+  select(Gene_id = `Gene ID`,
+         Gene_name = `Gene Name or Symbol`,
+         Annot = `Product Description`) %>%
+  distinct() # remove duplicated rows
+
+print(annot_df, width=200)
+table(duplicated(annot_df$Gene_id))
+\end{minted}
+\subsection{Create Join DF}
+\label{sec:org5d1341b}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 print(red_df, width = 200)
 print(area_df, width = 200)
@@ -679,16 +923,26 @@ final_df <- final_df %>%
 final_df <- left_join(final_df, annot_df, by = 'Gene_id')
 
 print(final_df, width = 200)
+
 \end{minted}
 \subsection{Create Lists according to thresholds}
+<<<<<<< HEAD
 \label{sec:orgaed8bfb}
+=======
+\label{sec:org3367683}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 print(final_df, width = 200)
 
 th_rnapcnt <- 25
 th_redpcnt <- 25
 th_redrescue <- 40
+<<<<<<< HEAD
+=======
+th_reddown <- 15
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 th_areaFC <- 1
+th_redpcntdif <- 30
 
 ## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
@@ -706,11 +960,22 @@ set_state <- function(df, statecol, redcol, relcol){
                 ## Actiu
                 !Variant &
                 areaFC < th_areaFC &
+<<<<<<< HEAD
                 MeanPercent >= th_rnapcnt ~ 'Active',
+=======
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown ~ 'Active',
+
+                !Variant &
+                areaFC < th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent > th_redrescue ~ 'Active_rescued',
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
                 ## Inactiu
                 !Variant &
                 areaFC < th_areaFC &
+<<<<<<< HEAD
                 MeanPercent < th_rnapcnt ~ 'Inactive',
 
                 ## No variant amb FC
@@ -721,11 +986,139 @@ set_state <- function(df, statecol, redcol, relcol){
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt ~ 'Inactive_FC',
+=======
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue ~ 'Inactive',
+
+                !Variant &
+                areaFC < th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown ~ 'Inactive_reddown',
+
+                ## No variant amb FC no RedPcntDif
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown &
+                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent >= th_redrescue &
+                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC_rescued',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue &
+                MaxRedPercentDif < th_redpcntdif ~ 'Inactive_FC',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown &
+                MaxRedPercentDif < th_redpcntdif ~ 'Inactive_FC_reddown',
+
+                ## No variant amb FC i RedPcntDif
+                ## RNA-Seq & MeanRed
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'max' ~ 'Active_FC_Dif_max',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'mid' ~ 'Active_FC_Dif_mid',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'min' ~ 'Inactive_FC_Dif_min',
+
+                ## RNA-Seq & NO-MeanRed
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'max' ~ 'Active_FC_Dif_reddown_max',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'mid' ~ 'Active_FC_Dif_reddown_mid',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'min' ~ 'Inactive_FC_Dif_reddown_min',
+
+                ## NO-RNA-Seq Rescued
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent >= th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'max' ~ 'Active_FC_Dif_rescued_max',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent >= th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'mid' ~ 'Active_FC_Dif_rescued_mid',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent >= th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'min' ~ 'Inactive_FC_Dif_rescued_min',
+
+                ## NO-RNA-Seq NO-Rescued
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'max' ~ 'Active_FC_Dif_noRNASeq_max',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'mid' ~ 'Active_FC_Dif_noRNASeq_mid',
+
+                !Variant &
+                areaFC > th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue &
+                MaxRedPercentDif >= th_redpcntdif &
+                !! relcol == 'min' ~ 'Inactive_FC_Dif_noRNASeq_min',
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
                 ## Var actiu
                 Variant &
                 areaFC < th_areaFC &
+<<<<<<< HEAD
                 MeanPercent >= th_rnapcnt ~ 'Var_Active_noFC', # noFC
+=======
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown ~ 'Var_Active_noFC', # noFC
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
                 Variant &
                 areaFC < th_areaFC &
@@ -747,20 +1140,124 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC < th_areaFC &
                 MeanPercent < th_rnapcnt &
                 MeanRedPercent < th_redrescue ~ 'Var_Repressed_noFC', # noFC, noRescued
+<<<<<<< HEAD
+=======
+
+                Variant &
+                areaFC < th_areaFC &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent < th_reddown ~ 'Var_Repressed_noFC_reddown', # noFC, downgraded
+
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 
                 Variant &
                 areaFC >= th_areaFC &
                 !! redcol >= th_redpcnt &
                 !! relcol == 'min' ~ 'Var_Repressed_FC', # Variant, FC, redpcnt, min
+<<<<<<< HEAD
+=======
 
                 Variant &
                 areaFC >= th_areaFC &
                 !! redcol < th_redpcnt ~ 'Var_Repressed_FC_noredpcnt', # Variant, FC, NOredpcnt
 
-                ## Not settable
-                is.na(areaFC) | is.na(MeanPercent) ~ 'Not_settable',
+                ###### Not settable
 
-                TRUE ~ 'Wrong!'))
+                ## FC NA
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue ~ 'Inactive_FCna',
+
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown ~ 'Active_FCna',
+
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent >= th_rnapcnt &
+                is.na(MeanRedPercent) ~ 'Active_FCna_Redna',
+
+                !Variant &
+                is.na(areaFC) &
+                MeanPercent < th_rnapcnt &
+                is.na(MeanRedPercent) ~ 'Inactive_FCna_Redna',
+
+                Variant &
+                is.na(areaFC) &
+                MeanPercent < th_rnapcnt &
+                MeanRedPercent < th_redrescue ~ 'Var_Repressed_FCna',
+
+                Variant &
+                is.na(areaFC) &
+                MeanPercent >= th_rnapcnt &
+                MeanRedPercent >= th_reddown ~ 'Var_Active_FCna',
+
+                ## RNA-Seq NA
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC < th_areaFC &
+                MeanRedPercent >= th_redrescue ~ 'Active_RNASeqNA_rescue',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC < th_areaFC &
+                MeanRedPercent < th_reddown ~ 'Inactive_RNASeqNA_reddown',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'max' ~ 'Active_RNASeqNA_rescue_FC_max',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'mid' ~ 'Active_RNASeqNA_rescue_FC_mid',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'min' ~ 'Inactive_RNASeqNA_rescue_FC_min',
+
+                Variant &
+                is.na(MeanPercent) &
+                areaFC < th_areaFC &
+                MeanRedPercent >= th_redrescue ~ 'Var_Active_RNASeqNA_rescue',
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
+
+                Variant &
+                is.na(MeanPercent) &
+                areaFC < th_areaFC &
+                MeanRedPercent < th_reddown ~ 'Var_Repressed_RNASeqNA_reddown',
+
+                Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'max' ~ 'Var_Active_RNASeqNA_rescue_FC_max',
+
+                Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+<<<<<<< HEAD
+                !! redcol < th_redpcnt ~ 'Var_Repressed_FC_noredpcnt', # Variant, FC, NOredpcnt
+=======
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'mid' ~ 'Var_Semiactive_RNASeqNA_rescue_FC_mid',
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
+
+                Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MeanRedPercent >= th_redrescue &
+                !! relcol == 'min' ~ 'Var_Repressed_RNASeqNA_rescue_FC_min',
+
+
+                TRUE ~ 'Not_Settable'))
 
   ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
   ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
@@ -780,15 +1277,79 @@ set_category <- function(df, statecol, categorycol){
                 !! statecol == 'Inactive' ~ 'Inactive',
                 !! statecol == 'Active_FC' ~ 'Active',
                 !! statecol == 'Inactive_FC' ~ 'Inactive',
+<<<<<<< HEAD
                 !! statecol == 'Var_Active_noFC' ~ 'Var_Active',
                 !! statecol == 'Var_Active_noFC_rescued' ~ 'Var_Active',
                 !! statecol == 'Var_Repressed_noFC' ~ 'Var_Repressed',
+=======
+
+                !! statecol == 'Active_rescued' ~ 'Active',
+                !! statecol == 'Inactive_reddown' ~ 'Inactive',
+                !! statecol == 'Active_FC_rescued' ~ 'Active',
+                !! statecol == 'Inactive_FC_reddown' ~ 'Inactive',
+
+                !! statecol == 'Active_FC_Dif_max' ~ 'Active',
+                !! statecol == 'Active_FC_Dif_mid' ~ 'Active',
+                !! statecol == 'Inactive_FC_Dif_min' ~ 'Inactive',
+
+                !! statecol == 'Active_FC_Dif_reddown_max' ~ 'Active',
+                !! statecol == 'Active_FC_Dif_reddown_mid' ~ 'Active',
+                !! statecol == 'Inactive_FC_Dif_reddown_min' ~ 'Inactive',
+
+                !! statecol == 'Active_FC_Dif_rescue_max' ~ 'Active',
+                !! statecol == 'Active_FC_Dif_rescue_mid' ~ 'Active',
+                !! statecol == 'Inactive_FC_Dif_rescue_min' ~ 'Inactive',
+
+                !! statecol == 'Active_FC_Dif_noRNASeq_max' ~ 'Active',
+                !! statecol == 'Active_FC_Dif_noRNASeq_mid' ~ 'Active',
+                !! statecol == 'Inactive_FC_Dif_noRNASeq_min' ~ 'Inactive',
+
+
+                !! statecol == 'Var_Active_noFC' ~ 'Var_Active',
+                !! statecol == 'Var_Active_noFC_rescued' ~ 'Var_Active',
+                !! statecol == 'Var_Repressed_noFC' ~ 'Var_Repressed',
+                !! statecol == 'Var_Repressed_noFC_reddown' ~ 'Var_Repressed',
+
+
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
                 !! statecol == 'Var_Active_FC' ~ 'Var_Active',
                 !! statecol == 'Var_Semiactive_FC' ~ 'Var_Semiactive',
                 !! statecol == 'Var_Repressed_FC' ~ 'Var_Repressed',
                 !! statecol == 'Var_Repressed_FC_noredpcnt' ~ 'Var_Repressed',
+<<<<<<< HEAD
                 !! statecol == 'Not_settable' ~ 'Not_settable',
                 TRUE ~ 'No_Category!'))
+=======
+
+                !! statecol == 'Inactive_FCna' ~ 'Inactive',
+                !! statecol == 'Active_FCna' ~ 'Active',
+                !! statecol == 'Active_noVar_noMicroarray' ~ 'Active',
+
+                ## With NAs
+                !! statecol == 'Inactive_FCna' ~ 'Inactive',
+                !! statecol == 'Active_FCna' ~ 'Active',
+                !! statecol == 'Inactive_FCna_Redna' ~ 'Inactive',
+                !! statecol == 'Active_FCna_Redna' ~ 'Active',
+
+                !! statecol == 'Var_Repressed_FCna' ~ 'Var_Repressed',
+                !! statecol == 'Var_Active_FCna' ~ 'Var_Active',
+
+                !! statecol == 'Active_RNASeqNA_rescue' ~ 'Active',
+                !! statecol == 'Inactive_RNASeqNA_reddown' ~ 'Inactive',
+
+                !! statecol == 'Active_RNASeqNA_rescue_FC_max' ~ 'Active',
+                !! statecol == 'Active_RNASeqNA_rescue_FC_mid' ~ 'Active',
+                !! statecol == 'Inactive_RNASeqNA_rescue_FC_min' ~ 'Inactive',
+
+                !! statecol == 'Var_Active_RNASeqNA_rescue' ~ 'Var_Active',
+                !! statecol == 'Var_Repressed_RNASeqNA_reddown' ~ 'Var_Repressed',
+
+                !! statecol == 'Var_Active_RNASeqNA_rescue_FC_max' ~ 'Var_Active',
+                !! statecol == 'Var_Semiactive_RNASeqNA_rescue_FC_mid' ~ 'Var_Semiactive',
+                !! statecol == 'Var_Repressed_RNASeqNA_rescue_FC_min' ~ 'Var_Repressed',
+
+                TRUE ~ 'No_Category'))
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
   return(df)
 }
 
@@ -801,6 +1362,7 @@ state_df <- final_df %>%
   set_category(state_12B, category_12B) %>%
   set_category(state_10G, category_10G) %>%
   set_category(state_3D7B, category_3D7B)
+<<<<<<< HEAD
 
 print(state_df, width = 400)
 \end{minted}
@@ -810,6 +1372,24 @@ print(state_df, width = 400)
 ## We check no rows are set to "Wrong!"
 state_df %>%
   filter(state_12B == 'Wrong!' | state_10G == 'Wrong!' | state_3D7B == 'Wrong!') %>%
+=======
+
+print(state_df, width = 400)
+
+table(state_df$state_12B)
+
+state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
+
+\end{minted}
+\subsection{Some checks and results}
+\label{sec:orgfbf806f}
+\begin{minted}[]{r}
+## We check no rows are set to "Wrong!"
+state_df %>%
+  filter(state_12B == 'Not_Settable' |
+         state_10G == 'Not_Settable' |
+         state_3D7B == 'Not_Settable') %>%
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
   print(width = 400)
 
 state_df %>%
@@ -843,7 +1423,11 @@ print(state_table, width = 200)
 summary(rna_df)
 \end{minted}
 \subsection{Comparison of 12B vs 10G differences}
+<<<<<<< HEAD
 \label{sec:org00fb2b6}
+=======
+\label{sec:orgcb3846e}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 excl <- "./Data/10Gvs1p2B.xlsx"
 
@@ -880,7 +1464,11 @@ print(compare_12Bvs10G, width = 400)
 write.csv(compare_12Bvs10G, './Results_Tables/gens_dif12B_10G.csv')
 \end{minted}
 \subsection{Venn Diagram of results}
+<<<<<<< HEAD
 \label{sec:org1f63139}
+=======
+\label{sec:org403f98a}
+>>>>>>> 349872723552e24dadd61eb9780dfcf3ff89def6
 \begin{minted}[]{r}
 makeIntersects <- function(a,b,c){
 

@@ -1,0 +1,393 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{final\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{200}\PYG{p}{)}
+
+\PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{25}
+\PYG{n}{th\PYGZus{}redpcnt} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{25}
+\PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{40}
+\PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{15}
+\PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{1}
+\PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+m}{30}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Here we create a dplyr function.}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}To be able to use variables (for colnames) we needto use the special quote functions.}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Colnames to use inside functions must be \PYGZdq{}enquoted\PYGZdq{} before usage and preceded by !! when used.}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Colnames to assign must be \PYGZdq{}enquoted\PYGZdq{} first, preceded by !! and assigned by :=}
+
+\PYG{n}{set\PYGZus{}state} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{statecol}\PYG{p}{,} \PYG{n}{redcol}\PYG{p}{,} \PYG{n}{relcol}\PYG{p}{)\PYGZob{}}
+
+  \PYG{n}{statecol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{statecol}\PYG{p}{)}
+  \PYG{n}{redcol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{redcol}\PYG{p}{)}
+  \PYG{n}{relcol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{relcol}\PYG{p}{)}
+
+  \PYG{n}{df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+    \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{:=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Actiu}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}rescued\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Inactiu}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}reddown\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} No variant amb FC no RedPcntDif}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}rescued\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}reddown\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} No variant amb FC i RedPcntDif}
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} RNA\PYGZhy{}Seq \PYGZam{} MeanRed}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} RNA\PYGZhy{}Seq \PYGZam{} NO\PYGZhy{}MeanRed}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} NO\PYGZhy{}RNA\PYGZhy{}Seq Rescued}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescued\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescued\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescued\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} NO\PYGZhy{}RNA\PYGZhy{}Seq NO\PYGZhy{}Rescued}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MaxRedPercentDif} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcntdif} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Var actiu}
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}noFC\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} noFC}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}noFC\PYGZus{}rescued\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} noFC, rescued}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{redcol} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcnt} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}FC\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} Variant, FC, redpcnt, max}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{redcol} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcnt} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZus{}FC\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} Variant, FC, redpcnt, mid}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Var repressed}
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}noFC\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} noFC, noRescued}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}noFC\PYGZus{}reddown\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} noFC, downgraded}
+
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{redcol} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redpcnt} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FC\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} Variant, FC, redpcnt, min}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{redcol} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redpcnt} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FC\PYGZus{}noredpcnt\PYGZsq{}}\PYG{p}{,} \PYG{c+c1}{\PYGZsh{} Variant, FC, NOredpcnt}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{} Not settable}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} FC NA}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FCna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FCna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanRedPercent}\PYG{p}{)} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FCna\PYGZus{}Redna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanRedPercent}\PYG{p}{)} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FCna\PYGZus{}Redna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FCna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{areaFC}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}rnapcnt} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}FCna\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} RNA\PYGZhy{}Seq NA}
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}RNASeqNA\PYGZus{}reddown\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!}\PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZlt{}} \PYG{n}{th\PYGZus{}reddown} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}RNASeqNA\PYGZus{}reddown\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}max\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}mid\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{n}{Variant} \PYG{o}{\PYGZam{}}
+                \PYG{n+nf}{is.na}\PYG{p}{(}\PYG{n}{MeanPercent}\PYG{p}{)} \PYG{o}{\PYGZam{}}
+                \PYG{n}{areaFC} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}areaFC} \PYG{o}{\PYGZam{}}
+                \PYG{n}{MeanRedPercent} \PYG{o}{\PYGZgt{}=} \PYG{n}{th\PYGZus{}redrescue} \PYG{o}{\PYGZam{}}
+                \PYG{o}{!!} \PYG{n}{relcol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}min\PYGZsq{}}\PYG{p}{,}
+
+
+                \PYG{k+kc}{TRUE} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Not\PYGZus{}Settable\PYGZsq{}}\PYG{p}{))}
+
+  \PYG{c+c1}{\PYGZsh{}\PYGZsh{} The \PYGZsq{}TRUE \PYGZti{} ...\PYGZsq{} handles rows that do not match any of previous patterns.}
+  \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Here we use it to make sure all rows are set (no \PYGZdq{}Wrong!\PYGZdq{} appearing)}
+
+  \PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{df}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+
+\PYG{n}{set\PYGZus{}category} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{statecol}\PYG{p}{,} \PYG{n}{categorycol}\PYG{p}{)\PYGZob{}}
+
+  \PYG{n}{statecol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{statecol}\PYG{p}{)}
+  \PYG{n}{categorycol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{categorycol}\PYG{p}{)}
+
+  \PYG{n}{df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+    \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{o}{!!} \PYG{n}{categorycol} \PYG{o}{:=} \PYG{n+nf}{case\PYGZus{}when}\PYG{p}{(}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}rescued\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}reddown\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}rescued\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}reddown\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}reddown\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescue\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescue\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}rescue\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FC\PYGZus{}Dif\PYGZus{}noRNASeq\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}noFC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}noFC\PYGZus{}rescued\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}noFC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}noFC\PYGZus{}reddown\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}FC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZus{}FC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FC\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FC\PYGZus{}noredpcnt\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}noVar\PYGZus{}noMicroarray\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{c+c1}{\PYGZsh{}\PYGZsh{} With NAs}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}FCna\PYGZus{}Redna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}FCna\PYGZus{}Redna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}FCna\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}RNASeqNA\PYGZus{}reddown\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Inactive\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Inactive\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}RNASeqNA\PYGZus{}reddown\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}max\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Active\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}mid\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Semiactive\PYGZsq{}}\PYG{p}{,}
+                \PYG{o}{!!} \PYG{n}{statecol} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZus{}RNASeqNA\PYGZus{}rescue\PYGZus{}FC\PYGZus{}min\PYGZsq{}} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}Var\PYGZus{}Repressed\PYGZsq{}}\PYG{p}{,}
+
+                \PYG{k+kc}{TRUE} \PYG{o}{\PYGZti{}} \PYG{l+s}{\PYGZsq{}No\PYGZus{}Category\PYGZsq{}}\PYG{p}{))}
+  \PYG{n+nf}{return}\PYG{p}{(}\PYG{n}{df}\PYG{p}{)}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} We now set each gene to it\PYGZsq{}s state}
+
+\PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{final\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}state}\PYG{p}{(}\PYG{n}{state\PYGZus{}12B}\PYG{p}{,} \PYG{n}{Percent\PYGZus{}12B}\PYG{p}{,} \PYG{n}{rel\PYGZus{}12B}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}state}\PYG{p}{(}\PYG{n}{state\PYGZus{}10G}\PYG{p}{,} \PYG{n}{Percent\PYGZus{}10G}\PYG{p}{,} \PYG{n}{rel\PYGZus{}10G}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}state}\PYG{p}{(}\PYG{n}{state\PYGZus{}3D7B}\PYG{p}{,} \PYG{n}{Percent\PYGZus{}3D7B}\PYG{p}{,} \PYG{n}{rel\PYGZus{}3D7B}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}category}\PYG{p}{(}\PYG{n}{state\PYGZus{}12B}\PYG{p}{,} \PYG{n}{category\PYGZus{}12B}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}category}\PYG{p}{(}\PYG{n}{state\PYGZus{}10G}\PYG{p}{,} \PYG{n}{category\PYGZus{}10G}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{set\PYGZus{}category}\PYG{p}{(}\PYG{n}{state\PYGZus{}3D7B}\PYG{p}{,} \PYG{n}{category\PYGZus{}3D7B}\PYG{p}{)}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{state\PYGZus{}12B}\PYG{p}{)}
+
+\PYG{n}{state\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{category\PYGZus{}12B} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}No\PYGZus{}Category!\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+\end{Verbatim}

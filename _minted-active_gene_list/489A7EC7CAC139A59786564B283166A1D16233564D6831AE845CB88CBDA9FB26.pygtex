@@ -1,0 +1,106 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} \PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{} Old approax \PYGZsh{}\PYGZsh{}\PYGZsh{}\PYGZsh{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Select max percentile directly}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} otto \PYGZlt{}\PYGZhy{} read\PYGZus{}delim(\PYGZdq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/PlasmoDB\PYGZus{}Otto.csv\PYGZdq{}, delim=\PYGZdq{};\PYGZdq{}) \PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   select(Gene\PYGZus{}id = `Gene ID`, MaxPercOtto = `Max \PYGZpc{}ile (Within Chosen Samples)`)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} hoej \PYGZlt{}\PYGZhy{} read\PYGZus{}delim(\PYGZdq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/PlasmoDB\PYGZus{}Hoejimakers.csv\PYGZdq{}, delim=\PYGZdq{};\PYGZdq{}) \PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   select(Gene\PYGZus{}id = `Gene ID`, MaxPercHoej = `Max \PYGZpc{}ile (Within Chosen Samples)`)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} toen \PYGZlt{}\PYGZhy{} read\PYGZus{}delim(\PYGZdq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/PlasmoDB\PYGZus{}Toenke.csv\PYGZdq{}, delim=\PYGZdq{};\PYGZdq{}) \PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   select(Gene\PYGZus{}id = `Gene ID`, MaxPercToen = `Max \PYGZpc{}ile (Within Chosen Samples)`)}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} bart \PYGZlt{}\PYGZhy{} read\PYGZus{}delim(\PYGZdq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/PlasmoDB\PYGZus{}Bartfai.csv\PYGZdq{}, delim=\PYGZdq{};\PYGZdq{}) \PYGZpc{}\PYGZgt{}\PYGZpc{}}
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{}   select(Gene\PYGZus{}id = `Gene ID`, MaxPercBart = `Max \PYGZpc{}ile (Within Chosen Samples)`)}
+
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Otto Data\PYGZhy{}Set}
+
+\PYG{n}{csv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZsq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/rnaseq\PYGZus{}otto\PYGZus{}normvals.csv\PYGZsq{}}
+
+\PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{n}{csv}\PYG{p}{,} \PYG{n}{delim}\PYG{o}{=}\PYG{l+s}{\PYGZdq{};\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{))}
+
+\PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Otto\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
+
+\PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Otto\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+\PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{summarize\PYGZus{}all}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{))}
+
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n+nf}{duplicated}\PYG{p}{(}\PYG{n}{otto}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))}
+\PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n+nf}{duplicated}\PYG{p}{(}\PYG{n}{otto}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+\PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{filter}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{==} \PYG{l+s}{\PYGZsq{}PF3D7\PYGZus{}0108400\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{width} \PYG{o}{=} \PYG{l+m}{400}\PYG{p}{)}
+
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{otto}\PYG{o}{\PYGZdl{}}\PYG{n}{Otto\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Hoeijmakers Data\PYGZhy{}Set}
+
+\PYG{n}{csv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZsq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/rnaseq\PYGZus{}hoeijmakers\PYGZus{}normvals.csv\PYGZsq{}}
+
+\PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{n}{csv}\PYG{p}{,} \PYG{n}{delim}\PYG{o}{=}\PYG{l+s}{\PYGZdq{};\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{))}
+
+\PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{hoeij} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Hoeij\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
+
+\PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{hoeij} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Hoeij\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+\PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{hoeij} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{summarize\PYGZus{}all}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{))}
+\PYG{n}{hoeij}
+
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{hoeij}\PYG{o}{\PYGZdl{}}\PYG{n}{Hoeij\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Toenhake Data\PYGZhy{}Sets}
+
+\PYG{n}{csv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZsq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/rnaseq\PYGZus{}toen\PYGZus{}normvals.csv\PYGZsq{}}
+
+\PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{n}{csv}\PYG{p}{,} \PYG{n}{delim}\PYG{o}{=}\PYG{l+s}{\PYGZdq{},\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{))}
+
+\PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{toen} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Toen\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
+
+\PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{toen} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Toen\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+\PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{toen} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{summarize\PYGZus{}all}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{))}
+
+\PYG{n}{toen}
+
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{toen}\PYG{o}{\PYGZdl{}}\PYG{n}{Toen\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Bartfai Data\PYGZhy{}Sets}
+
+\PYG{n}{csv} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZsq{}./Data/RNA\PYGZus{}Seq\PYGZus{}Percentiles/rnaseq\PYGZus{}bartfai\PYGZus{}normvals.csv\PYGZsq{}}
+
+\PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{n}{csv}\PYG{p}{,} \PYG{n}{delim}\PYG{o}{=}\PYG{l+s}{\PYGZdq{},\PYGZdq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{))}
+
+\PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{bart} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Bart\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
+
+\PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{bart} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Bart\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+\PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{bart} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{group\PYGZus{}by}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{summarize\PYGZus{}all}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{mean}\PYG{p}{))}
+
+\PYG{n}{bart}
+
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{bart}\PYG{o}{\PYGZdl{}}\PYG{n}{Bart\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
+
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Join DF}
+\PYG{n}{rna\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{full\PYGZus{}join}\PYG{p}{(}\PYG{n}{hoeij}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{full\PYGZus{}join}\PYG{p}{(}\PYG{n}{toen}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{full\PYGZus{}join}\PYG{p}{(}\PYG{n}{bart}\PYG{p}{)}
+
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Add mean and sd}
+\PYG{n}{rna\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{rna\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MeanPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{StdDevPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{sd}\PYG{p}{))}
+
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{200}\PYG{p}{)}
+
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{MeanPercent}\PYG{p}{,} \PYG{n}{breaks} \PYG{o}{=} \PYG{l+m}{20}\PYG{p}{)}
+\PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{StdDevPercent}\PYG{p}{,} \PYG{n}{breaks} \PYG{o}{=} \PYG{l+m}{100}\PYG{p}{)}
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n+nf}{duplicated}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))}
+\end{Verbatim}

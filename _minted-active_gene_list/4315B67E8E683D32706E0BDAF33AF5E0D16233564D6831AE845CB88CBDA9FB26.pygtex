@@ -1,0 +1,10 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{annot\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}delim}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}./Data/plasmoDB\PYGZus{}geneAnnot.csv\PYGZsq{}}\PYG{p}{,} \PYG{n}{delim} \PYG{o}{=} \PYG{l+s}{\PYGZsq{};\PYGZsq{}}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,}
+         \PYG{n}{Gene\PYGZus{}name} \PYG{o}{=} \PYG{n}{`Gene Name or Symbol`}\PYG{p}{,}
+         \PYG{n}{Annot} \PYG{o}{=} \PYG{n}{`Product Description`}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{distinct}\PYG{p}{()} \PYG{c+c1}{\PYGZsh{} remove duplicated rows}
+
+\PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{annot\PYGZus{}df}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{200}\PYG{p}{)}
+\PYG{n+nf}{table}\PYG{p}{(}\PYG{n+nf}{duplicated}\PYG{p}{(}\PYG{n}{annot\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{))}
+\end{Verbatim}
