@@ -768,183 +768,128 @@ set_state <- function(df, statecol, redcol, relcol){
 
   df <- df %>%
     mutate(!! statecol := case_when(
-                ## Actiu
-                !Variant &
-                areaFC < th_areaFC &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown ~ 'Active',
-
-                !Variant &
-                areaFC < th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent > th_redrescue ~ 'Active_rescued',
-
-                ## Inactiu
-                !Variant &
-                areaFC < th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue ~ 'Inactive',
-
-                !Variant &
-                areaFC < th_areaFC &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown ~ 'Inactive_reddown',
-
-                ## No variant amb FC no RedPcntDif
-                !Variant &
-                areaFC > th_areaFC &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown &
-                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC',
-
-                !Variant &
-                areaFC > th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent >= th_redrescue &
-                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC_rescued',
-
-                !Variant &
-                areaFC > th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue &
-                MaxRedPercentDif < th_redpcntdif ~ 'Inactive_FC',
-
-                !Variant &
-                areaFC > th_areaFC &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown &
-                MaxRedPercentDif < th_redpcntdif ~ 'Inactive_FC_reddown',
 
                 ## No variant amb FC i RedPcntDif
                 ## RNA-Seq & MeanRed
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown &
+                MaxRedPercent >= th_reddown &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'max' ~ 'Active_FC_Dif_max',
 
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown &
+                MaxRedPercent >= th_reddown &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'mid' ~ 'Active_FC_Dif_mid',
 
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown &
+                MaxRedPercent >= th_reddown &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'min' ~ 'Inactive_FC_Dif_min',
 
-                ## RNA-Seq & NO-MeanRed
+                ## No variant amb FC no RedPcntDif
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'max' ~ 'Active_FC_Dif_reddown_max',
+                MaxRedPercent >= th_reddown &
+                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC',
 
+                ## No variant amb FC < reddown
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'mid' ~ 'Active_FC_Dif_reddown_mid',
-
-                !Variant &
-                areaFC > th_areaFC &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'min' ~ 'Inactive_FC_Dif_reddown_min',
+                MaxRedPercent < th_reddown ~ 'Inactive_FC_reddown',
 
                 ## NO-RNA-Seq Rescued
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent >= th_redrescue &
+                MaxRedPercent >= th_redrescue &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'max' ~ 'Active_FC_Dif_rescued_max',
 
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent >= th_redrescue &
+                MaxRedPercent >= th_redrescue &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'mid' ~ 'Active_FC_Dif_rescued_mid',
 
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent >= th_redrescue &
+                MaxRedPercent >= th_redrescue &
                 MaxRedPercentDif >= th_redpcntdif &
                 !! relcol == 'min' ~ 'Inactive_FC_Dif_rescued_min',
 
-                ## NO-RNA-Seq NO-Rescued
+                ## FC NO RNA-Seq rescued, no redpcnt dif
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'max' ~ 'Active_FC_Dif_noRNASeq_max',
+                MaxRedPercent >= th_redrescue &
+                MaxRedPercentDif < th_redpcntdif ~ 'Active_FC_rescued',
 
+                ## FC  No RNA-Seq no rescue
                 !Variant &
                 areaFC > th_areaFC &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'mid' ~ 'Active_FC_Dif_noRNASeq_mid',
+                MaxRedPercent < th_redrescue ~ 'Inactive_FC',
 
+                ## No Var, no FC
                 !Variant &
-                areaFC > th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue &
-                MaxRedPercentDif >= th_redpcntdif &
-                !! relcol == 'min' ~ 'Inactive_FC_Dif_noRNASeq_min',
-
-                ## Var actiu
-                Variant &
                 areaFC < th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown ~ 'Var_Active_noFC', # noFC
+                MaxRedPercent >= th_reddown ~ 'Active',
 
-                Variant &
-                areaFC < th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent >= th_redrescue ~ 'Var_Active_noFC_rescued', # noFC, rescued
-
-                Variant &
-                areaFC >= th_areaFC &
-                !! redcol >= th_redpcnt &
-                !! relcol == 'max' ~ 'Var_Active_FC', # Variant, FC, redpcnt, max
-
-                Variant &
-                areaFC >= th_areaFC &
-                !! redcol >= th_redpcnt &
-                !! relcol == 'mid' ~ 'Var_Semiactive_FC', # Variant, FC, redpcnt, mid
-
-                ## Var repressed
-                Variant &
-                areaFC < th_areaFC &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue ~ 'Var_Repressed_noFC', # noFC, noRescued
-
-                Variant &
+                !Variant &
                 areaFC < th_areaFC &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent < th_reddown ~ 'Var_Repressed_noFC_reddown', # noFC, downgraded
+                MaxRedPercent < th_reddown ~ 'Inactive_reddown',
 
+                !Variant &
+                areaFC < th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MaxRedPercent > th_redrescue ~ 'Active_rescued',
+
+                !Variant &
+                areaFC < th_areaFC &
+                MeanPercent < th_rnapcnt &
+                MaxRedPercent < th_redrescue ~ 'Inactive',
+
+                ## Var
 
                 Variant &
                 areaFC >= th_areaFC &
-                !! redcol >= th_redpcnt &
-                !! relcol == 'min' ~ 'Var_Repressed_FC', # Variant, FC, redpcnt, min
+                MaxRedPercent >= th_reddown &
+                !! relcol == 'max' ~ 'Var_Active_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
-                !! redcol < th_redpcnt ~ 'Var_Repressed_FC_noredpcnt', # Variant, FC, NOredpcnt
+                MaxRedPercent >= th_reddown &
+                !! relcol == 'mid' ~ 'Var_Semiactive_FC',
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercent >= th_reddown &
+                !! relcol == 'min' ~ 'Var_Repressed_FC',
+
+                Variant &
+                areaFC >= th_areaFC &
+                MaxRedPercent < th_reddown ~ 'Var_Repressed_FC_reddown',
+
+                Variant &
+                areaFC < th_areaFC &
+                MeanRedPercent >= th_redpcnt ~ 'Var_Active_noFC'
+
+                Variant &
+                areaFC < th_areaFC &
+                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_noFC'
+
 
                 ###### Not settable
 
