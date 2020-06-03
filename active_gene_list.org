@@ -884,11 +884,11 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent >= th_redpcnt ~ 'Var_Active_noFC'
+                MeanRedPercent >= th_redpcnt ~ 'Var_Active_noFC',
 
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_noFC'
+                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_noFC',
 
 
                 ###### Not settable
@@ -973,7 +973,7 @@ set_state <- function(df, statecol, redcol, relcol){
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MaxRedPercent < th_redrescue
+                MaxRedPercent < th_redrescue &
                 MaxRedPercent >= th_reddown ~ 'Not_Settable',
 
                 !Variant &
@@ -984,7 +984,7 @@ set_state <- function(df, statecol, redcol, relcol){
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                is.na(MaxRedPercent) < ~ 'Not_Settable',
+                is.na(MaxRedPercent) ~ 'Not_Settable',
 
                 ## VARs
                 Variant &
@@ -998,8 +998,6 @@ set_state <- function(df, statecol, redcol, relcol){
                 Variant &
                 is.na(areaFC) &
                 is.na(MeanRedPercent) ~ 'Not_Settable',
-
-
 
 
 
@@ -1019,71 +1017,12 @@ set_category <- function(df, statecol, categorycol){
 
   df <- df %>%
     mutate(!! categorycol := case_when(
-                !! statecol == 'Active' ~ 'Active',
-                !! statecol == 'Inactive' ~ 'Inactive',
-                !! statecol == 'Active_FC' ~ 'Active',
-                !! statecol == 'Inactive_FC' ~ 'Inactive',
-
-                !! statecol == 'Active_rescued' ~ 'Active',
-                !! statecol == 'Inactive_reddown' ~ 'Inactive',
-                !! statecol == 'Active_FC_rescued' ~ 'Active',
-                !! statecol == 'Inactive_FC_reddown' ~ 'Inactive',
-
-                !! statecol == 'Active_FC_Dif_max' ~ 'Active',
-                !! statecol == 'Active_FC_Dif_mid' ~ 'Active',
-                !! statecol == 'Inactive_FC_Dif_min' ~ 'Inactive',
-
-                !! statecol == 'Active_FC_Dif_reddown_max' ~ 'Active',
-                !! statecol == 'Active_FC_Dif_reddown_mid' ~ 'Active',
-                !! statecol == 'Inactive_FC_Dif_reddown_min' ~ 'Inactive',
-
-                !! statecol == 'Active_FC_Dif_rescue_max' ~ 'Active',
-                !! statecol == 'Active_FC_Dif_rescue_mid' ~ 'Active',
-                !! statecol == 'Inactive_FC_Dif_rescue_min' ~ 'Inactive',
-
-                !! statecol == 'Active_FC_Dif_noRNASeq_max' ~ 'Active',
-                !! statecol == 'Active_FC_Dif_noRNASeq_mid' ~ 'Active',
-                !! statecol == 'Inactive_FC_Dif_noRNASeq_min' ~ 'Inactive',
-
-
-                !! statecol == 'Var_Active_noFC' ~ 'Var_Active',
-                !! statecol == 'Var_Active_noFC_rescued' ~ 'Var_Active',
-                !! statecol == 'Var_Repressed_noFC' ~ 'Var_Repressed',
-                !! statecol == 'Var_Repressed_noFC_reddown' ~ 'Var_Repressed',
-
-
-                !! statecol == 'Var_Active_FC' ~ 'Var_Active',
-                !! statecol == 'Var_Semiactive_FC' ~ 'Var_Semiactive',
-                !! statecol == 'Var_Repressed_FC' ~ 'Var_Repressed',
-                !! statecol == 'Var_Repressed_FC_noredpcnt' ~ 'Var_Repressed',
-
-                !! statecol == 'Inactive_FCna' ~ 'Inactive',
-                !! statecol == 'Active_FCna' ~ 'Active',
-                !! statecol == 'Active_noVar_noMicroarray' ~ 'Active',
-
-                ## With NAs
-                !! statecol == 'Inactive_FCna' ~ 'Inactive',
-                !! statecol == 'Active_FCna' ~ 'Active',
-                !! statecol == 'Inactive_FCna_Redna' ~ 'Inactive',
-                !! statecol == 'Active_FCna_Redna' ~ 'Active',
-
-                !! statecol == 'Var_Repressed_FCna' ~ 'Var_Repressed',
-                !! statecol == 'Var_Active_FCna' ~ 'Var_Active',
-
-                !! statecol == 'Active_RNASeqNA_rescue' ~ 'Active',
-                !! statecol == 'Inactive_RNASeqNA_reddown' ~ 'Inactive',
-
-                !! statecol == 'Active_RNASeqNA_rescue_FC_max' ~ 'Active',
-                !! statecol == 'Active_RNASeqNA_rescue_FC_mid' ~ 'Active',
-                !! statecol == 'Inactive_RNASeqNA_rescue_FC_min' ~ 'Inactive',
-
-                !! statecol == 'Var_Active_RNASeqNA_rescue' ~ 'Var_Active',
-                !! statecol == 'Var_Repressed_RNASeqNA_reddown' ~ 'Var_Repressed',
-
-                !! statecol == 'Var_Active_RNASeqNA_rescue_FC_max' ~ 'Var_Active',
-                !! statecol == 'Var_Semiactive_RNASeqNA_rescue_FC_mid' ~ 'Var_Semiactive',
-                !! statecol == 'Var_Repressed_RNASeqNA_rescue_FC_min' ~ 'Var_Repressed',
-
+                startsWith(!! statecol, 'Active') ~ 'Active',
+                startsWith(!! statecol, 'Inactive') ~ 'Inactive',
+                startsWith(!! statecol, 'Var_Active') ~ 'Var_Active',
+                startsWith(!! statecol, 'Var_Semiactive') ~ 'Var_Semiactive',
+                startsWith(!! statecol, 'Var_Repressed') ~ 'Var_Repressed',
+                startsWith(!! statecol, 'Not_Settable') ~ 'Not_Settable',
                 TRUE ~ 'No_Category'))
   return(df)
 }
