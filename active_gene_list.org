@@ -233,15 +233,15 @@ In addition to these thresholds we will use 2 more columns to set the categories
 
 We will have the following categories with the following logic:
 
-[[./Plots/Decision_Tree.jpg]]
+[[./Plots/active_genes_tree.jpg]]
 
-[[./Plots/Decision_Tree.jpg][Make bigger]]
+[[./Plots/active_genes_tree.jpg][Make bigger]]
 
 
 Genes that have NA values in any of the classification columns are classified according to the following tree.
-[[file:./Plots/active_genes_NAs.jpg]]
+[[file:Plots/active_genes_NAs_2.jpg]]
 
-[[file:Plots/active_genes_NAs.jpg][Make bigger]]
+[[file:Plots/active_genes_NAs_2.jpg][Make bigger]]
 
 Using this criteria we construct the following DataFrame:
 
@@ -285,20 +285,20 @@ head(as.data.frame(x))
 4                                                       rifin
 5 erythrocyte membrane protein 1 (PfEMP1), exon 1, pseudogene
 6                                                       rifin
-                   state_12B                  state_10G
-1         Var_Repressed_noFC         Var_Repressed_noFC
-2              Var_Active_FC Var_Repressed_FC_noredpcnt
-3 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt
-4 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt
-5               Not_Settable               Not_Settable
-6         Var_Repressed_FCna         Var_Repressed_FCna
-                  state_3D7B  category_12B  category_10G category_3D7B
-1         Var_Repressed_noFC Var_Repressed Var_Repressed Var_Repressed
-2 Var_Repressed_FC_noredpcnt    Var_Active Var_Repressed Var_Repressed
-3              Var_Active_FC Var_Repressed Var_Repressed    Var_Active
-4 Var_Repressed_FC_noredpcnt Var_Repressed Var_Repressed Var_Repressed
-5               Not_Settable   No_Category   No_Category   No_Category
-6         Var_Repressed_FCna Var_Repressed Var_Repressed Var_Repressed
+                 state_12B                state_10G               state_3D7B
+1       Var_Repressed_noFC       Var_Repressed_noFC       Var_Repressed_noFC
+2            Var_Active_FC         Var_Repressed_FC            Var_Active_FC
+3         Var_Repressed_FC         Var_Repressed_FC            Var_Active_FC
+4 Var_Repressed_FC_reddown Var_Repressed_FC_reddown Var_Repressed_FC_reddown
+5             Not_Settable             Not_Settable             Not_Settable
+6       Var_Repressed_FCna       Var_Repressed_FCna       Var_Repressed_FCna
+   category_12B  category_10G category_3D7B
+1 Var_Repressed Var_Repressed Var_Repressed
+2    Var_Active Var_Repressed    Var_Active
+3 Var_Repressed Var_Repressed    Var_Active
+4 Var_Repressed Var_Repressed Var_Repressed
+5  Not_Settable  Not_Settable  Not_Settable
+6 Var_Repressed Var_Repressed Var_Repressed
 #+end_example
 
 ** Some results
@@ -312,33 +312,29 @@ as.data.frame(state_table)
 #+RESULTS:
 #+begin_example
   Strain Active Active_FC Active_FC_Dif_max Active_FCna Active_FCna_Redna
-1    12B   3944        20                 2           1               191
-2    10G   3944        20                 2           1               191
-3   3D7B   3944        20                 2           1               191
-  Active_rescued Active_RNASeqNA_rescue Inactive Inactive_FC
-1             53                      6      660          36
-2             53                      6      660          36
-3             53                      6      660          36
+1    12B   3954        23                 2           2               191
+2    10G   3954        23                 2           2               191
+3   3D7B   3954        23                 2           2               191
+  Active_rescued Active_RNASeqNA_rescued Inactive Inactive_FC
+1             69                       6      644          36
+2             69                       6      644          36
+3             69                       6      644          36
   Inactive_FC_Dif_min Inactive_FC_reddown Inactive_FCna Inactive_FCna_Redna
-1                   2                   5            30                  89
-2                   2                   5            30                  89
-3                   2                   5            30                  89
-  Inactive_reddown Not_Settable Var_Active_FC Var_Active_noFC
-1               36          152             8              52
-2               36          152             7              52
-3               36          152            58              52
-  Var_Active_noFC_rescued Var_Active_RNASeqNA_rescue Var_Repressed_FC
-1                       3                          1                7
-2                       3                          1                5
-3                       3                          1                3
-  Var_Repressed_FC_noredpcnt Var_Repressed_FCna Var_Repressed_noFC
-1                        137                 92                128
-2                        141                 92                128
-3                         92                 92                128
-  Var_Repressed_noFC_reddown Var_Semiactive_FC
-1                          4                 1
-2                          4                NA
-3                          4                NA
+1                   2                   2            30                  89
+2                   2                   2            30                  89
+3                   2                   2            30                  89
+  Inactive_reddown Not_Settable Var_Active_FC Var_Active_noFC Var_Repressed_FC
+1               26          150            13              58               73
+2               26          150             8              58               77
+3               26          150            80              58                6
+  Var_Repressed_FC_reddown Var_Repressed_FCna Var_Repressed_noFC
+1                       64                 93                130
+2                       64                 93                130
+3                       64                 93                130
+  Var_Semiactive_FC
+1                 3
+2                 4
+3                 3
 #+end_example
 
 And this are the Clag genes
