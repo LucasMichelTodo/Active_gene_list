@@ -892,97 +892,118 @@ set_state <- function(df, statecol, redcol, relcol){
 
 
                 ###### Not settable
-
-                ## FC NA
+                ## No Var, FC NA
                 !Variant &
                 is.na(areaFC) &
-                MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue ~ 'Inactive_FCna',
+                MeanPercent >= th_rnapcnt &
+                MaxRedPercent >= th_reddown ~ 'Active_FCna',
 
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown ~ 'Active_FCna',
+                MaxRedPercent < th_reddown ~ 'Not_Settable',
 
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent >= th_rnapcnt &
-                is.na(MeanRedPercent) ~ 'Active_FCna_Redna',
+                is.na(MaxRedPercent) ~ 'Active_FCna_Redna',
 
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent < th_rnapcnt &
-                is.na(MeanRedPercent) ~ 'Inactive_FCna_Redna',
+                MaxRedPercent >= th_redrescue ~ 'Not_Settable',
 
-                Variant &
+                !Variant &
                 is.na(areaFC) &
                 MeanPercent < th_rnapcnt &
-                MeanRedPercent < th_redrescue ~ 'Var_Repressed_FCna',
+                MaxRedPercent < th_redrescue ~ 'Inactive_FCna',
 
-                Variant &
+                !Variant &
                 is.na(areaFC) &
-                MeanPercent >= th_rnapcnt &
-                MeanRedPercent >= th_reddown ~ 'Var_Active_FCna',
+                MeanPercent < th_rnapcnt &
+                is.na(MaxRedPercent) ~ 'Inactive_FCna_Redna',
 
                 ## RNA-Seq NA
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent >= th_redrescue &
+                !! relcol == 'max' ~ 'Active_RNASeqNA_rescued_FC_max',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent >= th_redrescue &
+                !! relcol == 'mid' ~ 'Active_RNASeqNA_rescued_FC_mid',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent >= th_redrescue &
+                !! relcol == 'min' ~ 'Inactive_RNASeqNA_rescued_FC_min',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent < th_redrescue &
+                MaxRedPercent > th_reddown ~ 'Not_Settable',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent < th_redrescue &
+                MaxRedPercent >= th_reddown ~ 'Not_Settable',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                MaxRedPercent < th_reddown ~ 'Inactive_FC_reddown',
+
+                !Variant &
+                is.na(MeanPercent) &
+                areaFC >= th_areaFC &
+                is.na(MaxRedPercent) ~ 'Not_Settable',
+
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MeanRedPercent >= th_redrescue ~ 'Active_RNASeqNA_rescue',
+                MaxRedPercent >= th_redrescue ~ 'Active_RNASeqNA_rescued',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MeanRedPercent < th_reddown ~ 'Inactive_RNASeqNA_reddown',
+                MaxRedPercent < th_redrescue
+                MaxRedPercent >= th_reddown ~ 'Not_Settable',
 
                 !Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'max' ~ 'Active_RNASeqNA_rescue_FC_max',
-
-                !Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'mid' ~ 'Active_RNASeqNA_rescue_FC_mid',
-
-                !Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'min' ~ 'Inactive_RNASeqNA_rescue_FC_min',
-
-                Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MeanRedPercent >= th_redrescue ~ 'Var_Active_RNASeqNA_rescue',
+                MaxRedPercent < th_reddown ~ 'Inactive_RNASeqNA_reddown',
 
-                Variant &
+                !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MeanRedPercent < th_reddown ~ 'Var_Repressed_RNASeqNA_reddown',
+                is.na(MaxRedPercent) < ~ 'Not_Settable',
+
+                ## VARs
+                Variant &
+                is.na(areaFC) &
+                MeanRedPercent >= th_redpcnt ~ 'Var_Active_FCna',
 
                 Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'max' ~ 'Var_Active_RNASeqNA_rescue_FC_max',
+                is.na(areaFC) &
+                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_FCna',
 
                 Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'mid' ~ 'Var_Semiactive_RNASeqNA_rescue_FC_mid',
-
-                Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MeanRedPercent >= th_redrescue &
-                !! relcol == 'min' ~ 'Var_Repressed_RNASeqNA_rescue_FC_min',
+                is.na(areaFC) &
+                is.na(MeanRedPercent) ~ 'Not_Settable',
 
 
-                TRUE ~ 'Not_Settable'))
+
+
+
+                TRUE ~ 'Wrong!'))
 
   ## The 'TRUE ~ ...' handles rows that do not match any of previous patterns.
   ## Here we use it to make sure all rows are set (no "Wrong!" appearing)
