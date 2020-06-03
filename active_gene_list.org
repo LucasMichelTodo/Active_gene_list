@@ -185,7 +185,6 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -222,10 +221,12 @@ head(as.data.frame(x))
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
 We have set the following thresholds:
-- (rna_pcnt) RNA-Seq mean percentile: 25%
-- (red_pcnt) Red Signal Percentile (by sample): 25%
-- (red_rescue) Red Signal Mean Percentile for "rescuing": 40%
-- (area_fc) Area log2 Fold-Change: 1
+- RNA-Seq mean percentile: 25%
+- Red Signal Mean Percentile : 25%
+- Red Signal Percentile for "rescuing": 40%
+- Red Signal Percentile for "downgrading": 15%
+- Area log2 Fold-Change: 1
+- Red Signal Percentile Difference: 30%
 
 In addition to these thresholds we will use 2 more columns to set the categories:
 - Variant: a column stating if gene is variant/non-variant
@@ -255,7 +256,6 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
