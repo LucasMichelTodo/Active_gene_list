@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{\PYGZsh{}\PYGZsh{} Categories histograms}
+
+\PYG{n}{make\PYGZus{}histogram} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{function}\PYG{p}{(}\PYG{n}{df}\PYG{p}{,} \PYG{n}{column}\PYG{p}{)\PYGZob{}}
+  \PYG{n}{col} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{column}\PYG{p}{)}
+
+  \PYG{n}{df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+    \PYG{n+nf}{select}\PYG{p}{(}\PYG{o}{!!}\PYG{n}{col}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+    \PYG{n+nf}{count}\PYG{p}{(}\PYG{o}{!!}\PYG{n}{col}\PYG{p}{)} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+    \PYG{n+nf}{ggplot}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{y}\PYG{o}{=}\PYG{n}{n}\PYG{p}{,} \PYG{n}{x}\PYG{o}{=!!}\PYG{n}{col}\PYG{p}{,} \PYG{n}{fill}\PYG{o}{=!!}\PYG{n}{col}\PYG{p}{))} \PYG{o}{+}
+    \PYG{n+nf}{geom\PYGZus{}bar}\PYG{p}{(}\PYG{n}{stat}\PYG{o}{=}\PYG{l+s}{\PYGZsq{}identity\PYGZsq{}}\PYG{p}{)} \PYG{o}{+}
+    \PYG{n+nf}{geom\PYGZus{}text}\PYG{p}{(}\PYG{n+nf}{aes}\PYG{p}{(}\PYG{n}{label}\PYG{o}{=}\PYG{n}{n}\PYG{p}{),} \PYG{n}{vjust}\PYG{o}{=}\PYG{l+m}{0}\PYG{p}{)} \PYG{o}{+}
+    \PYG{n+nf}{theme}\PYG{p}{(}
+      \PYG{n}{plot.title} \PYG{o}{=} \PYG{n+nf}{element\PYGZus{}blank}\PYG{p}{(),}
+      \PYG{n}{axis.title.x} \PYG{o}{=} \PYG{n+nf}{element\PYGZus{}blank}\PYG{p}{(),}
+      \PYG{n}{axis.title.y} \PYG{o}{=} \PYG{n+nf}{element\PYGZus{}blank}\PYG{p}{())}
+\PYG{p}{\PYGZcb{}}
+
+
+\PYG{n}{hist12B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{make\PYGZus{}histogram}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{n}{category\PYGZus{}12B}\PYG{p}{)}
+\PYG{n}{hist10G} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{make\PYGZus{}histogram}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{n}{category\PYGZus{}10G}\PYG{p}{)}
+\PYG{n}{hist3D7B} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{make\PYGZus{}histogram}\PYG{p}{(}\PYG{n}{state\PYGZus{}df}\PYG{p}{,} \PYG{n}{category\PYGZus{}3D7B}\PYG{p}{)}
+
+\PYG{n+nf}{ggsave}\PYG{p}{(}\PYG{n}{hist12B}\PYG{p}{,} \PYG{n}{filename} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}./Plots/histogram\PYGZus{}12B.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{height}\PYG{o}{=}\PYG{l+m}{7}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{8}\PYG{p}{)}
+\PYG{n+nf}{ggsave}\PYG{p}{(}\PYG{n}{hist10G}\PYG{p}{,} \PYG{n}{filename} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}./Plots/histogram\PYGZus{}10G.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{height}\PYG{o}{=}\PYG{l+m}{7}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{8}\PYG{p}{)}
+\PYG{n+nf}{ggsave}\PYG{p}{(}\PYG{n}{hist3D7B}\PYG{p}{,} \PYG{n}{filename} \PYG{o}{=} \PYG{l+s}{\PYGZsq{}./Plots/histogram\PYGZus{}3D7B.png\PYGZsq{}}\PYG{p}{,} \PYG{n}{height}\PYG{o}{=}\PYG{l+m}{7}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{8}\PYG{p}{)}
+\end{Verbatim}

@@ -1,4 +1,4 @@
-% Created 2020-06-03 Wed 15:35
+% Created 2020-06-04 Thu 12:36
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -16,7 +16,7 @@
 \usepackage{hyperref}
 \usepackage{minted}
 \author{Lucas Michel Todó}
-\date{31/03/2020}
+\date{04/06/2020}
 \title{Creation of active gene-lists}
 \hypersetup{
  pdfauthor={Lucas Michel Todó},
@@ -30,7 +30,7 @@
 \maketitle
 \tableofcontents \clearpage
 \section{Active/Inactive Gene lists}
-\label{sec:org35ea3b1}
+\label{sec:org0f486eb}
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
 We will define 5 possible expresion states:
 
@@ -51,7 +51,7 @@ We will define 5 possible expresion states:
 \end{itemize}
 
 \subsection{Microarray Data: Red Signal}
-\label{sec:orgb09d9ba}
+\label{sec:org3919fd9}
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
@@ -73,7 +73,7 @@ Red Signal DataFrame
 \end{verbatim}
 
 \subsection{Microarray Data: Areas}
-\label{sec:org1564a00}
+\label{sec:orgce67925}
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
@@ -116,7 +116,7 @@ Areas DataFrame
 \end{verbatim}
 
 \subsection{Load RNA-Seq Data}
-\label{sec:orga18e0a4}
+\label{sec:orged2082a}
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
@@ -161,7 +161,7 @@ We plot the standard deviation of the percentile values among different Data-Set
 \end{center}
 
 \subsection{Create table for classification}
-\label{sec:orgd7ff2b9}
+\label{sec:orgad97d72}
 
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
 
@@ -172,6 +172,7 @@ To create this column we have taken the maximum and minimum area value for each 
 
 Final DataFrame
 \begin{verbatim}
+
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -204,7 +205,7 @@ Final DataFrame
 \end{verbatim}
 
 \subsection{Create Lists according to thresholds}
-\label{sec:org467c2af}
+\label{sec:org457cedf}
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
@@ -244,6 +245,7 @@ Using this criteria we construct the following DataFrame:
 
 Gene-State DataFrame
 \begin{verbatim}
+
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -290,7 +292,7 @@ Gene-State DataFrame
 \end{verbatim}
 
 \subsection{Some results}
-\label{sec:org043eeaa}
+\label{sec:orgdd14880}
 This is a table with the number of genes in each state for each strain.
 
 States Table
@@ -340,9 +342,25 @@ And this are the Clag genes
 2    Var_Active_FC    Var_Active Var_Repressed    Var_Active
 \end{verbatim}
 
-\subsection{Venn Diagrams}
-\label{sec:orga76f57f}
-Here we plon Venn diagrams to visualize how the strains compare.
+\subsection{Category Histograms}
+\label{sec:org169319e}
+For each strain, we polt a histogram of genes in each category.
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{./Plots/histogram_12B.png}
+\end{center}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{./Plots/histogram_10G.png}
+\end{center}
+
+\begin{center}
+\includegraphics[width=.9\linewidth]{./Plots/histogram_3D7B.png}
+\end{center}
+
+\subsection{Venn Diagramls}
+\label{sec:orgdceb161}
+We now plot Venn diagrams to visualize how the strains compare.
 
 First we check how many genes share the same "state" among strains:
 
@@ -362,9 +380,9 @@ Then we make venn diagrams for the "Var\_active" and "Var\_Repressed" states.
 
 
 \section{Code}
-\label{sec:orgbdd6926}
+\label{sec:orgfe97e4f}
 \subsection{Load Packages and functions}
-\label{sec:org6439383}
+\label{sec:org833a6b2}
 \begin{minted}[]{r}
 #### Imports ####
 
@@ -387,7 +405,7 @@ max_dif <- function(vect){
 \end{minted}
 
 \subsection{Microarray Data: Red Signal}
-\label{sec:org4c5c6b8}
+\label{sec:org1f8ef1f}
 
 \begin{minted}[]{r}
 #### Red Signal DF ####
@@ -441,7 +459,7 @@ print(red_df, width = 200)
 hist(red_df$MeanRedPercent)
 \end{minted}
 \subsection{Microarray Data: Areas}
-\label{sec:orgf5b60e9}
+\label{sec:orgf3aafbc}
 \begin{minted}[]{r}
 #### Areas DF ####
 
@@ -547,7 +565,7 @@ print(area_df, width = 400)
 table(duplicated(area_df$Gene_id))
 \end{minted}
 \subsection{Load RNA-Seq Data}
-\label{sec:org0041b06}
+\label{sec:org21620dc}
 
 \begin{minted}[]{r}
 ## #### Old approax ####
@@ -657,7 +675,7 @@ table(duplicated(rna_df$Gene_id))
 \end{minted}
 **
 \subsection{Load Annotation}
-\label{sec:orgdc4b1ad}
+\label{sec:org98855d1}
 \begin{minted}[]{r}
 annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
   select(Gene_id = `Gene ID`,
@@ -669,7 +687,7 @@ print(annot_df, width=200)
 table(duplicated(annot_df$Gene_id))
 \end{minted}
 \subsection{Create Join DF}
-\label{sec:orgf76b090}
+\label{sec:org0c851fb}
 \begin{minted}[]{r}
 print(red_df, width = 200)
 print(area_df, width = 200)
@@ -728,7 +746,7 @@ print(final_df, width = 200)
 
 \end{minted}
 \subsection{Create Lists according to thresholds}
-\label{sec:org0d98bb4}
+\label{sec:org5b5de68}
 \begin{minted}[]{r}
 print(final_df, width = 200)
 
@@ -1030,7 +1048,7 @@ table(state_df$state_3D7B)
 state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 \end{minted}
 \subsection{Some checks and results}
-\label{sec:orgf0b7a55}
+\label{sec:org3b0629c}
 \begin{minted}[]{r}
 ## We check no rows are set to "Wrong!"
 state_df %>%
@@ -1046,7 +1064,7 @@ state_df %>%
   print(width = 400)
 
 ## Save results
-write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
+write.csv(state_df, './Results_Tables/gene_state_final.csv')
 
 ## Create a table with number of each state per strain
 state_table <-  bind_rows(table(state_df$state_12B),
@@ -1070,8 +1088,37 @@ write.csv(clags, './Results_Tables/clag_genes.csv')
 print(state_table, width = 200)
 summary(rna_df)
 \end{minted}
+\subsection{Histograns of classification}
+\label{sec:org3ba05cf}
+\begin{minted}[]{r}
+## Categories histograms
+
+make_histogram <- function(df, column){
+  col <- enquo(column)
+
+  df %>%
+    select(!!col) %>%
+    count(!!col) %>%
+    ggplot(aes(y=n, x=!!col, fill=!!col)) +
+    geom_bar(stat='identity') +
+    geom_text(aes(label=n), vjust=0) +
+    theme(
+      plot.title = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank())
+}
+
+
+hist12B <- make_histogram(state_df, category_12B)
+hist10G <- make_histogram(state_df, category_10G)
+hist3D7B <- make_histogram(state_df, category_3D7B)
+
+ggsave(hist12B, filename = './Plots/histogram_12B.png', height=7, width=8)
+ggsave(hist10G, filename = './Plots/histogram_10G.png', height=7, width=8)
+ggsave(hist3D7B, filename = './Plots/histogram_3D7B.png', height=7, width=8)
+\end{minted}
 \subsection{Comparison of 12B vs 10G differences}
-\label{sec:orgb37df69}
+\label{sec:orgc088722}
 \begin{minted}[]{r}
 excl <- "./Data/10Gvs1p2B.xlsx"
 
@@ -1108,7 +1155,7 @@ print(compare_12Bvs10G, width = 400)
 write.csv(compare_12Bvs10G, './Results_Tables/gens_dif12B_10G.csv')
 \end{minted}
 \subsection{Venn Diagram of results}
-\label{sec:org90a322f}
+\label{sec:org9bcba32}
 \begin{minted}[]{r}
 makeIntersects <- function(a,b,c){
 

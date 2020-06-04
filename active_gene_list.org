@@ -9,7 +9,7 @@
 #+TITLE:  Creation of active gene-lists
 #+AUTHOR: Lucas Michel Todó
 #+EMAIL:  lucas.michel@isglobal.org
-#+DATE:   31/03/2020
+#+DATE:   04/06/2020
 
 * Active/Inactive Gene lists
 :PROPERTIES:
@@ -185,6 +185,7 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
+
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -256,6 +257,7 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
+
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -361,8 +363,17 @@ as.data.frame(clags)
 2    Var_Active_FC    Var_Active Var_Repressed    Var_Active
 #+end_example
 
-** Venn Diagrams
-Here we plon Venn diagrams to visualize how the strains compare.
+** Category Histograms
+For each strain, we polt a histogram of genes in each category.
+
+[[./Plots/histogram_12B.png]]
+
+[[./Plots/histogram_10G.png]]
+
+[[./Plots/histogram_3D7B.png]]
+
+** Venn Diagramls
+We now plot Venn diagrams to visualize how the strains compare.
 
 First we check how many genes share the same "state" among strains:
 
@@ -1057,7 +1068,7 @@ state_df %>%
   print(width = 400)
 
 ## Save results
-write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
+write.csv(state_df, './Results_Tables/gene_state_final.csv')
 
 ## Create a table with number of each state per strain
 state_table <-  bind_rows(table(state_df$state_12B),
@@ -1080,6 +1091,34 @@ write.csv(clags, './Results_Tables/clag_genes.csv')
 
 print(state_table, width = 200)
 summary(rna_df)
+#+END_SRC
+** Histograns of classification
+#+BEGIN_SRC R
+## Categories histograms
+
+make_histogram <- function(df, column){
+  col <- enquo(column)
+
+  df %>%
+    select(!!col) %>%
+    count(!!col) %>%
+    ggplot(aes(y=n, x=!!col, fill=!!col)) +
+    geom_bar(stat='identity') +
+    geom_text(aes(label=n), vjust=0) +
+    theme(
+      plot.title = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank())
+}
+
+
+hist12B <- make_histogram(state_df, category_12B)
+hist10G <- make_histogram(state_df, category_10G)
+hist3D7B <- make_histogram(state_df, category_3D7B)
+
+ggsave(hist12B, filename = './Plots/histogram_12B.png', height=7, width=8)
+ggsave(hist10G, filename = './Plots/histogram_10G.png', height=7, width=8)
+ggsave(hist3D7B, filename = './Plots/histogram_3D7B.png', height=7, width=8)
 #+END_SRC
 ** Comparison of 12B vs 10G differences
 #+BEGIN_SRC R
