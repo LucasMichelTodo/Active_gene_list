@@ -185,7 +185,6 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -257,7 +256,6 @@ head(as.data.frame(x))
 
 #+RESULTS:
 #+begin_example
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
 2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
@@ -378,6 +376,10 @@ We now plot Venn diagrams to visualize how the strains compare.
 First we check how many genes share the same "state" among strains:
 
 [[file:./Plots/venn_Same_State.png]]
+
+And we do the same but only for clonally variant genes:
+
+[[./Plots/venn_Var_Same_State.png]]
 
 Then we make venn diagrams for the "Var_active" and "Var_Repressed" states.
 
@@ -1255,5 +1257,16 @@ genestate <- state_df %>%
 
 customEuler(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B, 'Same_State')
 
-x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)}
+x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)
+
+varstate <- state_df %>%
+  filter(Variant) %>%
+  mutate(gs_12B = paste(Gene_id, category_12B, sep = "_")) %>%
+  mutate(gs_10G = paste(Gene_id, category_10G, sep = "_")) %>%
+  mutate(gs_3D7B = paste(Gene_id, category_3D7B, sep = "_")) %>%
+  select(Gene_id,
+         category_12B, category_10G, category_3D7B,
+         gs_12B, gs_10G, gs_3D7B)
+
+customEuler(varstate$gs_12B, varstate$gs_10G, varstate$gs_3D7B, 'Var_Same_State')
 #+END_SRC
