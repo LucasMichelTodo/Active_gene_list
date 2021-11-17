@@ -7,13 +7,13 @@
   \PYG{n}{a\PYGZus{}b\PYGZus{}c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{intersect}\PYG{p}{(}\PYG{n}{a\PYGZus{}b}\PYG{p}{,} \PYG{n}{c}\PYG{p}{)}
 
   \PYG{n}{abc} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c}
-  \PYG{n}{ab} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}b[}\PYG{o}{!}\PYG{n}{a\PYGZus{}b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
-  \PYG{n}{ac} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}c[}\PYG{o}{!}\PYG{n}{a\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
-  \PYG{n}{bc} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b\PYGZus{}c[}\PYG{o}{!}\PYG{n}{b\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c]}
+  \PYG{n}{ab} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}b}\PYG{p}{[}\PYG{o}{!}\PYG{n}{a\PYGZus{}b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c}\PYG{p}{]}
+  \PYG{n}{ac} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a\PYGZus{}c}\PYG{p}{[}\PYG{o}{!}\PYG{n}{a\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c}\PYG{p}{]}
+  \PYG{n}{bc} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b\PYGZus{}c}\PYG{p}{[}\PYG{o}{!}\PYG{n}{b\PYGZus{}c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{a\PYGZus{}b\PYGZus{}c}\PYG{p}{]}
 
-  \PYG{n}{a} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a[}\PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
-  \PYG{n}{b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b[}\PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
-  \PYG{n}{c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{c[}\PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc]}
+  \PYG{n}{a} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{a}\PYG{p}{[}\PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{a} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc}\PYG{p}{]}
+  \PYG{n}{b} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{b}\PYG{p}{[}\PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ab} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{b} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc}\PYG{p}{]}
+  \PYG{n}{c} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{c}\PYG{p}{[}\PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{ac} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{bc} \PYG{o}{\PYGZam{}} \PYG{o}{!}\PYG{n}{c} \PYG{o}{\PYGZpc{}in\PYGZpc{}} \PYG{n}{abc}\PYG{p}{]}
 
   \PYG{n+nf}{return}\PYG{p}{(}\PYG{n+nf}{list}\PYG{p}{(}\PYG{n}{a} \PYG{o}{=} \PYG{n}{a}\PYG{p}{,} \PYG{n}{b} \PYG{o}{=} \PYG{n}{b}\PYG{p}{,} \PYG{n}{c} \PYG{o}{=} \PYG{n}{c}\PYG{p}{,} \PYG{n}{ab} \PYG{o}{=} \PYG{n}{ab}\PYG{p}{,} \PYG{n}{bc} \PYG{o}{=} \PYG{n}{bc}\PYG{p}{,} \PYG{n}{ac} \PYG{o}{=} \PYG{n}{ac}\PYG{p}{,} \PYG{n}{abc} \PYG{o}{=} \PYG{n}{abc}\PYG{p}{))}
 

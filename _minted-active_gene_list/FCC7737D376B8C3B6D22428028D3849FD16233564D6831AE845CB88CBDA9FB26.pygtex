@@ -32,7 +32,7 @@
     \PYG{n+nf}{return}\PYG{p}{(}\PYG{k+kc}{NA}\PYG{p}{)}
   \PYG{p}{\PYGZcb{}} \PYG{n}{else} \PYG{p}{\PYGZob{}}
     \PYG{n}{labs} \PYG{o}{=} \PYG{n+nf}{c}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}min\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}mid\PYGZsq{}}\PYG{p}{,} \PYG{l+s}{\PYGZsq{}max\PYGZsq{}}\PYG{p}{)}
-    \PYG{n}{lab} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{cut}\PYG{p}{(}\PYG{n}{vect}\PYG{p}{,} \PYG{l+m}{3}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{labs}\PYG{p}{)}\PYG{n}{[1]}
+    \PYG{n}{lab} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{cut}\PYG{p}{(}\PYG{n}{vect}\PYG{p}{,} \PYG{l+m}{3}\PYG{p}{,} \PYG{n}{labels} \PYG{o}{=} \PYG{n}{labs}\PYG{p}{)[}\PYG{l+m}{1}\PYG{p}{]}
     \PYG{n+nf}{return}\PYG{p}{(}\PYG{n+nf}{as.character}\PYG{p}{(}\PYG{n}{lab}\PYG{p}{))}
   \PYG{p}{\PYGZcb{}}
 \PYG{p}{\PYGZcb{}}
@@ -41,7 +41,7 @@
   \PYG{n}{outcol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{outcol}\PYG{p}{)}
   \PYG{n}{areacol} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{enquo}\PYG{p}{(}\PYG{n}{areacol}\PYG{p}{)}
   \PYG{n}{df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-    \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{o}{!!} \PYG{n}{outcol} \PYG{o}{:=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{o}{!!} \PYG{n}{areacol}\PYG{p}{,} \PYG{n}{MaxArea}\PYG{p}{,} \PYG{n}{MinArea}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{relexprs}\PYG{p}{))}
+    \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{o}{!!} \PYG{n}{outcol} \PYG{o}{:=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{o}{!!} \PYG{n}{areacol}\PYG{p}{,} \PYG{n}{MaxArea}\PYG{p}{,} \PYG{n}{MinArea}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{relexprs}\PYG{p}{))}
 \PYG{p}{\PYGZcb{}}
 
 \PYG{n}{final\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{final\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}

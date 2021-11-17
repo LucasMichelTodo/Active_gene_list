@@ -20,7 +20,7 @@
   \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{))}
 
 \PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
   \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Otto\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
 
 \PYG{n}{otto} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{otto} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Otto\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
@@ -40,7 +40,7 @@
   \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{))}
 
 \PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{hoeij} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
   \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Hoeij\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
 
 \PYG{n}{hoeij} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{hoeij} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Hoeij\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
@@ -57,7 +57,7 @@
   \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{))}
 
 \PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{toen} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}unique\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
   \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Toen\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
 
 \PYG{n}{toen} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{toen} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Toen\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
@@ -75,7 +75,7 @@
   \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id} \PYG{o}{=} \PYG{n}{`Gene ID`}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{))}
 
 \PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{bart} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Max} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}scaled\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
   \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{Bart\PYGZus{}Max\PYGZus{}pcnt} \PYG{o}{=} \PYG{p}{(}\PYG{n+nf}{rank}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{)}\PYG{o}{/}\PYG{n+nf}{length}\PYG{p}{(}\PYG{n}{Max}\PYG{p}{))}\PYG{o}{*}\PYG{l+m}{100}\PYG{p}{)}
 
 \PYG{n}{bart} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{bart} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}} \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{,} \PYG{n}{Bart\PYGZus{}Max\PYGZus{}pcnt}\PYG{p}{)}
@@ -94,8 +94,8 @@
 
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Add mean and sd}
 \PYG{n}{rna\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{rna\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MeanPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{StdDevPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{sd}\PYG{p}{))}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MeanPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{StdDevPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{o}{\PYGZhy{}}\PYG{n}{Gene\PYGZus{}id}\PYG{p}{),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{sd}\PYG{p}{))}
 
 
 \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{rna\PYGZus{}df}\PYG{p}{,} \PYG{n}{width}\PYG{o}{=}\PYG{l+m}{200}\PYG{p}{)}

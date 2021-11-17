@@ -2,9 +2,8 @@
 #+PROPERTY: header-args :eval never-export
 #+OPTIONS: ^:{}
 
-#+SETUPFILE: ~/.emacs.d/org-html-themes-master/setup/theme-readtheorg.setup
+#+SETUPFILE: /home/lucas/org-html-themes-master/org/theme-readtheorg-local.setup
 #+HTML_HEAD: <style>pre.src {background-color: #3F3F3F ; color: #e5e5e5;}</style>
-#+HTML_HEAD: <style>table{overflow-x:auto} </style>
 
 #+TITLE:  Creation of active gene-lists
 #+AUTHOR: Lucas Michel Todó
@@ -19,14 +18,15 @@
 :END:
 
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
-We will define 5 possible expresion states:
+We will define 6 possible expresion states:
 
 - Active
   - Active (no-variant genes)
   - Variant Active
   - Variant Semiactive (vairant genes with an intermediate state)
 
-- Inactive (no-variant genes)
+- Inactive
+  - Inactive (no-variant genes)
   - Variant Repressed
 
 - Not-Settable

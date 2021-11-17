@@ -1,61 +1,46 @@
-% Created 2021-11-10 mié 09:47
-% Intended LaTeX compiler: pdflatex
-\documentclass[11pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{graphicx}
-\usepackage{grffile}
-\usepackage{longtable}
-\usepackage{wrapfig}
-\usepackage{rotating}
-\usepackage[normalem]{ulem}
-\usepackage{amsmath}
-\usepackage{textcomp}
-\usepackage{amssymb}
-\usepackage{capt-of}
-\usepackage{hyperref}
-\usepackage{minted}
-\author{Lucas Michel Todó}
-\date{31/03/2020}
-\title{Creation of active gene-lists}
-\hypersetup{
- pdfauthor={Lucas Michel Todó},
- pdftitle={Creation of active gene-lists},
- pdfkeywords={},
- pdfsubject={},
- pdfcreator={Emacs 27.2 (Org mode 9.2)},
- pdflang={English}}
-\begin{document}
+#+STARTUP: hideblocks
+#+PROPERTY: header-args :eval never-export
+#+OPTIONS: ^:{}
 
-\maketitle
-\tableofcontents \clearpage
-\section{Active/Inactive Gene lists}
-\label{sec:org17c7341}
+#+SETUPFILE: /home/lucas/org-html-themes-master/org/theme-readtheorg-local.setup
+#+HTML_HEAD: <style>pre.src {background-color: #3F3F3F ; color: #e5e5e5;}</style>
+
+#+TITLE:  Creation of active gene-lists
+#+AUTHOR: Lucas Michel Todó
+#+EMAIL:  lucas.michel@isglobal.org
+#+DATE:   31/03/2020
+
+* Active/Inactive Gene lists
+:PROPERTIES:
+:header-args:R: :session active_gene_lists
+:header-args:R+: :exports results
+:header-args:R+: :results output
+:END:
+
 Our aim is to create a unified table that assigns to each gene in the P.falicparum gnome a expresion state.
-We will define 5 possible expresion states:
+We will define 6 possible expresion states:
 
-\begin{itemize}
-\item Active
-\begin{itemize}
-\item Active (no-variant genes)
-\item Variant Active
-\item Variant Semiactive (vairant genes with an intermediate state)
-\end{itemize}
+- Active
+  - Active (no-variant genes)
+  - Variant Active
+  - Variant Semiactive (vairant genes with an intermediate state)
 
-\item Inactive (no-variant genes)
-\begin{itemize}
-\item Variant Repressed
-\end{itemize}
+- Inactive
+  - Inactive (no-variant genes)
+  - Variant Repressed
 
-\item Not-Settable
-\end{itemize}
+- Not-Settable
 
-\subsection{Microarray Data: Red Signal}
-\label{sec:orgd402585}
+** Microarray Data: Red Signal
 We willl load the red signal and transform it into percentiles. For each gene we pick the "Aver.2Higher" column from the original microarrays data table. This column corresponds to the average between the two highest red signals among available timepoints.
 
 Red Signal DataFrame
-\begin{verbatim}
+#+BEGIN_SRC R
+head(as.data.frame(red_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
         Gene_id     Red_12B     Red_10G   Red_3D7B Percent_12B Percent_10G
 1    mal_mito_3 22579.33333 36436.73333 30636.8250  96.0466005  98.4721161
 2 PF3D7_0100100   104.17083   215.03542   264.4000   5.6913675  10.9625668
@@ -70,14 +55,18 @@ Red Signal DataFrame
 4   81.3407181        68.773873     35.6315253    81.3407181
 5    8.0595875         8.842628      6.3343519     9.8930481
 6    0.2387319         0.210084      0.3023937     0.4392666
-\end{verbatim}
+#+end_example
 
-\subsection{Microarray Data: Areas}
-\label{sec:org57dbada}
+** Microarray Data: Areas
 We will load the areas data to calculate FC among strains. For each gene, we select the time interval (right, left, mid or sides) for which we find the maximum difference among strains (between highest and lowest). We will also add a column to check if this time interval corresponds to the interval of maxium expression for each strain.
 
 Areas DataFrame
-\begin{verbatim}
+#+BEGIN_SRC R
+head(as.data.frame(area_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
               Gene_id     l_12B     r_12B     m_12B    s_12B     l_10G    r_10G
 1          mal_mito_3 30.592496 61.080128 49.676556 41.99607 25.372470 62.38873
 2 MAL13P1.415_oldname  5.423269  8.488971  1.289779 12.62246  6.117132 10.59524
@@ -113,26 +102,28 @@ Areas DataFrame
 4 13.66108  7.099032
 5       NA        NA
 6       NA        NA
-\end{verbatim}
+#+end_example
 
-\subsection{Load RNA-Seq Data}
-\label{sec:orgf4dc958}
+** Load RNA-Seq Data
 We will use publicly available data from PlasmoDB to create a reference expresion percentile for each gene.
 All data-sets are from RNA-Seq studies in the 3D7 strain.
 We are using 4 different data-sets:
-\begin{itemize}
-\item Otto et.al.
-\item Hoeijmakers et.al.
-\item Toenhake et.al.
-\item Bartfai et.al.
-\end{itemize}
+- Otto et.al.
+- Hoeijmakers et.al.
+- Toenhake et.al.
+- Bartfai et.al.
 
 We use only uniquely mapped reads and scaled data when available.
 For each Data-Set we first create a column representing the maxium value among timepoints for each gene. We then convert this column into percentile values. Finally we average this percentile values among all Data-Sets.
 
 
 RNA-Seq DataFrame
-\begin{verbatim}
+#+BEGIN_SRC R
+head(as.data.frame(rna_df))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
         Gene_id Otto_Max_pcnt Hoeij_Max_pcnt Toen_Max_pcnt Bart_Max_pcnt
 1    mal_mito_1     97.695933      66.259382      69.20929     80.520161
 2    mal_mito_2     98.079944      88.776401      85.12829     94.728574
@@ -147,30 +138,52 @@ RNA-Seq DataFrame
 4   21.694449      3.818402
 5   16.414296      6.711285
 6    7.496945      8.421970
-\end{verbatim}
+#+end_example
 
 We plot the resulting distribution of percentiles (it should be almost flat).
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc.png}
-\end{center}
+#+BEGIN_SRC R :file ./Plots/rnaseq_perc.png :exports results :results output graphics
+p <- ggplot(rna_df, aes(x=MeanPercent)) +
+  geom_histogram(bins = 20) +
+  ggtitle("Mean Percentile among Data-Sets")
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/rnaseq_perc.png]]
 
 
 We plot the standard deviation of the percentile values among different Data-Sets and we can see that for the vast majority of genes it doesn't go above 10.
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/rnaseq_perc_sd.png}
-\end{center}
-\subsection{Create table for classification}
-\label{sec:org7bf3981}
+#+BEGIN_SRC R :file ./Plots/rnaseq_perc_sd.png :exports results :results output graphics
+p <- ggplot(rna_df, aes(x=StdDevPercent)) +
+  geom_histogram(bins = 100) +
+  ggtitle("SD of Percent value (among different studies)")
+
+print(p)
+#+END_SRC
+
+#+RESULTS:
+[[file:./Plots/rnaseq_perc_sd.png]]
+** Create table for classification
 
 Joining and summarizing all the prevoius data we create a a table that will let us classify the genes according to their expression state.
 
 To classify genes, we add a colum for each strain were we classify genes according to their expression relative to other strains.
 To create this column we have taken the maximum and minimum area value for each gene and divided this interval in 3 equal regions. Each strain then gets a value of man/mid/max according to which region it falls.
 
-\texttt{gene-min-{}--{}-|-{}--mid-{}--{}-|-{}--{}-gene-max}
+~gene-min----|---mid----|----gene-max~
 
 Final DataFrame
-\begin{verbatim}
+#+BEGIN_SRC R
+## NA's dont print well when in a "character" col.
+x <- final_df %>%
+  replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
+
+head(as.data.frame(x))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
 
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1    mal_mito_3   FALSE  96.0466005  98.4721161   97.8800611         2.425516
@@ -200,47 +213,46 @@ Final DataFrame
 4 erythrocyte membrane protein 1, PfEMP1
 5                                  rifin
 6                                  rifin
-\end{verbatim}
+#+end_example
 
-\subsection{Create Lists according to thresholds}
-\label{sec:org93f1a2f}
+** Create Lists according to thresholds
 
 Now that we have all the data loaded in, we can star to set labels for each gene.
 
 We have set the following thresholds:
-\begin{itemize}
-\item (rna\_pcnt) RNA-Seq mean percentile: 25\%
-\item (red\_pcnt) Red Signal Percentile (by sample): 25\%
-\item (red\_rescue) Red Signal Mean Percentile for "rescuing": 40\%
-\item (area\_fc) Area log2 Fold-Change: 1
-\end{itemize}
+- (rna_pcnt) RNA-Seq mean percentile: 25%
+- (red_pcnt) Red Signal Percentile (by sample): 25%
+- (red_rescue) Red Signal Mean Percentile for "rescuing": 40%
+- (area_fc) Area log2 Fold-Change: 1
 
 In addition to these thresholds we will use 2 more columns to set the categories:
-\begin{itemize}
-\item Variant: a column stating if gene is variant/non-variant
-\item Relative Expression (by strain): a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
-\end{itemize}
+- Variant: a column stating if gene is variant/non-variant
+- Relative Expression (by strain): a colum were each gene is set to min/mid/max according to it's expression level relative to the other strains.
 
 We will have the following categories with the following logic:
 
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/Decision_Tree.jpg}
-\end{center}
+[[./Plots/Decision_Tree.jpg]]
 
-\href{./Plots/Decision\_Tree.jpg}{Make bigger}
+[[./Plots/Decision_Tree.jpg][Make bigger]]
 
 
 Genes that have NA values in any of the classification columns are classified according to the following tree.
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/active_genes_NAs.jpg}
-\end{center}
+[[file:./Plots/active_genes_NAs.jpg]]
 
-\href{Plots/active\_genes\_NAs.jpg}{Make bigger}
+[[file:Plots/active_genes_NAs.jpg][Make bigger]]
 
 Using this criteria we construct the following DataFrame:
 
 Gene-State DataFrame
-\begin{verbatim}
+#+BEGIN_SRC R
+x <- state_df %>%
+  replace_na(list(rel_12B = "NA", rel_10G = "NA", rel_3D7B = "NA"))
+
+head(as.data.frame(x))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
 
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1    mal_mito_3   FALSE  96.0466005  98.4721161   97.8800611         2.425516
@@ -284,14 +296,18 @@ Gene-State DataFrame
 4 Var_Repressed    Var_Active
 5 Var_Repressed Var_Repressed
 6 Var_Repressed Var_Repressed
-\end{verbatim}
+#+end_example
 
-\subsection{Some results}
-\label{sec:orga428e85}
+** Some results
 This is a table with the number of genes in each state for each strain.
 
 States Table
-\begin{verbatim}
+#+begin_src R
+as.data.frame(state_table)
+#+end_src
+
+#+RESULTS:
+#+begin_example
   Strain Active Active_FC Active_FC_Dif_max Active_FCna Active_FCna_Redna
 1    12B   3944        20                 2           1               191
 2    10G   3944        20                 2           1               191
@@ -320,10 +336,15 @@ States Table
 1                          4                 1
 2                          4                NA
 3                          4                NA
-\end{verbatim}
+#+end_example
 
 And this are the Clag genes
-\begin{verbatim}
+#+begin_src R
+as.data.frame(clags)
+#+end_src
+
+#+RESULTS:
+#+begin_example
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
 1 PF3D7_0302200    TRUE    78.68602    99.57983     42.32238         57.25745
 2 PF3D7_0302500    TRUE    98.81589    84.39649     98.98778         14.59129
@@ -339,33 +360,30 @@ And this are the Clag genes
         state_3D7B  category_12B  category_10G category_3D7B
 1 Var_Repressed_FC Var_Repressed    Var_Active Var_Repressed
 2    Var_Active_FC    Var_Active Var_Repressed    Var_Active
-\end{verbatim}
+#+end_example
 
-\subsection{Venn Diagrams}
-\label{sec:org9264071}
+** Venn Diagrams
 Here we plon Venn diagrams to visualize how the strains compare.
 
 First we check how many genes share the same "state" among strains:
 
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/venn_Same_State.png}
-\end{center}
+[[file:./Plots/venn_Same_State.png]]
 
-Then we make venn diagrams for the "Var\_active" and "Var\_Repressed" states.
+Then we make venn diagrams for the "Var_active" and "Var_Repressed" states.
 
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/venn_Var_Active_Genes.png}
-\end{center}
+[[file:./Plots/venn_Var_Active_Genes.png]]
 
-\begin{center}
-\includegraphics[width=.9\linewidth]{./Plots/venn_Var_Repressed_Genes.png}
-\end{center}
+[[file:./Plots/venn_Var_Repressed_Genes.png]]
 
-\section{Code}
-\label{sec:org2f2c935}
-\subsection{Load Packages and functions}
-\label{sec:org1ae4236}
-\begin{minted}[]{r}
+* Code
+:PROPERTIES:
+:header-args:R: :session active_gene_lists
+:header-args:R+: :tangle ./Scripts/active_gene_list.R
+:header-args:R+: :results none
+:END:
+
+** Load Packages and functions
+#+BEGIN_SRC R :results none
 #### Imports ####
 
 library(readxl)
@@ -384,12 +402,33 @@ max_dif <- function(vect){
   }
   return(md)
 }
-\end{minted}
 
-\subsection{Microarray Data: Red Signal}
-\label{sec:orgc3b4529}
+myMax <- function(x){
+  if (all(is.na(x))){
+    out <- NA
+  } else {
+    out <- max(x, na.rm=T)
+  }
+  return(out)
+}
 
-\begin{minted}[]{r}
+myMin <- function(x){
+  if (all(is.na(x))){
+    out <- NA
+  } else {
+    out <- min(x, na.rm=T)
+  }
+  return(out)
+}
+
+ave2higher <- function(vect){
+  return(mean(sort(vect, decreasing = TRUE)[1:2]))
+}
+#+END_SRC
+
+** Microarray Data: Red Signal
+
+#+BEGIN_SRC R :results none
 #### Red Signal DF ####
 
 ## Read translation table
@@ -408,6 +447,14 @@ red_df <- red %>%
          Red_3D7B = `Aver.2Higher3D7-B.`) %>%
   left_join(map, by='Old_id')
 
+## Add B11
+b11_fld <- '/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/New_Arrays/R_results_NewArray/'
+
+B11_red <- read_csv(paste0(b11_fld, 'geneLevel_redSignal_exp.csv')) %>%
+  select(Gene_id, contains('B11')) %>%
+  mutate(across(contains('B11'), function(x) 2**x)) %>%
+  mutate(Red_B11 = apply(select(., contains('tp')), 1, ave2higher))
+
 ## Manually add gene ids that do not appear on map (we blasted the probes to assign them)
 red_df <- red_df %>%
   mutate(Gene_id = ifelse(Old_id == 'MAL8P1.310', 'PF3D7_0830200', Gene_id)) %>%
@@ -423,26 +470,48 @@ red_df <- red_df %>%
 red_df <- red_df %>%
   filter(!grepl('_oldname', Gene_id))
 
+## Join B11
+
+red_df <- red_df %>%
+  left_join(B11_red %>% select(Gene_id, Red_B11))
+
 ## Transform into percentiles
 
 red_df <- red_df %>%
   mutate(Percent_12B = (rank(Red_12B)/length(Red_12B))*100) %>%
   mutate(Percent_10G = (rank(Red_10G)/length(Red_10G))*100) %>%
-  mutate(Percent_3D7B = (rank(Red_3D7B)/length(Red_3D7B))*100)
+  mutate(Percent_3D7B = (rank(Red_3D7B)/length(Red_3D7B))*100) %>%
+  mutate(Percent_B11 = (rank(Red_B11)/length(Red_B11))*100)
+
+print(red_df) %>% print(width = 400)
+
+## ### From PhD main
+
+## ## Load Red Percentile Data
+## red_percent_old <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/Old_Arrays/R_results_OldArrays_Variantome/red_percentiles.csv')
+## red_percent_new <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/New_Arrays/R_results_NewArray/red_percentiles.csv')
+
+## red_df <- full_join(red_percent_old, red_percent_new, by = 'Gene_id')
+## red_df[red_df$Gene_id == 'PF3D7_0935400_as',]$Gene_id <- 'PF3D7_0935390'
+
+## red_df <- red_df %>%
+##   set_names(c('Gene_id', 'Percent_12B', 'Percent_10G', 'Percent_3D7B',
+##               'Percent_A7', 'Percent_E5', 'Percent_B11')) %>%
+##   select(Gene_id, contains(c('12B', '10G', '3D7B', 'B11')))
 
 ## Add max percentile dif
 
 red_df <- red_df %>%
-  mutate(MaxRedPercentDif= apply(select(., contains('Percent_')), 1, max_dif)) %>%
+  mutate(MaxRedPercentDif = apply(select(., contains('Percent_')), 1, max_dif)) %>%
   mutate(MeanRedPercent = apply(select(., contains('Percent_')), 1, mean)) %>%
-  mutate(MaxRedPercent = apply(select(., contains('Percent_')), 1, max))
+  mutate(MaxRedPercent = apply(select(., contains('Percent_')), 1, myMax))
 
 print(red_df, width = 200)
 hist(red_df$MeanRedPercent)
-\end{minted}
-\subsection{Microarray Data: Areas}
-\label{sec:orga0c8957}
-\begin{minted}[]{r}
+
+#+END_SRC
+** Microarray Data: Areas
+#+BEGIN_SRC R :results none
 #### Areas DF ####
 
 # Import Areas table
@@ -473,21 +542,31 @@ area_df <- area %>%
   select(-Old_id) %>%
   group_by(Gene_id) %>% summarize_all(list(mean))
 
+## Add B11
+
+B11_area <- read_csv(paste0(b11_fld, 'area_geneLevel.csv')) %>%
+  select(Gene_id, contains('B11')) %>%
+  set_names(c('Gene_id', 'l_B11', 'r_B11', 'm_B11', 's_B11'))
+
+area_df <- area_df %>%
+  left_join(B11_area)
+
+## Get Max and Min
 
 print(area_df, width = 200)
 
 area_df <- area_df %>%
-  mutate(MaxLeft = apply(select(., contains('l_')), 1, max)) %>%
-  mutate(MinLeft = apply(select(., contains('l_')), 1, min)) %>%
+  mutate(MaxLeft = apply(select(., contains('l_')), 1, myMax)) %>%
+  mutate(MinLeft = apply(select(., contains('l_')), 1, myMin)) %>%
 
-  mutate(MaxRight = apply(select(., contains('r_')), 1, max)) %>%
-  mutate(MinRight = apply(select(., contains('r_')), 1, min)) %>%
+  mutate(MaxRight = apply(select(., contains('r_')), 1, myMax)) %>%
+  mutate(MinRight = apply(select(., contains('r_')), 1, myMin)) %>%
 
-  mutate(MaxMid = apply(select(., contains('m_')), 1, max)) %>%
-  mutate(MinMid = apply(select(., contains('m_')), 1, min)) %>%
+  mutate(MaxMid = apply(select(., contains('m_')), 1, myMax)) %>%
+  mutate(MinMid = apply(select(., contains('m_')), 1, myMin)) %>%
 
-  mutate(MaxSides = apply(select(., contains('s_')), 1, max)) %>%
-  mutate(MinSides = apply(select(., contains('s_')), 1, min)) %>%
+  mutate(MaxSides = apply(select(., contains('s_')), 1, myMax)) %>%
+  mutate(MinSides = apply(select(., contains('s_')), 1, myMin)) %>%
 
   mutate(DifLeft = MaxLeft - MinLeft) %>%
   mutate(DifRight = MaxRight - MinRight) %>%
@@ -539,17 +618,22 @@ area_df <- area_df %>%
            Interval == 'Mid' ~ m_3D7B,
            Interval == 'Sides' ~ s_3D7B,
            Interval == 'No Data' ~ NA_real_)) %>%
-  mutate(MaxArea = apply(select(., contains('area_')), 1, max)) %>%
-  mutate(MinArea = apply(select(., contains('area_')), 1, min))
+  mutate(area_B11 = case_when(
+           Interval == 'Left' ~ l_B11,
+           Interval == 'Right' ~ r_B11,
+           Interval == 'Mid' ~ m_B11,
+           Interval == 'Sides' ~ s_B11,
+           Interval == 'No Data' ~ NA_real_)) %>%
+  mutate(MaxArea = apply(select(., contains('area_')), 1, myMax)) %>%
+  mutate(MinArea = apply(select(., contains('area_')), 1, myMin))
 
 
 print(area_df, width = 400)
 table(duplicated(area_df$Gene_id))
-\end{minted}
-\subsection{Load RNA-Seq Data}
-\label{sec:org380342b}
+#+END_SRC
+** Load RNA-Seq Data
 
-\begin{minted}[]{r}
+#+BEGIN_SRC R :results none
 ## #### Old approax ####
 ## Select max percentile directly
 
@@ -571,7 +655,7 @@ otto <- read_delim(csv, delim=";") %>%
   select(Gene_id = `Gene ID`, contains('unique'))
 
 otto <- otto %>%
-  mutate(Max = apply(select(., contains('unique')), 1, max)) %>%
+  mutate(Max = apply(select(., contains('unique')), 1, myMax)) %>%
   mutate(Otto_Max_pcnt = (rank(Max)/length(Max))*100)
 
 otto <- otto %>% select(Gene_id, Otto_Max_pcnt)
@@ -591,7 +675,7 @@ hoeij <- read_delim(csv, delim=";") %>%
   select(Gene_id = `Gene ID`, contains('scaled'))
 
 hoeij <- hoeij %>%
-  mutate(Max = apply(select(., contains('scaled')), 1, max)) %>%
+  mutate(Max = apply(select(., contains('scaled')), 1, myMax)) %>%
   mutate(Hoeij_Max_pcnt = (rank(Max)/length(Max))*100)
 
 hoeij <- hoeij %>% select(Gene_id, Hoeij_Max_pcnt)
@@ -608,7 +692,7 @@ toen <- read_delim(csv, delim=",") %>%
   select(Gene_id = `Gene ID`, contains('unique'))
 
 toen <- toen %>%
-  mutate(Max = apply(select(., contains('unique')), 1, max)) %>%
+  mutate(Max = apply(select(., contains('unique')), 1, myMax)) %>%
   mutate(Toen_Max_pcnt = (rank(Max)/length(Max))*100)
 
 toen <- toen %>% select(Gene_id, Toen_Max_pcnt)
@@ -626,7 +710,7 @@ bart <- read_delim(csv, delim=",") %>%
   select(Gene_id = `Gene ID`, contains('scaled'))
 
 bart <- bart %>%
-  mutate(Max = apply(select(., contains('scaled')), 1, max)) %>%
+  mutate(Max = apply(select(., contains('scaled')), 1, myMax)) %>%
   mutate(Bart_Max_pcnt = (rank(Max)/length(Max))*100)
 
 bart <- bart %>% select(Gene_id, Bart_Max_pcnt)
@@ -654,11 +738,9 @@ print(rna_df, width=200)
 hist(rna_df$MeanPercent, breaks = 20)
 hist(rna_df$StdDevPercent, breaks = 100)
 table(duplicated(rna_df$Gene_id))
-\end{minted}
-**
-\subsection{Load Annotation}
-\label{sec:org70ae6b2}
-\begin{minted}[]{r}
+#+END_SRC
+** Load Annotation
+#+BEGIN_SRC R
 annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
   select(Gene_id = `Gene ID`,
          Gene_name = `Gene Name or Symbol`,
@@ -667,10 +749,9 @@ annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
 
 print(annot_df, width=200)
 table(duplicated(annot_df$Gene_id))
-\end{minted}
-\subsection{Create Join DF}
-\label{sec:org3d1a54f}
-\begin{minted}[]{r}
+#+END_SRC
+** Create Join DF
+#+BEGIN_SRC R :results none
 print(red_df, width = 200)
 print(area_df, width = 200)
 print(rna_df, width = 200)
@@ -719,17 +800,18 @@ set_relexprs <- function(df, outcol, areacol){
 final_df <- final_df %>%
   set_relexprs(rel_12B, area_12B) %>%
   set_relexprs(rel_10G, area_10G) %>%
-  set_relexprs(rel_3D7B, area_3D7B)
+  set_relexprs(rel_3D7B, area_3D7B) %>%
+  set_relexprs(rel_B11, area_B11)
+
 
 ## Add annotation
 final_df <- left_join(final_df, annot_df, by = 'Gene_id')
 
 print(final_df, width = 200)
 
-\end{minted}
-\subsection{Create Lists according to thresholds}
-\label{sec:orgb4b5a13}
-\begin{minted}[]{r}
+#+END_SRC
+** Create Lists according to thresholds
+#+BEGIN_SRC R
 print(final_df, width = 200)
 
 th_rnapcnt <- 25
@@ -1112,9 +1194,11 @@ state_df <- final_df %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
   set_state(state_3D7B, Percent_3D7B, rel_3D7B) %>%
+  set_state(state_B11, Percent_B11, rel_B11) %>%
   set_category(state_12B, category_12B) %>%
   set_category(state_10G, category_10G) %>%
-  set_category(state_3D7B, category_3D7B)
+  set_category(state_3D7B, category_3D7B) %>%
+  set_category(state_B11, category_B11)
 
 print(state_df, width = 400)
 
@@ -1122,31 +1206,37 @@ table(state_df$state_12B)
 
 state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 
-\end{minted}
-\subsection{Some checks and results}
-\label{sec:orgf39f36a}
-\begin{minted}[]{r}
+#+END_SRC
+** Some checks and results
+#+BEGIN_SRC R
 ## We check no rows are set to "Wrong!"
 state_df %>%
   filter(state_12B == 'Not_Settable' |
          state_10G == 'Not_Settable' |
-         state_3D7B == 'Not_Settable') %>%
+         state_3D7B == 'Not_Settable'|
+         state_B11 == 'Not_Settable') %>%
   print(width = 400)
 
 state_df %>%
   filter(category_12B == 'No_Category' |
          category_10G == 'No_Category' |
-         category_3D7B == 'No_Category')
+         category_3D7B == 'No_Category' |
+         category_B11 == 'No_Category')
 
 ## Save results
-write.csv(state_df, './Results_Tables/state_df_rna25_red25_reddif0_area1.csv')
+outname <- sprintf(
+  './Results_Tables_withB11/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s.csv',
+  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
+)
+write.csv(state_df, outname)
 
 ## Create a table with number of each state per strain
 state_table <-  bind_rows(table(state_df$state_12B),
                           table(state_df$state_10G),
-                          table(state_df$state_3D7B)) %>%
+                          table(state_df$state_3D7B),
+                          table(state_df$state_B11)) %>%
   replace_na(list(Var_Semiactive = 0)) %>%
-  mutate(Strain = c('12B', '10G', '3D7B')) %>%
+  mutate(Strain = c('12B', '10G', '3D7B', 'B11')) %>%
   select(Strain, everything())
 
 ## Create a table with differences between 12B and 10G
@@ -1158,19 +1248,18 @@ dif12B_10G <- state_df %>%
 clags <- state_df %>%
   filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200')
 
-write.csv(clags, './Results_Tables/clag_genes.csv')
+write.csv(clags, './Results_Tables_withB11/clag_genes.csv')
 
 print(state_table, width = 200)
 summary(rna_df)
-\end{minted}
-\subsection{Comparison of 12B vs 10G differences}
-\label{sec:org693caa3}
-\begin{minted}[]{r}
+#+END_SRC
+** Comparison of 12B vs 10G differences
+#+BEGIN_SRC R
 excl <- "./Data/10Gvs1p2B.xlsx"
 
 ## Import 12B vs 10G differences by transcription table
 trans_difs <- read_delim('./Data/transDif_12Bvs10G.csv', delim = ';') %>%
-  rename(Old_id = X1) %>%
+  rename(Old_id = ...1) %>%
   left_join(map, by = 'Old_id')
 
 print(trans_difs, width = 400)
@@ -1198,11 +1287,10 @@ compare_12Bvs10G <- state_df %>%
   mutate(Dif_state = category_12B != category_10G)
 
 print(compare_12Bvs10G, width = 400)
-write.csv(compare_12Bvs10G, './Results_Tables/gens_dif12B_10G.csv')
-\end{minted}
-\subsection{Venn Diagram of results}
-\label{sec:orge21e642}
-\begin{minted}[]{r}
+write.csv(compare_12Bvs10G, './Results_Tables_withB11/gens_dif12B_10G.csv')
+#+END_SRC
+** Venn Diagram of results (Not modified, no need to into 4way Eulers)
+#+BEGIN_SRC R
 makeIntersects <- function(a,b,c){
 
   a_b <- intersect(a, b)
@@ -1301,5 +1389,4 @@ genestate <- state_df %>%
 customEuler(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B, 'Same_State')
 
 x <- makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)}
-\end{minted}
-\end{document}
+#+END_SRC

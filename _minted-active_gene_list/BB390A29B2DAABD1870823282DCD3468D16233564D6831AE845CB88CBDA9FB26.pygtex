@@ -8,7 +8,7 @@
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Import Red Signal table}
 \PYG{n}{red} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n+nf}{read\PYGZus{}excel}\PYG{p}{(}\PYG{n}{excl}\PYG{p}{,} \PYG{n}{sheet} \PYG{o}{=} \PYG{l+m}{4}\PYG{p}{)}
 
-\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{red}\PYG{p}{)}\PYG{n}{[1]} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZdq{}Old\PYGZus{}id\PYGZdq{}}
+\PYG{n+nf}{colnames}\PYG{p}{(}\PYG{n}{red}\PYG{p}{)[}\PYG{l+m}{1}\PYG{p}{]} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{l+s}{\PYGZdq{}Old\PYGZus{}id\PYGZdq{}}
 
 \PYG{n}{red\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{red} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
   \PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{Old\PYGZus{}id}\PYG{p}{,}
@@ -42,9 +42,9 @@
 \PYG{c+c1}{\PYGZsh{}\PYGZsh{} Add max percentile dif}
 
 \PYG{n}{red\PYGZus{}df} \PYG{o}{\PYGZlt{}\PYGZhy{}} \PYG{n}{red\PYGZus{}df} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxRedPercentDif}\PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max\PYGZus{}dif}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MeanRedPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
-  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxRedPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxRedPercentDif}\PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max\PYGZus{}dif}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MeanRedPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{mean}\PYG{p}{))} \PYG{o}{\PYGZpc{}\PYGZgt{}\PYGZpc{}}
+  \PYG{n+nf}{mutate}\PYG{p}{(}\PYG{n}{MaxRedPercent} \PYG{o}{=} \PYG{n+nf}{apply}\PYG{p}{(}\PYG{n+nf}{select}\PYG{p}{(}\PYG{n}{.}\PYG{p}{,} \PYG{n+nf}{contains}\PYG{p}{(}\PYG{l+s}{\PYGZsq{}Percent\PYGZus{}\PYGZsq{}}\PYG{p}{)),} \PYG{l+m}{1}\PYG{p}{,} \PYG{n}{max}\PYG{p}{))}
 
 \PYG{n+nf}{print}\PYG{p}{(}\PYG{n}{red\PYGZus{}df}\PYG{p}{,} \PYG{n}{width} \PYG{o}{=} \PYG{l+m}{200}\PYG{p}{)}
 \PYG{n+nf}{hist}\PYG{p}{(}\PYG{n}{red\PYGZus{}df}\PYG{o}{\PYGZdl{}}\PYG{n}{MeanRedPercent}\PYG{p}{)}
