@@ -161,19 +161,6 @@
   .footdef  { margin-bottom: 1em; }
   .figure { padding: 1em; }
   .figure p { text-align: center; }
-  .equation-container {
-    display: table;
-    text-align: center;
-    width: 100%;
-  }
-  .equation {
-    vertical-align: middle;
-  }
-  .equation-label {
-    display: table-cell;
-    text-align: right;
-    vertical-align: middle;
-  }
   .inlinetask {
     padding: 10px;
     border: 2px solid gray;
@@ -205,7 +192,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2018 Free Software Foundation, Inc.
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -469,35 +456,35 @@ To create this column we have taken the maximum and minimum area value for each 
 Final DataFrame
 </p>
 <pre class="example">
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
-1    mal_mito_3   FALSE  96.0466005  98.4721161   97.8800611         2.425516
-2 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
-3 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
-4 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
-5 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
+1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
+2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
+3 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
+4 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
+5 PF3D7_0100500    TRUE          NA          NA           NA               NA
 6 PF3D7_0100600    TRUE   0.2291826   0.4392666    0.2387319         0.210084
   MeanRedPercent MaxRedPercent Interval    areaFC area_12B  area_10G area_3D7B
-1     97.4662592    98.4721161     Left 0.3881060 30.59250 25.372470  25.48463
-2      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
-3     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
-4     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
-5      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+1      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
+2     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
+3     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
+4      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+5             NA            NA     &lt;
+       NA       NA        NA        NA
 6      0.3023937     0.4392666  No Data        NA       NA        NA        NA
    MaxArea   MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
-1 30.59250 25.372470   92.568511     max     min      min      null
-2 43.71350 31.769976   21.694449     min     max      mid       VAR
-3 52.33320  5.237266   16.414296     max     min      max       RIF
-4 77.46213 31.789080    7.496945     min     min      max       VAR
-5 35.50954  7.706832   14.607698     mid     min      max       RIF
+1 43.71350 31.769976   21.694449     min     max      mid       VAR
+2 52.33320  5.237266   16.414296     max     min      max       RIF
+3 77.46213 31.789080    7.496945     min     min      max       VAR
+4 35.50954  7.706832   14.607698     mid     min      max       RIF
+5       NA        NA   18.975825      NA      NA       NA      null
 6       NA        NA    4.789230      NA      NA       NA       RIF
-                                   Annot
-1                    unspecified product
-2 erythrocyte membrane protein 1, PfEMP1
-3                                  rifin
-4 erythrocyte membrane protein 1, PfEMP1
-5                                  rifin
-6                                  rifin
+                                                        Annot
+1                      erythrocyte membrane protein 1, PfEMP1
+2                                                       rifin
+3                      erythrocyte membrane protein 1, PfEMP1
+4                                                       rifin
+5 erythrocyte membrane protein 1 (PfEMP1), exon 1, pseudogene
+6                                                       rifin
 </pre>
 </div>
 </div>
@@ -513,10 +500,12 @@ Now that we have all the data loaded in, we can star to set labels for each gene
 We have set the following thresholds:
 </p>
 <ul class="org-ul">
-<li>(rna_pcnt) RNA-Seq mean percentile: 25%</li>
-<li>(red_pcnt) Red Signal Percentile (by sample): 25%</li>
-<li>(red_rescue) Red Signal Mean Percentile for "rescuing": 40%</li>
-<li>(area_fc) Area log2 Fold-Change: 1</li>
+<li>RNA-Seq mean percentile: 25%</li>
+<li>Red Signal Mean Percentile : 25%</li>
+<li>Red Signal Percentile for "rescuing": 40%</li>
+<li>Red Signal Percentile for "downgrading": 15%</li>
+<li>Area log2 Fold-Change: 1</li>
+<li>Red Signal Percentile Difference: 30%</li>
 </ul>
 
 <p>
@@ -533,22 +522,22 @@ We will have the following categories with the following logic:
 
 
 <div class="figure">
-<p><img src="./Plots/Decision_Tree.jpg" alt="Decision_Tree.jpg" />
+<p><img src="./Plots/active_genes_tree.jpg" alt="active_genes_tree.jpg" />
 </p>
 </div>
 
 <p>
-<a href="./Plots/Decision_Tree.jpg">Make bigger</a>
+<a href="./Plots/active_genes_tree.jpg">Make bigger</a>
 </p>
 
 
 <p>
 Genes that have NA values in any of the classification columns are classified according to the following tree.
-<img src="./Plots/active_genes_NAs.jpg" alt="active_genes_NAs.jpg" />
+<img src="Plots/active_genes_NAs_2.jpg" alt="active_genes_NAs_2.jpg" />
 </p>
 
 <p>
-<a href="Plots/active_genes_NAs.jpg">Make bigger</a>
+<a href="Plots/active_genes_NAs_2.jpg">Make bigger</a>
 </p>
 
 <p>
@@ -559,49 +548,49 @@ Using this criteria we construct the following DataFrame:
 Gene-State DataFrame
 </p>
 <pre class="example">
-
         Gene_id Variant Percent_12B Percent_10G Percent_3D7B MaxRedPercentDif
-1    mal_mito_3   FALSE  96.0466005  98.4721161   97.8800611         2.425516
-2 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
-3 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
-4 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
-5 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
+1 PF3D7_0100100    TRUE   5.6913675  10.9625668   11.1153552         5.423988
+2 PF3D7_0100200    TRUE  29.7555386   4.0106952   19.9006875        25.744843
+3 PF3D7_0100300    TRUE  12.5668449  12.9870130   81.3407181        68.773873
+4 PF3D7_0100400    TRUE   9.8930481   1.0504202    8.0595875         8.842628
+5 PF3D7_0100500    TRUE          NA          NA           NA               NA
 6 PF3D7_0100600    TRUE   0.2291826   0.4392666    0.2387319         0.210084
   MeanRedPercent MaxRedPercent Interval    areaFC area_12B  area_10G area_3D7B
-1     97.4662592    98.4721161     Left 0.3881060 30.59250 25.372470  25.48463
-2      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
-3     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
-4     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
-5      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+1      9.2564298    11.1153552     Left 0.8879945 31.76998 43.713503  38.29839
+2     17.8889738    29.7555386    Right 3.5015562 52.33320  5.237266  43.02460
+3     35.6315253    81.3407181     Left 3.3957657 31.78908 33.073957  77.46213
+4      6.3343519     9.8930481     Left 2.0671154 23.21846  7.706832  35.50954
+5             NA            NA     &lt;
+       NA       NA        NA        NA
 6      0.3023937     0.4392666  No Data        NA       NA        NA        NA
    MaxArea   MinArea MeanPercent rel_12B rel_10G rel_3D7B Gene_name
-1 30.59250 25.372470   92.568511     max     min      min      null
-2 43.71350 31.769976   21.694449     min     max      mid       VAR
-3 52.33320  5.237266   16.414296     max     min      max       RIF
-4 77.46213 31.789080    7.496945     min     min      max       VAR
-5 35.50954  7.706832   14.607698     mid     min      max       RIF
+1 43.71350 31.769976   21.694449     min     max      mid       VAR
+2 52.33320  5.237266   16.414296     max     min      max       RIF
+3 77.46213 31.789080    7.496945     min     min      max       VAR
+4 35.50954  7.706832   14.607698     mid     min      max       RIF
+5       NA        NA   18.975825      NA      NA       NA      null
 6       NA        NA    4.789230      NA      NA       NA       RIF
-                                   Annot                  state_12B
-1                    unspecified product                     Active
-2 erythrocyte membrane protein 1, PfEMP1         Var_Repressed_noFC
-3                                  rifin              Var_Active_FC
-4 erythrocyte membrane protein 1, PfEMP1 Var_Repressed_FC_noredpcnt
-5                                  rifin Var_Repressed_FC_noredpcnt
-6                                  rifin         Var_Repressed_FCna
-                   state_10G                 state_3D7B  category_12B
-1                     Active                     Active        Active
-2         Var_Repressed_noFC         Var_Repressed_noFC Var_Repressed
-3 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt    Var_Active
-4 Var_Repressed_FC_noredpcnt              Var_Active_FC Var_Repressed
-5 Var_Repressed_FC_noredpcnt Var_Repressed_FC_noredpcnt Var_Repressed
-6         Var_Repressed_FCna         Var_Repressed_FCna Var_Repressed
-   category_10G category_3D7B
-1        Active        Active
-2 Var_Repressed Var_Repressed
-3 Var_Repressed Var_Repressed
-4 Var_Repressed    Var_Active
-5 Var_Repressed Var_Repressed
-6 Var_Repressed Var_Repressed
+                                                        Annot
+1                      erythrocyte membrane protein 1, PfEMP1
+2                                                       rifin
+3                      erythrocyte membrane protein 1, PfEMP1
+4                                                       rifin
+5 erythrocyte membrane protein 1 (PfEMP1), exon 1, pseudogene
+6                                                       rifin
+                 state_12B                state_10G               state_3D7B
+1       Var_Repressed_noFC       Var_Repressed_noFC       Var_Repressed_noFC
+2            Var_Active_FC         Var_Repressed_FC            Var_Active_FC
+3         Var_Repressed_FC         Var_Repressed_FC            Var_Active_FC
+4 Var_Repressed_FC_reddown Var_Repressed_FC_reddown Var_Repressed_FC_reddown
+5             Not_Settable             Not_Settable             Not_Settable
+6       Var_Repressed_FCna       Var_Repressed_FCna       Var_Repressed_FCna
+   category_12B  category_10G category_3D7B
+1 Var_Repressed Var_Repressed Var_Repressed
+2    Var_Active Var_Repressed    Var_Active
+3 Var_Repressed Var_Repressed    Var_Active
+4 Var_Repressed Var_Repressed Var_Repressed
+5  Not_Settable  Not_Settable  Not_Settable
+6 Var_Repressed Var_Repressed Var_Repressed
 </pre>
 </div>
 </div>
@@ -618,33 +607,29 @@ States Table
 </p>
 <pre class="example">
   Strain Active Active_FC Active_FC_Dif_max Active_FCna Active_FCna_Redna
-1    12B   3944        20                 2           1               191
-2    10G   3944        20                 2           1               191
-3   3D7B   3944        20                 2           1               191
-  Active_rescued Active_RNASeqNA_rescue Inactive Inactive_FC
-1             53                      6      660          36
-2             53                      6      660          36
-3             53                      6      660          36
+1    12B   3954        23                 2           2               191
+2    10G   3954        23                 2           2               191
+3   3D7B   3954        23                 2           2               191
+  Active_rescued Active_RNASeqNA_rescued Inactive Inactive_FC
+1             69                       6      644          36
+2             69                       6      644          36
+3             69                       6      644          36
   Inactive_FC_Dif_min Inactive_FC_reddown Inactive_FCna Inactive_FCna_Redna
-1                   2                   5            30                  89
-2                   2                   5            30                  89
-3                   2                   5            30                  89
-  Inactive_reddown Not_Settable Var_Active_FC Var_Active_noFC
-1               36          152             8              52
-2               36          152             7              52
-3               36          152            58              52
-  Var_Active_noFC_rescued Var_Active_RNASeqNA_rescue Var_Repressed_FC
-1                       3                          1                7
-2                       3                          1                5
-3                       3                          1                3
-  Var_Repressed_FC_noredpcnt Var_Repressed_FCna Var_Repressed_noFC
-1                        137                 92                128
-2                        141                 92                128
-3                         92                 92                128
-  Var_Repressed_noFC_reddown Var_Semiactive_FC
-1                          4                 1
-2                          4                NA
-3                          4                NA
+1                   2                   2            30                  89
+2                   2                   2            30                  89
+3                   2                   2            30                  89
+  Inactive_reddown Not_Settable Var_Active_FC Var_Active_noFC Var_Repressed_FC
+1               26          150            13              58               73
+2               26          150             8              58               77
+3               26          150            80              58                6
+  Var_Repressed_FC_reddown Var_Repressed_FCna Var_Repressed_noFC
+1                       64                 93                130
+2                       64                 93                130
+3                       64                 93                130
+  Var_Semiactive_FC
+1                 3
+2                 4
+3                 3
 </pre>
 
 <p>
@@ -674,7 +659,34 @@ And this are the Clag genes
 <h3 id="org590f06a"><span class="section-number-3">1.7</span> Venn Diagrams</h3>
 <div class="outline-text-3" id="text-1-7">
 <p>
-Here we plon Venn diagrams to visualize how the strains compare.
+For each strain, we polt a histogram of genes in each category.
+</p>
+
+
+<div class="figure">
+<p><img src="./Plots/histogram_12B.png" alt="histogram_12B.png" />
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./Plots/histogram_10G.png" alt="histogram_10G.png" />
+</p>
+</div>
+
+
+<div class="figure">
+<p><img src="./Plots/histogram_3D7B.png" alt="histogram_3D7B.png" />
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orge81ba48" class="outline-3">
+<h3 id="orge81ba48"><span class="section-number-3">1.8</span> Venn Diagramls</h3>
+<div class="outline-text-3" id="text-1-8">
+<p>
+We now plot Venn diagrams to visualize how the strains compare.
 </p>
 
 <p>
@@ -684,6 +696,16 @@ First we check how many genes share the same "state" among strains:
 
 <div class="figure">
 <p><img src="./Plots/venn_Same_State.png" alt="venn_Same_State.png" />
+</p>
+</div>
+
+<p>
+And we do the same but only for clonally variant genes:
+</p>
+
+
+<div class="figure">
+<p><img src="./Plots/venn_Var_Same_State.png" alt="venn_Var_Same_State.png" />
 </p>
 </div>
 
@@ -760,7 +782,7 @@ red_df <span style="color: #BFEBBF;">&lt;-</span> red <span style="color: #BFEBB
          Red_3D7B = <span style="color: #DCDCCC; background-color: #3F3F3F;">`Aver.2Higher3D7-B.`</span>) <span style="color: #BFEBBF;">%&gt;%</span>
   left_join(map, by=<span style="color: #CC9393;">'Old_id'</span>)
 
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Manually add gene ids that do not appear on map (we blasted the probes to assign them)</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Manually add gene ids that do not appear on map (we blasted the probes to ass</span><span style="color: #DC8CC3; background-color: #3F3F3F;">ign them)</span>
 red_df <span style="color: #BFEBBF;">&lt;-</span> red_df <span style="color: #BFEBBF;">%&gt;%</span>
   mutate(Gene_id = ifelse(Old_id == <span style="color: #CC9393;">'MAL8P1.310'</span>, <span style="color: #CC9393;">'PF3D7_0830200'</span>, Gene_id)) <span style="color: #BFEBBF;">%&gt;%</span>
   mutate(Gene_id = ifelse(Old_id == <span style="color: #CC9393;">'PFI0905W'</span>, <span style="color: #CC9393;">'PF3D7_0918500'</span>, Gene_id)) <span style="color: #BFEBBF;">%&gt;%</span>
@@ -785,7 +807,7 @@ red_df <span style="color: #BFEBBF;">&lt;-</span> red_df <span style="color: #BF
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Add max percentile dif</span>
 
 red_df <span style="color: #BFEBBF;">&lt;-</span> red_df <span style="color: #BFEBBF;">%&gt;%</span>
-  mutate(MaxRedPercentDif= apply(select(., contains(<span style="color: #CC9393;">'Percent_'</span>)), 1, max_dif)) <span style="color: #BFEBBF;">%&gt;%</span>
+  mutate(MaxRedPercentDif= apply(select(., contains(<span style="color: #CC9393;">'Percent_'</span>)), 1, max_dif)) <span style="color: #BFEBBF;">%</span><span style="color: #DC8CC3; background-color: #3F3F3F;">&gt;%</span>
   mutate(MeanRedPercent = apply(select(., contains(<span style="color: #CC9393;">'Percent_'</span>)), 1, mean)) <span style="color: #BFEBBF;">%&gt;%</span>
   mutate(MaxRedPercent = apply(select(., contains(<span style="color: #CC9393;">'Percent_'</span>)), 1, max))
 
@@ -912,14 +934,14 @@ table(duplicated(area_df$Gene_id))
 <pre class="src src-R"><span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">#### Old approax ####</span>
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Select max percentile directly</span>
 
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">otto &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";") %&gt;%</span>
-<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)`)</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">hoej &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", delim=";") %&gt;%</span>
-<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)`)</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">toen &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";") %&gt;%</span>
-<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)`)</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">bart &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim=";") %&gt;%</span>
-<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)`)</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">otto &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Otto.csv", delim=";")</span><span style="color: #DC8CC3; background-color: #3F3F3F;"> %&gt;%</span>
+<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercOtto = `Max %ile (Within Chosen Samples)</span><span style="color: #DC8CC3; background-color: #3F3F3F;">`)</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">hoej &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Hoejimakers.csv", del</span><span style="color: #DC8CC3; background-color: #3F3F3F;">im=";") %&gt;%</span>
+<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercHoej = `Max %ile (Within Chosen Samples)</span><span style="color: #DC8CC3; background-color: #3F3F3F;">`)</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">toen &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Toenke.csv", delim=";</span><span style="color: #DC8CC3; background-color: #3F3F3F;">") %&gt;%</span>
+<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercToen = `Max %ile (Within Chosen Samples)</span><span style="color: #DC8CC3; background-color: #3F3F3F;">`)</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">bart &lt;- read_delim("./Data/RNA_Seq_Percentiles/PlasmoDB_Bartfai.csv", delim="</span><span style="color: #DC8CC3; background-color: #3F3F3F;">;") %&gt;%</span>
+<span style="color: #5F7F5F;">##   </span><span style="color: #7F9F7F;">select(Gene_id = `Gene ID`, MaxPercBart = `Max %ile (Within Chosen Samples)</span><span style="color: #DC8CC3; background-color: #3F3F3F;">`)</span>
 
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Otto Data-Set</span>
@@ -1045,7 +1067,7 @@ print(area_df, width = 200)
 print(rna_df, width = 200)
 
 all_df <span style="color: #BFEBBF;">&lt;-</span> select(red_df, Gene_id, contains(<span style="color: #CC9393;">'Percent'</span>), MeanRedPercent) <span style="color: #BFEBBF;">%&gt;%</span>
-  full_join(select(area_df, Gene_id, Interval, contains(<span style="color: #CC9393;">'area'</span>)), by = <span style="color: #CC9393;">'Gene_id'</span>) <span style="color: #BFEBBF;">%&gt;%</span>
+  full_join(select(area_df, Gene_id, Interval, contains(<span style="color: #CC9393;">'area'</span>)), by = <span style="color: #CC9393;">'Gene_id'</span><span style="color: #DC8CC3; background-color: #3F3F3F;">) </span><span style="color: #DC8CC3; background-color: #3F3F3F;">%&gt;%</span>
   full_join(select(rna_df, Gene_id, MeanPercent), by = <span style="color: #CC9393;">'Gene_id'</span>)
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Add Vartiant Genes information</span>
@@ -1060,12 +1082,12 @@ final_df <span style="color: #BFEBBF;">&lt;-</span> cvg <span style="color: #BFE
 print(final_df, width = 200)
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Here we create a dplyr function.</span>
-<span style="color: #5F7F5F;">##</span><span style="color: #7F9F7F;">To be able to use variables (for colnames) we needto use the special quote functions.</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=</span>
+<span style="color: #5F7F5F;">##</span><span style="color: #7F9F7F;">To be able to use variables (for colnames) we needto use the special quote fun</span><span style="color: #DC8CC3; background-color: #3F3F3F;">ctions.</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to use inside functions must be "enquoted" before usage and preceded</span><span style="color: #DC8CC3; background-color: #3F3F3F;"> by !! when used.</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to assign must be "enquoted" first, preceded by !! and assigned by :</span><span style="color: #DC8CC3; background-color: #3F3F3F;">=</span>
 
 
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">First create a col where we set categories for each gene according relative expression</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">First create a col where we set categories for each gene according relative e</span><span style="color: #DC8CC3; background-color: #3F3F3F;">xpression</span>
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">For each gene: gene-min----|---mid----|----gene-max</span>
 
 <span style="color: #93E0E3;">relexprs</span> <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #F0DFAF; font-weight: bold;">function</span>(vect){
@@ -1082,7 +1104,7 @@ print(final_df, width = 200)
   outcol <span style="color: #BFEBBF;">&lt;-</span> enquo(outcol)
   areacol <span style="color: #BFEBBF;">&lt;-</span> enquo(areacol)
   df <span style="color: #BFEBBF;">%&gt;%</span>
-    mutate(!! outcol := apply(select(., !! areacol, MaxArea, MinArea), 1, relexprs))
+    mutate(!! outcol := apply(select(., !! areacol, MaxArea, MinArea), 1, relexp<span style="color: #DC8CC3; background-color: #3F3F3F;">rs))</span>
 }
 
 final_df <span style="color: #BFEBBF;">&lt;-</span> final_df <span style="color: #BFEBBF;">%&gt;%</span>
@@ -1113,9 +1135,9 @@ th_areaFC <span style="color: #BFEBBF;">&lt;-</span> 1
 th_redpcntdif <span style="color: #BFEBBF;">&lt;-</span> 30
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Here we create a dplyr function.</span>
-<span style="color: #5F7F5F;">##</span><span style="color: #7F9F7F;">To be able to use variables (for colnames) we needto use the special quote functions.</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to use inside functions must be "enquoted" before usage and preceded by !! when used.</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to assign must be "enquoted" first, preceded by !! and assigned by :=</span>
+<span style="color: #5F7F5F;">##</span><span style="color: #7F9F7F;">To be able to use variables (for colnames) we needto use the special quote fun</span><span style="color: #DC8CC3; background-color: #3F3F3F;">ctions.</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to use inside functions must be "enquoted" before usage and preceded</span><span style="color: #DC8CC3; background-color: #3F3F3F;"> by !! when used.</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Colnames to assign must be "enquoted" first, preceded by !! and assigned by :</span><span style="color: #DC8CC3; background-color: #3F3F3F;">=</span>
 
 <span style="color: #93E0E3;">set_state</span> <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #F0DFAF; font-weight: bold;">function</span>(df, statecol, redcol, relcol){
 
@@ -1125,276 +1147,242 @@ th_redpcntdif <span style="color: #BFEBBF;">&lt;-</span> 30
 
   df <span style="color: #BFEBBF;">&lt;-</span> df <span style="color: #BFEBBF;">%&gt;%</span>
     mutate(!! statecol := case_when(
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Actiu</span>
-                !Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Active'</span>,
-
-                !Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt; th_redrescue ~ <span style="color: #CC9393;">'Active_rescued'</span>,
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Inactiu</span>
-                !Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_reddown'</span>,
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No variant amb FC no RedPcntDif</span>
-                !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown &amp;
-                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Active_FC'</span>,
-
-                !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Active_FC_rescued'</span>,
-
-                !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue &amp;
-                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Inactive_FC'</span>,
-
-                !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown &amp;
-                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Inactive_FC_reddown'</span>,
 
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No variant amb FC i RedPcntDif</span>
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">RNA-Seq &amp; MeanRed</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown &amp;
+                MaxRedPercent &gt;= th_reddown &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_max'</span>,
 
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown &amp;
+                MaxRedPercent &gt;= th_reddown &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_mid'</span>,
 
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown &amp;
+                MaxRedPercent &gt;= th_reddown &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_FC_Dif_min'</span>,
 
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">RNA-Seq &amp; NO-MeanRed</span>
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No variant amb FC no RedPcntDif</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_reddown_max'</span>,
+                MaxRedPercent &gt;= th_reddown &amp;
+                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Active_FC'</span>,
 
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No variant amb FC &lt; reddown</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_reddown_mid'</span>,
-
-                !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_FC_Dif_reddown_min'</span>,
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_FC_reddown'</span>,
 
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">NO-RNA-Seq Rescued</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_rescued_max'</span>,
 
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_rescued_mid'</span>,
 
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
                 MaxRedPercentDif &gt;= th_redpcntdif &amp;
                 !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_FC_Dif_rescued_min'</span>,
 
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">NO-RNA-Seq NO-Rescued</span>
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">FC NO RNA-Seq rescued, no redpcnt dif</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_noRNASeq_max'</span>,
+                MaxRedPercent &gt;= th_redrescue &amp;
+                MaxRedPercentDif &lt; th_redpcntdif ~ <span style="color: #CC9393;">'Active_FC_rescued'</span>,
 
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">FC  No RNA-Seq no rescue</span>
                 !Variant &amp;
                 areaFC &gt; th_areaFC &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_FC_Dif_noRNASeq_mid'</span>,
+                MaxRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Inactive_FC'</span>,
 
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No Var, no FC</span>
                 !Variant &amp;
-                areaFC &gt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue &amp;
-                MaxRedPercentDif &gt;= th_redpcntdif &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_FC_Dif_noRNASeq_min'</span>,
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Var actiu</span>
-                Variant &amp;
                 areaFC &lt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Var_Active_noFC'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">noFC</span>
+                MaxRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Active'</span>,
 
-                Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_redrescue ~ <span style="color: #CC9393;">'Var_Active_noFC_rescued'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">noFC, rescued</span>
-
-                Variant &amp;
-                areaFC &gt;= th_areaFC &amp;
-                !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Var_Active_FC'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, max</span>
-
-                Variant &amp;
-                areaFC &gt;= th_areaFC &amp;
-                !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive_FC'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, mid</span>
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Var repressed</span>
-                Variant &amp;
-                areaFC &lt; th_areaFC &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Var_Repressed_noFC'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">noFC, noRescued</span>
-
-                Variant &amp;
+                !Variant &amp;
                 areaFC &lt; th_areaFC &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Var_Repressed_noFC_reddown'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">noFC, downgraded</span>
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_reddown'</span>,
 
+                !Variant &amp;
+                areaFC &lt; th_areaFC &amp;
+                MeanPercent &lt; th_rnapcnt &amp;
+                MaxRedPercent &gt; th_redrescue ~ <span style="color: #CC9393;">'Active_rescued'</span>,
+
+                !Variant &amp;
+                areaFC &lt; th_areaFC &amp;
+                MeanPercent &lt; th_rnapcnt &amp;
+                MaxRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Inactive'</span>,
+
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Var</span>
 
                 Variant &amp;
                 areaFC &gt;= th_areaFC &amp;
-                !! redcol &gt;= th_redpcnt &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Var_Repressed_FC'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, redpcnt, min</span>
+                MaxRedPercent &gt;= th_reddown &amp;
+                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Var_Active_FC'</span>,
 
                 Variant &amp;
                 areaFC &gt;= th_areaFC &amp;
-                !! redcol &lt; th_redpcnt ~ <span style="color: #CC9393;">'Var_Repressed_FC_noredpcnt'</span>, <span style="color: #5F7F5F;"># </span><span style="color: #7F9F7F;">Variant, FC, NOredpcnt</span>
+                MaxRedPercent &gt;= th_reddown &amp;
+                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive_FC'</span>,
+
+                Variant &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &gt;= th_reddown &amp;
+                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Var_Repressed_FC'</span>,
+
+                Variant &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Var_Repressed_FC_reddown'</span>,
+
+                Variant &amp;
+                areaFC &lt; th_areaFC &amp;
+                MeanRedPercent &gt;= th_redpcnt ~ <span style="color: #CC9393;">'Var_Active_noFC'</span>,
+
+                Variant &amp;
+                areaFC &lt; th_areaFC &amp;
+                MeanRedPercent &lt; th_redpcnt ~ <span style="color: #CC9393;">'Var_Repressed_noFC'</span>,
+
 
                 <span style="color: #5F7F5F;">###### </span><span style="color: #7F9F7F;">Not settable</span>
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">FC NA</span>
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">No Var, FC NA</span>
                 !Variant &amp;
                 is.na(areaFC) &amp;
-                MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Inactive_FCna'</span>,
+                MeanPercent &gt;= th_rnapcnt &amp;
+                MaxRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Active_FCna'</span>,
 
                 !Variant &amp;
                 is.na(areaFC) &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Active_FCna'</span>,
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Not_Settable'</span>,
 
                 !Variant &amp;
                 is.na(areaFC) &amp;
                 MeanPercent &gt;= th_rnapcnt &amp;
-                is.na(MeanRedPercent) ~ <span style="color: #CC9393;">'Active_FCna_Redna'</span>,
+                is.na(MaxRedPercent) ~ <span style="color: #CC9393;">'Active_FCna_Redna'</span>,
 
                 !Variant &amp;
                 is.na(areaFC) &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                is.na(MeanRedPercent) ~ <span style="color: #CC9393;">'Inactive_FCna_Redna'</span>,
+                MaxRedPercent &gt;= th_redrescue ~ <span style="color: #CC9393;">'Not_Settable'</span>,
 
-                Variant &amp;
+                !Variant &amp;
                 is.na(areaFC) &amp;
                 MeanPercent &lt; th_rnapcnt &amp;
-                MeanRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Var_Repressed_FCna'</span>,
+                MaxRedPercent &lt; th_redrescue ~ <span style="color: #CC9393;">'Inactive_FCna'</span>,
 
-                Variant &amp;
+                !Variant &amp;
                 is.na(areaFC) &amp;
-                MeanPercent &gt;= th_rnapcnt &amp;
-                MeanRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Var_Active_FCna'</span>,
+                MeanPercent &lt; th_rnapcnt &amp;
+                is.na(MaxRedPercent) ~ <span style="color: #CC9393;">'Inactive_FCna_Redna'</span>,
 
                 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">RNA-Seq NA</span>
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
+                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescued_FC_max'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
+                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescued_FC_mid'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &gt;= th_redrescue &amp;
+                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_RNASeqNA_rescued_FC_min'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &lt; th_redrescue &amp;
+                MaxRedPercent &gt; th_reddown ~ <span style="color: #CC9393;">'Not_Settable'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &lt; th_redrescue &amp;
+                MaxRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Not_Settable'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_FC_reddown'</span>,
+
+                !Variant &amp;
+                is.na(MeanPercent) &amp;
+                areaFC &gt;= th_areaFC &amp;
+                is.na(MaxRedPercent) ~ <span style="color: #CC9393;">'Not_Settable'</span>,
+
                 !Variant &amp;
                 is.na(MeanPercent) &amp;
                 areaFC &lt; th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescue'</span>,
+                MaxRedPercent &gt;= th_redrescue ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescued'</span>,
 
                 !Variant &amp;
                 is.na(MeanPercent) &amp;
                 areaFC &lt; th_areaFC &amp;
-                MeanRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_RNASeqNA_reddown'</span>,
+                MaxRedPercent &lt; th_redrescue &amp;
+                MaxRedPercent &gt;= th_reddown ~ <span style="color: #CC9393;">'Not_Settable'</span>,
 
                 !Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescue_FC_max'</span>,
-
-                !Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Active_RNASeqNA_rescue_FC_mid'</span>,
-
-                !Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Inactive_RNASeqNA_rescue_FC_min'</span>,
-
-                Variant &amp;
                 is.na(MeanPercent) &amp;
                 areaFC &lt; th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue ~ <span style="color: #CC9393;">'Var_Active_RNASeqNA_rescue'</span>,
+                MaxRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Inactive_RNASeqNA_reddown'</span>,
 
-                Variant &amp;
+                !Variant &amp;
                 is.na(MeanPercent) &amp;
                 areaFC &lt; th_areaFC &amp;
-                MeanRedPercent &lt; th_reddown ~ <span style="color: #CC9393;">'Var_Repressed_RNASeqNA_reddown'</span>,
+                is.na(MaxRedPercent) ~ <span style="color: #CC9393;">'Not_Settable'</span>,
+
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">VARs</span>
+                Variant &amp;
+                is.na(areaFC) &amp;
+                MeanRedPercent &gt;= th_redpcnt ~ <span style="color: #CC9393;">'Var_Active_FCna'</span>,
 
                 Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'max'</span> ~ <span style="color: #CC9393;">'Var_Active_RNASeqNA_rescue_FC_max'</span>,
+                is.na(areaFC) &amp;
+                MeanRedPercent &lt; th_redpcnt ~ <span style="color: #CC9393;">'Var_Repressed_FCna'</span>,
 
                 Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive_RNASeqNA_rescue_FC_mid'</span>,
+                is.na(areaFC) &amp;
+                is.na(MeanRedPercent) ~ <span style="color: #CC9393;">'Not_Settable'</span>,
 
-                Variant &amp;
-                is.na(MeanPercent) &amp;
-                areaFC &gt;= th_areaFC &amp;
-                MeanRedPercent &gt;= th_redrescue &amp;
-                !! relcol == <span style="color: #CC9393;">'min'</span> ~ <span style="color: #CC9393;">'Var_Repressed_RNASeqNA_rescue_FC_min'</span>,
+                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Double NAs</span>
+                is.na(areaFC) &amp;
+                is.na(MeanPercent) ~ <span style="color: #CC9393;">'Not_Settable'</span>,
 
-
-                <span style="color: #7CB8BB;">TRUE</span> ~ <span style="color: #CC9393;">'Not_Settable'</span>))
+                <span style="color: #7CB8BB;">TRUE</span> ~ <span style="color: #CC9393;">'Wrong!'</span>))
 
   <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">The 'TRUE ~ ...' handles rows that do not match any of previous patterns.</span>
   <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Here we use it to make sure all rows are set (no "Wrong!" appearing)</span>
@@ -1410,71 +1398,12 @@ th_redpcntdif <span style="color: #BFEBBF;">&lt;-</span> 30
 
   df <span style="color: #BFEBBF;">&lt;-</span> df <span style="color: #BFEBBF;">%&gt;%</span>
     mutate(!! categorycol := case_when(
-                !! statecol == <span style="color: #CC9393;">'Active'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_rescued'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_reddown'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC_rescued'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC_reddown'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_max'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_mid'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC_Dif_min'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_reddown_max'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_reddown_mid'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC_Dif_reddown_min'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_rescue_max'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_rescue_mid'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC_Dif_rescue_min'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_noRNASeq_max'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FC_Dif_noRNASeq_mid'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FC_Dif_noRNASeq_min'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-
-                !! statecol == <span style="color: #CC9393;">'Var_Active_noFC'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Active_noFC_rescued'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_noFC'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_noFC_reddown'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-
-
-                !! statecol == <span style="color: #CC9393;">'Var_Active_FC'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Semiactive_FC'</span> ~ <span style="color: #CC9393;">'Var_Semiactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_FC'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_FC_noredpcnt'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Inactive_FCna'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FCna'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_noVar_noMicroarray'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-
-                <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">With NAs</span>
-                !! statecol == <span style="color: #CC9393;">'Inactive_FCna'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FCna'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_FCna_Redna'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_FCna_Redna'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_FCna'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Active_FCna'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_RNASeqNA_rescue'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_RNASeqNA_reddown'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Active_RNASeqNA_rescue_FC_max'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Active_RNASeqNA_rescue_FC_mid'</span> ~ <span style="color: #CC9393;">'Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Inactive_RNASeqNA_rescue_FC_min'</span> ~ <span style="color: #CC9393;">'Inactive'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Var_Active_RNASeqNA_rescue'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_RNASeqNA_reddown'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-
-                !! statecol == <span style="color: #CC9393;">'Var_Active_RNASeqNA_rescue_FC_max'</span> ~ <span style="color: #CC9393;">'Var_Active'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Semiactive_RNASeqNA_rescue_FC_mid'</span> ~ <span style="color: #CC9393;">'Var_Semiactive'</span>,
-                !! statecol == <span style="color: #CC9393;">'Var_Repressed_RNASeqNA_rescue_FC_min'</span> ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
-
+                startsWith(!! statecol, <span style="color: #CC9393;">'Active'</span>) ~ <span style="color: #CC9393;">'Active'</span>,
+                startsWith(!! statecol, <span style="color: #CC9393;">'Inactive'</span>) ~ <span style="color: #CC9393;">'Inactive'</span>,
+                startsWith(!! statecol, <span style="color: #CC9393;">'Var_Active'</span>) ~ <span style="color: #CC9393;">'Var_Active'</span>,
+                startsWith(!! statecol, <span style="color: #CC9393;">'Var_Semiactive'</span>) ~ <span style="color: #CC9393;">'Var_Semiactive'</span>,
+                startsWith(!! statecol, <span style="color: #CC9393;">'Var_Repressed'</span>) ~ <span style="color: #CC9393;">'Var_Repressed'</span>,
+                startsWith(!! statecol, <span style="color: #CC9393;">'Not_Settable'</span>) ~ <span style="color: #CC9393;">'Not_Settable'</span>,
                 <span style="color: #7CB8BB;">TRUE</span> ~ <span style="color: #CC9393;">'No_Category'</span>))
   <span style="color: #F0DFAF; font-weight: bold;">return</span>(df)
 }
@@ -1491,10 +1420,9 @@ state_df <span style="color: #BFEBBF;">&lt;-</span> final_df <span style="color:
 
 print(state_df, width = 400)
 
-table(state_df$state_12B)
+table(state_df$state_3D7B)
 
 state_df <span style="color: #BFEBBF;">%&gt;%</span> filter(category_12B == <span style="color: #CC9393;">'No_Category!'</span>) <span style="color: #BFEBBF;">%&gt;%</span> print(width = 400)
-
 </pre>
 </div>
 </div>
@@ -1513,10 +1441,11 @@ state_df <span style="color: #BFEBBF;">%&gt;%</span>
 state_df <span style="color: #BFEBBF;">%&gt;%</span>
   filter(category_12B == <span style="color: #CC9393;">'No_Category'</span> |
          category_10G == <span style="color: #CC9393;">'No_Category'</span> |
-         category_3D7B == <span style="color: #CC9393;">'No_Category'</span>)
+         category_3D7B == <span style="color: #CC9393;">'No_Category'</span>) <span style="color: #BFEBBF;">%&gt;%</span>
+  print(width = 400)
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Save results</span>
-write.csv(state_df, <span style="color: #CC9393;">'./Results_Tables/state_df_rna25_red25_reddif0_area1.csv'</span>)
+write.csv(state_df, <span style="color: #CC9393;">'./Results_Tables/gene_state_final.csv'</span>)
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Create a table with number of each state per strain</span>
 state_table <span style="color: #BFEBBF;">&lt;-</span>  bind_rows(table(state_df$state_12B),
@@ -1546,6 +1475,39 @@ summary(rna_df)
 <div id="outline-container-orgda7fdd3" class="outline-3">
 <h3 id="orgda7fdd3"><span class="section-number-3">2.9</span> Comparison of 12B vs 10G differences</h3>
 <div class="outline-text-3" id="text-2-9">
+<div class="org-src-container">
+<pre class="src src-R"><span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Categories histograms</span>
+
+<span style="color: #93E0E3;">make_histogram</span> <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #F0DFAF; font-weight: bold;">function</span>(df, column){
+  col <span style="color: #BFEBBF;">&lt;-</span> enquo(column)
+
+  df <span style="color: #BFEBBF;">%&gt;%</span>
+    select(!!col) <span style="color: #BFEBBF;">%&gt;%</span>
+    count(!!col) <span style="color: #BFEBBF;">%&gt;%</span>
+    ggplot(aes(y=n, x=!!col, fill=!!col)) +
+    geom_bar(stat=<span style="color: #CC9393;">'identity'</span>) +
+    geom_text(aes(label=n), vjust=0) +
+    theme(
+      plot.title = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank())
+}
+
+
+hist12B <span style="color: #BFEBBF;">&lt;-</span> make_histogram(state_df, category_12B)
+hist10G <span style="color: #BFEBBF;">&lt;-</span> make_histogram(state_df, category_10G)
+hist3D7B <span style="color: #BFEBBF;">&lt;-</span> make_histogram(state_df, category_3D7B)
+
+ggsave(hist12B, filename = <span style="color: #CC9393;">'./Plots/histogram_12B.png'</span>, height=7, width=8)
+ggsave(hist10G, filename = <span style="color: #CC9393;">'./Plots/histogram_10G.png'</span>, height=7, width=8)
+ggsave(hist3D7B, filename = <span style="color: #CC9393;">'./Plots/histogram_3D7B.png'</span>, height=7, width=8)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org3785c0a" class="outline-3">
+<h3 id="org3785c0a"><span class="section-number-3">2.10</span> Comparison of 12B vs 10G differences</h3>
+<div class="outline-text-3" id="text-2-10">
 <div class="org-src-container">
 <pre class="src src-R">excl <span style="color: #BFEBBF;">&lt;-</span> <span style="color: #CC9393;">"./Data/10Gvs1p2B.xlsx"</span>
 
@@ -1617,7 +1579,7 @@ write.csv(compare_12Bvs10G, <span style="color: #CC9393;">'./Results_Tables/gens
                  <span style="color: #CC9393;">"A&amp;B"</span>=areas$ab, <span style="color: #CC9393;">"A&amp;C"</span>=areas$ac, <span style="color: #CC9393;">"B&amp;C"</span>=areas$bc,
                  <span style="color: #CC9393;">"A&amp;B&amp;C"</span> = areas$abc))
 
-  d <span style="color: #BFEBBF;">&lt;-</span> plot(fit, fills = list(fill = c(<span style="color: #CC9393;">"#619CFF"</span>, <span style="color: #CC9393;">"#F8766D"</span>, <span style="color: #CC9393;">"#00BA38"</span>), alpha = 0.5),
+  d <span style="color: #BFEBBF;">&lt;-</span> plot(fit, fills = list(fill = c(<span style="color: #CC9393;">"#619CFF"</span>, <span style="color: #CC9393;">"#F8766D"</span>, <span style="color: #CC9393;">"#00BA38"</span>), alpha =<span style="color: #DC8CC3; background-color: #3F3F3F;"> 0.5),</span>
             edges = list(lwd = 0.1), quantities = list(quantities = T),
             labels = list(labels=c(<span style="color: #CC9393;">"12B"</span>, <span style="color: #CC9393;">"10G"</span>, <span style="color: #CC9393;">"3D7B"</span>)),
             main = name)
@@ -1671,7 +1633,7 @@ vi_3D7B <span style="color: #BFEBBF;">&lt;-</span> state_df <span style="color: 
 customEuler(vi_12B, vi_10G, vi_3D7B, <span style="color: #CC9393;">'Var_Repressed_Genes'</span>)
 
 <span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">Same category</span>
-<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">We fuse the gene_id with it's state so that genes with same state will be exactly the same while genes with different state will be different.</span>
+<span style="color: #5F7F5F;">## </span><span style="color: #7F9F7F;">We fuse the gene_id with it's state so that genes with same state will be exa</span><span style="color: #DC8CC3; background-color: #3F3F3F;">ctly the same while genes with different state will be different.</span>
 
 print(state_df, width = 400)
 
@@ -1685,7 +1647,18 @@ genestate <span style="color: #BFEBBF;">&lt;-</span> state_df <span style="color
 
 customEuler(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B, <span style="color: #CC9393;">'Same_State'</span>)
 
-x <span style="color: #BFEBBF;">&lt;-</span> makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)}
+x <span style="color: #BFEBBF;">&lt;-</span> makeIntersects(genestate$gs_12B, genestate$gs_10G, genestate$gs_3D7B)
+
+varstate <span style="color: #BFEBBF;">&lt;-</span> state_df <span style="color: #BFEBBF;">%&gt;%</span>
+  filter(Variant) <span style="color: #BFEBBF;">%&gt;%</span>
+  mutate(gs_12B = paste(Gene_id, category_12B, sep = <span style="color: #CC9393;">"_"</span>)) <span style="color: #BFEBBF;">%&gt;%</span>
+  mutate(gs_10G = paste(Gene_id, category_10G, sep = <span style="color: #CC9393;">"_"</span>)) <span style="color: #BFEBBF;">%&gt;%</span>
+  mutate(gs_3D7B = paste(Gene_id, category_3D7B, sep = <span style="color: #CC9393;">"_"</span>)) <span style="color: #BFEBBF;">%&gt;%</span>
+  select(Gene_id,
+         category_12B, category_10G, category_3D7B,
+         gs_12B, gs_10G, gs_3D7B)
+
+customEuler(varstate$gs_12B, varstate$gs_10G, varstate$gs_3D7B, <span style="color: #CC9393;">'Var_Same_State'</span><span style="color: #DC8CC3; background-color: #3F3F3F;">)</span>
 </pre>
 </div>
 </div>
@@ -1693,7 +1666,7 @@ x <span style="color: #BFEBBF;">&lt;-</span> makeIntersects(genestate$gs_12B, ge
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Date: 31/03/2020</p>
+<p class="date">Date: 04/06/2020</p>
 <p class="author">Author: Lucas Michel Todó</p>
 <p class="date">Created: 2021-11-10 mié 09:52</p>
 <p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
