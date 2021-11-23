@@ -1160,12 +1160,16 @@ print(final_df_stz, width = 200)
 #+END_SRC
 ** Create Lists according to thresholds
 #+BEGIN_SRC R
-th_rnapcnt <- 25
-th_redpcnt <- 25
-th_redrescue <- 40
-th_reddown <- 15
-th_areaFC <- 1
-th_redpcntdif <- 30
+## Plot histograms of areaFC to decide treshold
+
+p <- ggplot(final_df, aes(final_df$areaFC)) + geom_histogram()
+ggsave('./Results_Tables_All_Strains/fc_hist.png', p)
+
+p <- ggplot(final_df_mmnorm, aes(final_df_mmnorm$areaFC)) + geom_histogram()
+ggsave('./Results_Tables_All_Strains/fc_mmnorm_hist.png', p)
+
+p <- ggplot(final_df_stz, aes(final_df_stz$areaFC)) + geom_histogram()
+ggsave('./Results_Tables_All_Strains/fc_stz_hist.png', p)
 
 ## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
@@ -1536,6 +1540,15 @@ set_category <- function(df, statecol, categorycol){
 
 ## We now set each gene to it's state
 
+## Thresolds
+
+th_rnapcnt <- 25
+th_redpcnt <- 25
+th_redrescue <- 40
+th_reddown <- 15
+th_areaFC <- 1
+th_redpcntdif <- 30
+
 state_df <- final_df %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
@@ -1550,6 +1563,18 @@ state_df <- final_df %>%
   set_category(state_A7, category_A7) %>%
   set_category(state_E5, category_E5)
 
+## Save results
+outname <- sprintf(
+  './Results_Tables_All_Strains/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains.csv',
+  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
+)
+write.csv(state_df, outname)
+
+
+## Thresolds
+
+th_areaFC <- 0.01
+
 state_df_mmnorm <- final_df_mmnorm %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
   set_state(state_10G, Percent_10G, rel_10G) %>%
@@ -1563,6 +1588,17 @@ state_df_mmnorm <- final_df_mmnorm %>%
   set_category(state_B11, category_B11) %>%
   set_category(state_A7, category_A7) %>%
   set_category(state_E5, category_E5)
+
+## Save results
+outname <- sprintf(
+  './Results_Tables_All_Strains/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains_mmnorm.csv',
+  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
+)
+write.csv(state_df_mmnorm, outname)
+
+## Thresolds
+
+th_areaFC <- 0.7
 
 state_df_stz <- final_df_stz %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
@@ -1583,6 +1619,13 @@ table(state_df$state_12B)
 
 state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 
+## Save results
+
+outname <- sprintf(
+  './Results_Tables_All_Strains/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains_stz.csv',
+  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
+)
+write.csv(state_df_stz, outname)
 #+END_SRC
 ** Some checks and results
 #+BEGIN_SRC R
@@ -1601,25 +1644,6 @@ state_df %>%
          category_10G == 'No_Category' |
          category_3D7B == 'No_Category' |
          category_B11 == 'No_Category')
-
-## Save results
-outname <- sprintf(
-  './Results_Tables/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains.csv',
-  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
-)
-write.csv(state_df, outname)
-
-outname <- sprintf(
-  './Results_Tables/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains_mmnorm.csv',
-  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
-)
-write.csv(state_df_mmnorm, outname)
-
-outname <- sprintf(
-  './Results_Tables/state_df_rna%s_red%s_redresc%s_reddw%s_areaFC%s_redpcntdif%s_allstrains_stz.csv',
-  th_rnapcnt, th_redpcnt, th_redrescue, th_reddown, th_areaFC, th_redpcntdif
-)
-write.csv(state_df_stz, outname)
 
 
 ## ## Create a table with number of each state per strain
@@ -1640,7 +1664,7 @@ write.csv(state_df_stz, outname)
 ## clags <- state_df %>%
 ##   filter(Gene_id == 'PF3D7_0302500' | Gene_id == 'PF3D7_0302200')
 
-## write.csv(clags, './Results_Tables_withB11/clag_genes.csv')
+## write.csv(clags, './Results_Tables_All_Strains_withB11/clag_genes.csv')
 
 ## print(state_table, width = 200)
 ## summary(rna_df)
