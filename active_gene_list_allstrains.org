@@ -1598,7 +1598,7 @@ write.csv(state_df_mmnorm, outname)
 
 ## Thresolds
 
-th_areaFC <- 0.7
+th_areaFC <- 0.05
 
 state_df_stz <- final_df_stz %>%
   set_state(state_12B, Percent_12B, rel_12B) %>%
