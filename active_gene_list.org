@@ -370,7 +370,7 @@ For each strain, we polt a histogram of genes in each category.
 
 [[./Plots/histogram_3D7B.png]]
 
-** Venn Diagramls
+** Venn Diagrams
 We now plot Venn diagrams to visualize how the strains compare.
 
 First we check how many genes share the same "state" among strains:
@@ -754,6 +754,12 @@ final_df <- left_join(final_df, annot_df, by = 'Gene_id')
 print(final_df, width = 200)
 
 #+END_SRC
+** Save RData
+#+begin_src R
+##save.image('load_gene_state_old.RData')
+##setwd('/mnt/Disc4T/Projects/Active_gene_list/')
+##load('load_gene_state_old.RData')
+#+end_src
 ** Create Lists according to thresholds
 #+BEGIN_SRC R
 print(final_df, width = 200)
@@ -763,6 +769,7 @@ th_redpcnt <- 25
 th_redrescue <- 40
 th_reddown <- 15
 th_areaFC <- 1
+#th_areaFC_redrescue <- 3
 th_redpcntdif <- 30
 
 ## Here we create a dplyr function.
@@ -871,34 +878,50 @@ set_state <- function(df, statecol, redcol, relcol){
                 MeanPercent < th_rnapcnt &
                 MaxRedPercent < th_redrescue ~ 'Inactive',
 
-                ## Var
+                ## Clonally Variant Genes
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
-                !! relcol == 'max' ~ 'Var_Active_FC',
+                !! relcol == 'max' ~ 'CVG_Active_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
-                !! relcol == 'mid' ~ 'Var_Semiactive_FC',
+                !! relcol == 'mid' ~ 'CVG_Semiactive_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
-                !! relcol == 'min' ~ 'Var_Repressed_FC',
+                !! relcol == 'min' ~ 'CVG_Repressed_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
-                MaxRedPercent < th_reddown ~ 'Var_Repressed_FC_reddown',
+                MaxRedPercent < th_reddown ~ 'CVG_Repressed_FC_reddown',
 
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent >= th_redpcnt ~ 'Var_Active_noFC',
+                MeanRedPercent >= th_redpcnt ~ 'CVG_Active_noFC',
 
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_noFC',
+                MeanRedPercent < th_redpcnt ~ 'CVG_Repressed_noFC',
+
+                ## ## Exceptions
+                ## Variant &
+                ## MaxRedPercent < th_redpcnt &
+                ## areaFC > th_areaFC_redrescue &
+                ## !! relcol == 'max' ~ 'CVG_Semiactive_FC_nored',
+
+                ## Variant &
+                ## MaxRedPercent < th_redpcnt &
+                ## areaFC > th_areaFC_redrescue &
+                ## !! relcol == 'mid' ~ 'CVG_Repressed_FC_nored',
+
+                ## Variant &
+                ## MaxRedPercent < th_redpcnt &
+                ## areaFC > th_areaFC_redrescue &
+                ## !! relcol == 'min' ~ 'CVG_Repressed_FC_nored',
 
 
                 ###### Not settable
@@ -999,11 +1022,11 @@ set_state <- function(df, statecol, redcol, relcol){
                 ## VARs
                 Variant &
                 is.na(areaFC) &
-                MeanRedPercent >= th_redpcnt ~ 'Var_Active_FCna',
+                MeanRedPercent >= th_redpcnt ~ 'CVG_Active_FCna',
 
                 Variant &
                 is.na(areaFC) &
-                MeanRedPercent < th_redpcnt ~ 'Var_Repressed_FCna',
+                MeanRedPercent < th_redpcnt ~ 'CVG_Repressed_FCna',
 
                 Variant &
                 is.na(areaFC) &
@@ -1031,9 +1054,9 @@ set_category <- function(df, statecol, categorycol){
     mutate(!! categorycol := case_when(
                 startsWith(!! statecol, 'Active') ~ 'Active',
                 startsWith(!! statecol, 'Inactive') ~ 'Inactive',
-                startsWith(!! statecol, 'Var_Active') ~ 'Var_Active',
-                startsWith(!! statecol, 'Var_Semiactive') ~ 'Var_Semiactive',
-                startsWith(!! statecol, 'Var_Repressed') ~ 'Var_Repressed',
+                startsWith(!! statecol, 'CVG_Active') ~ 'CVG_Active',
+                startsWith(!! statecol, 'CVG_Semiactive') ~ 'CVG_Semiactive',
+                startsWith(!! statecol, 'CVG_Repressed') ~ 'CVG_Repressed',
                 startsWith(!! statecol, 'Not_Settable') ~ 'Not_Settable',
                 TRUE ~ 'No_Category'))
   return(df)
