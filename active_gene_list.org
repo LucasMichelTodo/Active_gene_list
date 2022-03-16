@@ -678,12 +678,13 @@ rna_df <- rna_df %>%
 
 
 print(rna_df, width=200)
+write_csv(rna_df, './Results_Tables/rna_seq_percentiles.csv')
+
 
 hist(rna_df$MeanPercent, breaks = 20)
 hist(rna_df$StdDevPercent, breaks = 100)
 table(duplicated(rna_df$Gene_id))
 #+END_SRC
-**
 ** Load Annotation
 #+BEGIN_SRC R
 annot_df <- read_delim('./Data/plasmoDB_geneAnnot.csv', delim = ';') %>%
