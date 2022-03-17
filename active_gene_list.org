@@ -609,7 +609,7 @@ table(duplicated(otto$Gene_id))
 otto %>% filter(duplicated(otto$Gene_id)) %>% print(width = 400)
 otto %>% filter(Gene_id == 'PF3D7_0108400') %>% print(width = 400)
 
-hist(otto$Otto_Max_pcnt)
+#hist(otto$Otto_Max_pcnt)
 
 ## Hoeijmakers Data-Set
 
@@ -626,7 +626,7 @@ hoeij <- hoeij %>% select(Gene_id, Hoeij_Max_pcnt)
 hoeij <- hoeij %>% group_by(Gene_id) %>% summarize_all(list(mean))
 hoeij
 
-hist(hoeij$Hoeij_Max_pcnt)
+#hist(hoeij$Hoeij_Max_pcnt)
 
 ## Toenhake Data-Sets
 
@@ -644,7 +644,7 @@ toen <- toen %>% group_by(Gene_id) %>% summarize_all(list(mean))
 
 toen
 
-hist(toen$Toen_Max_pcnt)
+#hist(toen$Toen_Max_pcnt)
 
 ## Bartfai Data-Sets
 
@@ -662,7 +662,7 @@ bart <- bart %>% group_by(Gene_id) %>% summarize_all(list(mean))
 
 bart
 
-hist(bart$Bart_Max_pcnt)
+#hist(bart$Bart_Max_pcnt)
 
 
 ## Join DF
@@ -769,7 +769,7 @@ th_redpcnt <- 25
 th_redrescue <- 40
 th_reddown <- 15
 th_areaFC <- 1
-#th_areaFC_redrescue <- 3
+th_areaFC_redrescue <- 3
 th_redpcntdif <- 30
 
 ## Here we create a dplyr function.
@@ -907,21 +907,22 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC < th_areaFC &
                 MeanRedPercent < th_redpcnt ~ 'CVG_Repressed_noFC',
 
-                ## ## Exceptions
-                ## Variant &
-                ## MaxRedPercent < th_redpcnt &
-                ## areaFC > th_areaFC_redrescue &
-                ## !! relcol == 'max' ~ 'CVG_Semiactive_FC_nored',
+                ## Exceptions
+                ## CVGs with very high FC and very low Red Signal
+                Variant &
+                areaFC > th_areaFC_redrescue &
+                MaxRedPercent < th_reddown &
+                !! relcol == 'max' ~ 'CVG_Semiactive_FC_reddown',
 
-                ## Variant &
-                ## MaxRedPercent < th_redpcnt &
-                ## areaFC > th_areaFC_redrescue &
-                ## !! relcol == 'mid' ~ 'CVG_Repressed_FC_nored',
+                Variant &
+                areaFC > th_areaFC_redrescue &
+                MaxRedPercent < th_reddown &
+                !! relcol == 'mid' ~ 'CVG_Repressed_FC_reddown',
 
-                ## Variant &
-                ## MaxRedPercent < th_redpcnt &
-                ## areaFC > th_areaFC_redrescue &
-                ## !! relcol == 'min' ~ 'CVG_Repressed_FC_nored',
+                Variant &
+                areaFC > th_areaFC_redrescue &
+                MaxRedPercent < th_reddown &
+                !! relcol == 'min' ~ 'CVG_Repressed_FC_reddown',
 
 
                 ###### Not settable
