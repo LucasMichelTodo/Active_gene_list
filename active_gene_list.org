@@ -766,6 +766,7 @@ print(final_df, width = 200)
 
 th_rnapcnt <- 25
 th_redpcnt <- 25
+th_redpcnt_up <- 50
 th_redrescue <- 40
 th_reddown <- 15
 th_areaFC <- 1
@@ -879,7 +880,7 @@ set_state <- function(df, statecol, redcol, relcol){
                 MaxRedPercent < th_redrescue ~ 'Inactive',
 
                 ## Clonally Variant Genes
-
+                ## With FC
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
@@ -899,28 +900,34 @@ set_state <- function(df, statecol, redcol, relcol){
                 areaFC >= th_areaFC &
                 MaxRedPercent < th_reddown ~ 'CVG_Repressed_FC_reddown',
 
+                ## No FC
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent >= th_redpcnt ~ 'CVG_Active_noFC',
+                MaxRedPercent >= th_redpcnt_up ~ 'CVG_Active_noFC',
 
                 Variant &
                 areaFC < th_areaFC &
-                MeanRedPercent < th_redpcnt ~ 'CVG_Repressed_noFC',
+                MaxRedPercent < th_redpcnt_up &
+                MaxRedPercent >= th_redpcnt  ~ 'CVG_Semiactive_noFC',
+
+                Variant &
+                areaFC < th_areaFC &
+                MaxRedPercent < th_redpcnt ~ 'CVG_Repressed_noFC',
 
                 ## Exceptions
                 ## CVGs with very high FC and very low Red Signal
                 Variant &
-                areaFC > th_areaFC_redrescue &
+                areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
                 !! relcol == 'max' ~ 'CVG_Semiactive_FC_reddown',
 
                 Variant &
-                areaFC > th_areaFC_redrescue &
+                areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
                 !! relcol == 'mid' ~ 'CVG_Repressed_FC_reddown',
 
                 Variant &
-                areaFC > th_areaFC_redrescue &
+                areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
                 !! relcol == 'min' ~ 'CVG_Repressed_FC_reddown',
 
@@ -1078,6 +1085,20 @@ print(state_df, width = 400)
 table(state_df$state_3D7B)
 
 state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
+
+## Save results
+outname <- sprintf(
+  'state_df_rna%s_red%s_redup%s_redresc%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
+  th_rnapcnt,
+  th_redpcnt,
+  th_redpcnt_up,
+  th_redrescue,
+  th_reddown,
+  th_areaFC,
+  th_areaFC_redrescue,
+  th_redpcntdif
+)
+write_tsv(state_df, paste0('./Results_Tables/', outname))
 #+END_SRC
 ** Some checks and results
 #+BEGIN_SRC R
@@ -1153,7 +1174,7 @@ excl <- "./Data/10Gvs1p2B.xlsx"
 
 ## Import 12B vs 10G differences by transcription table
 trans_difs <- read_delim('./Data/transDif_12Bvs10G.csv', delim = ';') %>%
-  rename(Old_id = X1) %>%
+  rename(Old_id = `...1`) %>%
   left_join(map, by = 'Old_id')
 
 print(trans_difs, width = 400)
@@ -1230,42 +1251,42 @@ customEuler <- function(a,b,c, name){
 ## Var active
 
 va_12B <- state_df %>%
-  filter(category_12B == "Var_Active") %>%
+  filter(category_12B == "CVG_Active") %>%
   select(Gene_id) %>%
   pull()
 
 va_10G <- state_df %>%
-  filter(category_10G == "Var_Active") %>%
+  filter(category_10G == "CVG_Active") %>%
   select(Gene_id) %>%
   pull()
 
 va_3D7B <- state_df %>%
-  filter(category_3D7B == "Var_Active") %>%
+  filter(category_3D7B == "CVG_Active") %>%
   select(Gene_id) %>%
   pull()
 
 
-customEuler(va_12B, va_10G, va_3D7B, 'Var_Active_Genes')
+customEuler(va_12B, va_10G, va_3D7B, 'CVG_Active_Genes')
 
 ## Var inactive
 
 vi_12B <- state_df %>%
-  filter(category_12B == "Var_Repressed") %>%
+  filter(category_12B == "CVG_Repressed") %>%
   select(Gene_id) %>%
   pull()
 
 vi_10G <- state_df %>%
-  filter(category_10G == "Var_Repressed") %>%
+  filter(category_10G == "CVG_Repressed") %>%
   select(Gene_id) %>%
   pull()
 
 vi_3D7B <- state_df %>%
-  filter(category_3D7B == "Var_Repressed") %>%
+  filter(category_3D7B == "CVG_Repressed") %>%
   select(Gene_id) %>%
   pull()
 
 
-customEuler(vi_12B, vi_10G, vi_3D7B, 'Var_Repressed_Genes')
+customEuler(vi_12B, vi_10G, vi_3D7B, 'CVG_Repressed_Genes')
 
 ## Same category
 ## We fuse the gene_id with it's state so that genes with same state will be exactly the same while genes with different state will be different.
@@ -1293,5 +1314,5 @@ varstate <- state_df %>%
          category_12B, category_10G, category_3D7B,
          gs_12B, gs_10G, gs_3D7B)
 
-customEuler(varstate$gs_12B, varstate$gs_10G, varstate$gs_3D7B, 'Var_Same_State')
+customEuler(varstate$gs_12B, varstate$gs_10G, varstate$gs_3D7B, 'CVG_Same_State')
 #+END_SRC
