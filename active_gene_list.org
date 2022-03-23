@@ -234,7 +234,15 @@ In addition to these thresholds we will use 2 more columns to set the categories
 
 We will have the following categories with the following logic:
 
-[[./Plots/active_genes_tree.jpg]]
+[[file:./Plots/State_nonCVGs.pdf][]]
+
+
+[[file:Plots/State_nonCVGs.pdf]]
+
+
+
+
+[[./Plots/State_nonCVGs.pdf][file:Plots/State_nonCVGs.pdf]]
 
 [[./Plots/active_genes_tree.jpg][Make bigger]]
 
@@ -394,7 +402,6 @@ Then we make venn diagrams for the "Var_active" and "Var_Repressed" states.
 :header-args:R+: :tangle ./Scripts/active_gene_list.R
 :header-args:R+: :results none
 :END:
-
 ** Load Packages and functions
 #+BEGIN_SRC R :results none
 #### Imports ####
@@ -948,12 +955,12 @@ set_state <- function(df, statecol, redcol, relcol){
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent >= th_rnapcnt &
-                MaxRedPercent >= th_reddown ~ 'Active_FCna',
+                MaxRedPercent >= th_redpcnt_dw ~ 'Active_FCna',
 
                 !Variant &
                 is.na(areaFC) &
                 MeanPercent >= th_rnapcnt &
-                MaxRedPercent < th_reddown ~ 'Not_Settable',
+                MaxRedPercent < th_redpcnt_dw ~ 'Not_Settable',
 
                 !Variant &
                 is.na(areaFC) &
@@ -981,36 +988,30 @@ set_state <- function(df, statecol, redcol, relcol){
                 is.na(MeanPercent) &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_redpcnt_up &
-                !! relcol == 'max' ~ 'Active_RNASeqNA_rescued_FC_max',
+                !! relcol == 'max' ~ 'Active_FC_RNASeqNA_max',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_redpcnt_up &
-                !! relcol == 'mid' ~ 'Active_RNASeqNA_rescued_FC_mid',
+                !! relcol == 'mid' ~ 'Active_FC_RNASeqNA_max',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_redpcnt_up &
-                !! relcol == 'min' ~ 'Inactive_RNASeqNA_rescued_FC_min',
+                !! relcol == 'min' ~ 'Inactive_FC_RNASeqNA_min',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC >= th_areaFC &
                 MaxRedPercent < th_redpcnt_up &
-                MaxRedPercent > th_reddown ~ 'Not_Settable',
+                MaxRedPercent >= th_redpcnt_dw ~ 'Not_Settable',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC >= th_areaFC &
-                MaxRedPercent < th_redpcnt_up &
-                MaxRedPercent >= th_reddown ~ 'Not_Settable',
-
-                !Variant &
-                is.na(MeanPercent) &
-                areaFC >= th_areaFC &
-                MaxRedPercent < th_reddown ~ 'Inactive_FC_reddown',
+                MaxRedPercent < th_redpcnt_dw ~ 'Inactive_FC_reddown',
 
                 !Variant &
                 is.na(MeanPercent) &
@@ -1020,18 +1021,18 @@ set_state <- function(df, statecol, redcol, relcol){
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MaxRedPercent >= th_redpcnt_up ~ 'Active_RNASeqNA_rescued',
+                MaxRedPercent >= th_redpcnt_up ~ 'Active_RNASeqNA',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
                 MaxRedPercent < th_redpcnt_up &
-                MaxRedPercent >= th_reddown ~ 'Not_Settable',
+                MaxRedPercent >= th_redpcnt_dw ~ 'Undetermined_RNASeqNA',
 
                 !Variant &
                 is.na(MeanPercent) &
                 areaFC < th_areaFC &
-                MaxRedPercent < th_reddown ~ 'Inactive_RNASeqNA_reddown',
+                MaxRedPercent < th_redpcnt_dw ~ 'Inactive_RNASeqNA_reddown',
 
                 !Variant &
                 is.na(MeanPercent) &
@@ -1041,15 +1042,20 @@ set_state <- function(df, statecol, redcol, relcol){
                 ## VARs
                 Variant &
                 is.na(areaFC) &
-                MeanRedPercent >= th_redpcnt_dw ~ 'CVG_Active_FCna',
+                MaxRedPercent >= th_redpcnt_up ~ 'CVG_Active_FCna',
 
                 Variant &
                 is.na(areaFC) &
-                MeanRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_FCna',
+                MaxRedPercent < th_redpcnt_up &
+                MaxRedPercent >= th_redpcnt_dw ~ 'CVG_Undetermined_FCna',
 
                 Variant &
                 is.na(areaFC) &
-                is.na(MeanRedPercent) ~ 'Not_Settable',
+                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_FCna',
+
+                Variant &
+                is.na(areaFC) &
+                is.na(MaxRedPercent) ~ 'Not_Settable',
 
                 ## Double NAs
                 is.na(areaFC) &
