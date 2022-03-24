@@ -912,11 +912,11 @@ set_state <- function(df, statecol, redcol, relcol){
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
-                !! relcol == 'min' ~ 'CVG_Repressed_FC',
+                !! relcol == 'min' ~ 'CVG_Silenced_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
-                MaxRedPercent < th_reddown ~ 'CVG_Repressed_FC_reddown',
+                MaxRedPercent < th_reddown ~ 'CVG_Silenced_FC_reddown',
 
                 ## No FC
                 Variant &
@@ -930,7 +930,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 areaFC < th_areaFC &
-                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_noFC',
+                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Silenced_noFC',
 
                 ## Exceptions
                 ## CVGs with very high FC and very low Red Signal
@@ -942,12 +942,12 @@ set_state <- function(df, statecol, redcol, relcol){
                 Variant &
                 areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
-                !! relcol == 'mid' ~ 'CVG_Repressed_FC_reddown',
+                !! relcol == 'mid' ~ 'CVG_Silenced_FC_reddown',
 
                 Variant &
                 areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
-                !! relcol == 'min' ~ 'CVG_Repressed_FC_reddown',
+                !! relcol == 'min' ~ 'CVG_Silenced_FC_reddown',
 
 
                 ###### Not settable
@@ -1051,7 +1051,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 is.na(areaFC) &
-                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_FCna',
+                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Silenced_FCna',
 
                 Variant &
                 is.na(areaFC) &
@@ -1081,7 +1081,7 @@ set_category <- function(df, statecol, categorycol){
                 startsWith(!! statecol, 'Inactive') ~ 'Inactive',
                 startsWith(!! statecol, 'CVG_Active') ~ 'CVG_Active',
                 startsWith(!! statecol, 'CVG_Semiactive') ~ 'CVG_Semiactive',
-                startsWith(!! statecol, 'CVG_Repressed') ~ 'CVG_Repressed',
+                startsWith(!! statecol, 'CVG_Silenced') ~ 'CVG_Silenced',
                 startsWith(!! statecol, 'Not_Settable') ~ 'Not_Settable',
                 TRUE ~ 'No_Category'))
   return(df)
@@ -1097,11 +1097,14 @@ state_df <- final_df %>%
   set_category(state_10G, category_10G) %>%
   set_category(state_3D7B, category_3D7B)
 
-print(state_df, width = 400)
+state_df %>%
+  filter(grepl('Undetermined', state_12B)) %>%
+  print(width = 400)
 
-table(state_df$state_3D7B)
+state_df %>%
+  filter(category_12B == 'No_Category') %>%
+  print(width = 400)
 
-state_df %>% filter(category_12B == 'No_Category!') %>% print(width = 400)
 
 ## Save results
 outname <- sprintf(
@@ -1130,9 +1133,6 @@ state_df %>%
          category_10G == 'No_Category' |
          category_3D7B == 'No_Category') %>%
   print(width = 400)
-
-## Save results
-write.csv(state_df, './Results_Tables/gene_state_final.csv')
 
 ## Create a table with number of each state per strain
 state_table <-  bind_rows(table(state_df$state_12B),

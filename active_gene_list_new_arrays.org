@@ -786,7 +786,7 @@ write_tsv(final_df, paste0(outdir, 'final_df.tsv'))
 ** Save RData
 #+begin_src R
 ##save.image('load_gene_state_new.RData')
-##setwd('/mnt/Disc4T/Projects/Active_gene_list/')
+setwd('/mnt/Disc4T/Projects/Active_gene_list/')
 ##load('load_gene_state_new.RData')
 #+end_src
 ** Create Lists according to thresholds Old
@@ -934,11 +934,11 @@ set_state <- function(df, statecol, redcol, relcol){
                 Variant &
                 areaFC >= th_areaFC &
                 MaxRedPercent >= th_reddown &
-                !! relcol == 'min' ~ 'CVG_Repressed_FC',
+                !! relcol == 'min' ~ 'CVG_Silenced_FC',
 
                 Variant &
                 areaFC >= th_areaFC &
-                MaxRedPercent < th_reddown ~ 'CVG_Repressed_FC_reddown',
+                MaxRedPercent < th_reddown ~ 'CVG_Silenced_FC_reddown',
 
                 ## No FC
                 Variant &
@@ -952,7 +952,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 areaFC < th_areaFC &
-                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_noFC',
+                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Silenced_noFC',
 
                 ## Exceptions
                 ## CVGs with very high FC and very low Red Signal
@@ -964,12 +964,12 @@ set_state <- function(df, statecol, redcol, relcol){
                 Variant &
                 areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
-                !! relcol == 'mid' ~ 'CVG_Repressed_FC_reddown',
+                !! relcol == 'mid' ~ 'CVG_Silenced_FC_reddown',
 
                 Variant &
                 areaFC >= th_areaFC_redrescue &
                 MaxRedPercent < th_reddown &
-                !! relcol == 'min' ~ 'CVG_Repressed_FC_reddown',
+                !! relcol == 'min' ~ 'CVG_Silenced_FC_reddown',
 
 
                 ###### Not settable
@@ -1073,7 +1073,7 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 is.na(areaFC) &
-                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Repressed_FCna',
+                MaxRedPercent < th_redpcnt_dw ~ 'CVG_Silenced_FCna',
 
                 Variant &
                 is.na(areaFC) &
@@ -1103,7 +1103,7 @@ set_category <- function(df, statecol, categorycol){
                 startsWith(!! statecol, 'Inactive') ~ 'Inactive',
                 startsWith(!! statecol, 'CVG_Active') ~ 'CVG_Active',
                 startsWith(!! statecol, 'CVG_Semiactive') ~ 'CVG_Semiactive',
-                startsWith(!! statecol, 'CVG_Repressed') ~ 'CVG_Repressed',
+                startsWith(!! statecol, 'CVG_Silenced') ~ 'CVG_Silenced',
                 startsWith(!! statecol, 'Not_Settable') ~ 'Not_Settable',
                 TRUE ~ 'No_Category'))
   return(df)
