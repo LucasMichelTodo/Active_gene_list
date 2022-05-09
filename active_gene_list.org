@@ -430,7 +430,10 @@ max_dif <- function(vect){
 #### Red Signal DF ####
 
 ## Read translation table
-map <- read.csv('./Data/oldnames_table.csv', stringsAsFactors = F)
+#map <- read.csv('./Data/oldnames_table.csv', stringsAsFactors = F)
+map <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/Old_Arrays/raw_gene_level_data.csv') %>%
+  select(Old_id, Gene_id)
+
 excl <- "./Data/3D7_Variantome_AllData_withGam.xls"
 
 ## Import Red Signal table
@@ -582,6 +585,95 @@ area_df <- area_df %>%
 print(area_df, width = 400)
 table(duplicated(area_df$Gene_id))
 #+END_SRC
+** Filter By Maxtime
+#+begin_src R
+#### Filter by Max-Time ####
+
+breaks_df <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/Old_Arrays/R_results_OldArrays_Variantome/old_area_breaks.csv')
+
+max_time <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/Old_Arrays/R_results_OldArrays_Variantome/old_arrays_maxtime.csv')
+
+## Check which areas does maxtimepoint overlapp -> check if aAFC > th at this areas
+
+point_overlap <- function(point, interval){
+  point >= interval[1] & point <= interval[2]
+}
+
+pass_maxtime <- c()
+gids <- c()
+th <- 1
+for (gid in area_df$Gene_id){
+
+  ##gid <- 'PF3D7_0324600'
+  ##gid <- 'PF3D7_0203100'
+
+  ## Create time-regions
+  breaks <- breaks_df$Areas_Breaks
+  left <- c(breaks[1], breaks[3])
+  right <- c(breaks[3], breaks[5])
+  mid <- c(breaks[2], breaks[4])
+  sides_l <- c(breaks[1], breaks[2])
+  sides_r <- c(breaks[4], breaks[5])
+
+  ## Get maxtime
+  if (gid %in% max_time$Gene_id){
+    maxtime <- max_time %>%
+      filter(Gene_id == gid) %>%
+      pull()
+  } else {
+    maxtime <- NA
+  }
+
+  if (is.na(maxtime)){
+    pass_maxtime <- c(pass_maxtime, NA)
+    gids <- c(gids, gid)
+  } else {
+    ## Ensure maxtime is in the areas intervals
+    if (maxtime < breaks[1]) {maxtime <- breaks[1]}
+    if (maxtime > breaks[5]) {maxtime <- breaks[5]}
+
+    ## Get overlappped areas
+    areas <- list('left' = left, 'right' = right, 'mid' = mid,
+                  'sides' = sides_l, 'sides' = sides_r)
+    overlaps <- sapply(areas, function(x) point_overlap(maxtime, x))
+
+    ## Get aAFC in overlapping areas by comparison
+    maxes <- area_df %>%
+      filter(Gene_id == gid) %>%
+      select(contains(names(areas[overlaps])) & contains('Max')) %>%
+      replace(is.na(.), 0) %>%
+      as.numeric()
+
+    mins <- area_df %>%
+      filter(Gene_id == gid) %>%
+      select(contains(names(areas[overlaps])) & contains('Min')) %>%
+      replace(is.na(.), 0) %>%
+      as.numeric()
+
+    aFCs <- (maxes - mins)/13.5
+
+    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th))
+    gids <- c(gids, gid)
+  }
+}
+maxtime_aAFC_df <- tibble(
+  Gene_id = gids,
+  Pass_Maxtime = pass_maxtime
+  )
+
+maxtime_aAFC_df %>%
+  count(Pass_Maxtime)
+
+area_df %>%
+  left_join(maxtime_aAFC_df, by = 'Gene_id') %>%
+  filter(areaFC > 1) %>%
+  select(Gene_id, areaFC, Pass_Maxtime) %>%
+  print(n = 250)
+
+area_df %>%
+  left_join(maxtime_aAFC_df, by = 'Gene_id') %>%
+  filter(areaFC < 1 & Pass_Maxtime)
+#+end_src
 ** Load RNA-Seq Data
 
 #+BEGIN_SRC R :results none
@@ -770,6 +862,8 @@ print(final_df, width = 200)
 ** Create Lists according to thresholds
 #+BEGIN_SRC R
 print(final_df, width = 200)
+
+colnames(final_df)
 
 th_rnapcnt <- 25
 th_redpcnt_dw <- 25
