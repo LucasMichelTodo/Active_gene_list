@@ -501,8 +501,6 @@ hist(red_df$MeanRedPercent)
 
 write_tsv(red_df, paste0(outdir, 'red_df.tsv'))
 
-
-
 #+END_SRC
 ** Microarray Data: Areas
 #+begin_src R :results none
@@ -598,7 +596,96 @@ area_df <- area_df %>%
 print(area_df, width = 400)
 table(duplicated(area_df$Gene_id))
 write_tsv(area_df, paste0(outdir, 'area_df.tsv'))
+#+end_src
+** Filter By Maxtime
+#+begin_src R
+#### Filter by Max-Time ####
 
+breaks_df <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/New_Arrays/R_results_NewArray/new_area_breaks.csv')
+
+max_time <- read_csv('/mnt/Disc4T/Projects/PhD_Project/Microarrays/New_Old_separate_approach/New_Arrays/R_results_NewArray/new_arrays_maxtime.csv')
+
+## Check which areas does maxtimepoint overlapp -> check if aAFC > th at this areas
+
+point_overlap <- function(point, interval){
+  point >= interval[1] & point <= interval[2]
+}
+
+pass_maxtime <- c()
+gids <- c()
+th <- 1
+for (gid in area_df$Gene_id){
+
+  ## Create time-regions
+  breaks <- breaks_df$Areas_Breaks
+  left <- c(breaks[1], breaks[3])
+  right <- c(breaks[3], breaks[5])
+  mid <- c(breaks[2], breaks[4])
+  sides_l <- c(breaks[1], breaks[2])
+  sides_r <- c(breaks[4], breaks[5])
+
+  ## Get maxtime
+  if (gid %in% max_time$Gene_id){
+    maxtime <- max_time %>%
+      filter(Gene_id == gid) %>%
+      pull()
+  } else {
+    maxtime <- NA
+  }
+
+  if (is.na(maxtime)){
+    pass_maxtime <- c(pass_maxtime, NA)
+    gids <- c(gids, gid)
+  } else {
+    ## Ensure maxtime is in the areas intervals
+    if (maxtime < breaks[1]) {maxtime <- breaks[1]}
+    if (maxtime > breaks[5]) {maxtime <- breaks[5]}
+
+    ## Get overlappped areas
+    areas <- list('left' = left, 'right' = right, 'mid' = mid,
+                  'sides' = sides_l, 'sides' = sides_r)
+    overlaps <- sapply(areas, function(x) point_overlap(maxtime, x))
+
+    ## Get aAFC in overlapping areas by comparison
+    maxes <- area_df %>%
+      filter(Gene_id == gid) %>%
+      select(contains(names(areas[overlaps])) & contains('Max')) %>%
+      replace(is.na(.), 0) %>%
+      as.numeric()
+
+    mins <- area_df %>%
+      filter(Gene_id == gid) %>%
+      select(contains(names(areas[overlaps])) & contains('Min')) %>%
+      replace(is.na(.), 0) %>%
+      as.numeric()
+
+    aFCs <- (maxes - mins)/timeinterval
+
+    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th))
+    gids <- c(gids, gid)
+  }
+}
+
+maxtime_df <- tibble(
+  Gene_id = gids,
+  Pass_Maxtime = pass_maxtime
+  )
+
+maxtime_df %>%
+  count(Pass_Maxtime)
+
+area_df %>%
+  filter(areaFC > 1) %>%
+  filter(!Pass_Maxtime) %>%
+  select(Gene_id, areaFC, Pass_Maxtime) %>%
+  print(n = 999)
+
+area_df %>%
+  left_join(maxtime_df, by = 'Gene_id') %>%
+  filter(areaFC < 1 & Pass_Maxtime)
+
+area_df <- area_df %>%
+  left_join(maxtime_df, by = 'Gene_id')
 
 #+end_src
 ** Load RNA-Seq Data
@@ -742,7 +829,7 @@ print(area_df, width = 400)
 print(rna_df, width = 400)
 
 all_df <- select(red_df, Gene_id, contains('Percent'), MeanRedPercent) %>%
-  full_join(select(area_df, Gene_id, Interval, contains('area')), by = 'Gene_id') %>%
+  full_join(select(area_df, Gene_id, Interval, Pass_Maxtime, contains('area')), by = 'Gene_id') %>%
   full_join(select(rna_df, Gene_id, MeanPercent), by = 'Gene_id')
 
 print(all_df, width = 200)
@@ -786,7 +873,7 @@ write_tsv(final_df, paste0(outdir, 'final_df.tsv'))
 ** Save RData
 #+begin_src R
 ##save.image('load_gene_state_new.RData')
-setwd('/mnt/Disc4T/Projects/Active_gene_list/')
+##setwd('/mnt/Disc4T/Projects/Active_gene_list/')
 ##load('load_gene_state_new.RData')
 #+end_src
 ** Create Lists according to thresholds Old
@@ -801,6 +888,14 @@ th_reddown <- 15
 th_areaFC <- 1
 th_areaFC_redrescue <- 3
 th_redpcntdif <- 30
+
+## Set areaFC of genes that don't pass MaxTime filter under the FC threshold.
+final_df <- final_df %>%
+  mutate(areaFC = ifelse(
+           areaFC > th_areaFC & !Pass_Maxtime,
+           th_areaFC - 0.1,
+           areaFC
+           ))
 
 ## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
@@ -1141,7 +1236,7 @@ state_df <- state_df %>%
 
 ## Save results
 outname <- sprintf(
-  'state_df_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
+  'state_df_new_arrays__rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
   th_rnapcnt,
   th_redpcnt_up,
   th_redpcnt_dw,
@@ -1151,8 +1246,6 @@ outname <- sprintf(
   th_redpcntdif
 )
 write_tsv(state_df, paste0(outdir, outname))
-
-
 #+end_src
 ** Some checks and results
 #+BEGIN_SRC R
