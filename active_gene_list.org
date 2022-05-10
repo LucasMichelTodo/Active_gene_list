@@ -548,7 +548,7 @@ maxinterval <- area_df %>%
                               Interval == 'DifMid' ~ 'Mid',
                               Interval == 'DifSides' ~ 'Sides',
                               Interval == 'No Data' ~ 'No Data')) %>%
-  mutate(areaFC = MaxDif/13.45)
+  mutate(areaFC = MaxDif/13.5)
 
 maxinterval
 
@@ -604,9 +604,6 @@ gids <- c()
 th <- 1
 for (gid in area_df$Gene_id){
 
-  ##gid <- 'PF3D7_0324600'
-  ##gid <- 'PF3D7_0203100'
-
   ## Create time-regions
   breaks <- breaks_df$Areas_Breaks
   left <- c(breaks[1], breaks[3])
@@ -656,23 +653,29 @@ for (gid in area_df$Gene_id){
     gids <- c(gids, gid)
   }
 }
-maxtime_aAFC_df <- tibble(
+
+maxtime_df <- tibble(
   Gene_id = gids,
   Pass_Maxtime = pass_maxtime
   )
 
-maxtime_aAFC_df %>%
+maxtime_df %>%
   count(Pass_Maxtime)
 
 area_df %>%
-  left_join(maxtime_aAFC_df, by = 'Gene_id') %>%
+  left_join(maxtime_df, by = 'Gene_id') %>%
   filter(areaFC > 1) %>%
-  select(Gene_id, areaFC, Pass_Maxtime) %>%
-  print(n = 250)
+  filter(!Pass_Maxtime) %>%
+  select(Gene_id, areaFC, Pass_Maxtime)
 
 area_df %>%
-  left_join(maxtime_aAFC_df, by = 'Gene_id') %>%
+  left_join(maxtime_df, by = 'Gene_id') %>%
   filter(areaFC < 1 & Pass_Maxtime)
+
+area_df <- area_df %>%
+  left_join(maxtime_df, by = 'Gene_id')
+
+
 #+end_src
 ** Load RNA-Seq Data
 
@@ -802,7 +805,7 @@ print(area_df, width = 200)
 print(rna_df, width = 200)
 
 all_df <- select(red_df, Gene_id, contains('Percent'), MeanRedPercent) %>%
-  full_join(select(area_df, Gene_id, Interval, contains('area')), by = 'Gene_id') %>%
+  full_join(select(area_df, Gene_id, Interval, Pass_Maxtime, contains('area')), by = 'Gene_id') %>%
   full_join(select(rna_df, Gene_id, MeanPercent), by = 'Gene_id')
 
 ## Add Vartiant Genes information
@@ -873,6 +876,14 @@ th_reddown <- 15
 th_areaFC <- 1
 th_areaFC_redrescue <- 3
 th_redpcntdif <- 30
+
+## Set areaFC of genes that don't pass MaxTime filter under the FC threshold.
+final_df <- final_df %>%
+  mutate(areaFC = ifelse(
+           areaFC > th_areaFC & !Pass_Maxtime,
+           th_areaFC - 0.1,
+           areaFC
+         ))
 
 ## Here we create a dplyr function.
 ##To be able to use variables (for colnames) we needto use the special quote functions.
@@ -1202,7 +1213,7 @@ state_df %>%
 
 ## Save results
 outname <- sprintf(
-  'state_df_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
+  'state_df_old_arrays_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
   th_rnapcnt,
   th_redpcnt_up,
   th_redpcnt_dw,
@@ -1381,22 +1392,22 @@ customEuler(va_12B, va_10G, va_3D7B, 'CVG_Active_Genes')
 ## Var inactive
 
 vi_12B <- state_df %>%
-  filter(category_12B == "CVG_Repressed") %>%
+  filter(category_12B == "CVG_Silenced") %>%
   select(Gene_id) %>%
   pull()
 
 vi_10G <- state_df %>%
-  filter(category_10G == "CVG_Repressed") %>%
+  filter(category_10G == "CVG_Silenced") %>%
   select(Gene_id) %>%
   pull()
 
 vi_3D7B <- state_df %>%
-  filter(category_3D7B == "CVG_Repressed") %>%
+  filter(category_3D7B == "CVG_Silenced") %>%
   select(Gene_id) %>%
   pull()
 
 
-customEuler(vi_12B, vi_10G, vi_3D7B, 'CVG_Repressed_Genes')
+customEuler(vi_12B, vi_10G, vi_3D7B, 'CVG_Silenced_Genes')
 
 ## Same category
 ## We fuse the gene_id with it's state so that genes with same state will be exactly the same while genes with different state will be different.
