@@ -601,7 +601,7 @@ point_overlap <- function(point, interval){
 
 pass_maxtime <- c()
 gids <- c()
-th <- 1
+th_maxtime <- 1
 for (gid in area_df$Gene_id){
 
   ## Create time-regions
@@ -649,7 +649,7 @@ for (gid in area_df$Gene_id){
 
     aFCs <- (maxes - mins)/13.5
 
-    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th))
+    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th_maxtime))
     gids <- c(gids, gid)
   }
 }
@@ -1211,16 +1211,53 @@ state_df %>%
   print(width = 400)
 
 
+## Filter out deleted/duplicated genes
+
+f_path <- '/home/lucas/ISGlobal/Projects/Phd_Project/ChIP_Seq/Duplication_Deletion_Regions_Mean/Crossed_with_genes/'
+
+file_list <- c(
+  "1.2B_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv",
+  "10G_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv"
+)
+
+dupl_dl_12B <- read_tsv(paste0(f_path, file_list[1]), col_names = F) %>%
+  select(X1) %>% pull()
+
+dupl_dl_10G <- read_tsv(paste0(f_path, file_list[2]), col_names = F) %>%
+  select(X1) %>% pull()
+
+state_df <- state_df %>%
+  mutate(state_12B = ifelse(
+           Gene_id %in% dupl_dl_12B,
+           'Not_Settable',
+           state_12B
+         )) %>%
+  mutate(category_12B = ifelse(
+           Gene_id %in% dupl_dl_12B,
+           'Not_Settable',
+           category_12B
+         )) %>%
+  mutate(state_10G = ifelse(
+           Gene_id %in% dupl_dl_10G,
+           'Not_Settable',
+           state_10G
+         )) %>%
+  mutate(category_10G = ifelse(
+           Gene_id %in% dupl_dl_10G,
+           'Not_Settable',
+           category_10G
+         ))
+
 ## Save results
-outname <- sprintf(
-  'state_df_old_arrays_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
+outname <- sprintf(  'state_df_old_arrays_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s_maxtime%s_dupldel_filtered.csv',
   th_rnapcnt,
   th_redpcnt_up,
   th_redpcnt_dw,
   th_reddown,
   th_areaFC,
   th_areaFC_redrescue,
-  th_redpcntdif
+  th_redpcntdif,
+  th_maxtime
 )
 write_tsv(state_df, paste0('./Results_Tables/', outname))
 #+END_SRC

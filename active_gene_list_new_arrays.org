@@ -613,7 +613,7 @@ point_overlap <- function(point, interval){
 
 pass_maxtime <- c()
 gids <- c()
-th <- 1
+th_maxtime <- 1
 for (gid in area_df$Gene_id){
 
   ## Create time-regions
@@ -661,7 +661,7 @@ for (gid in area_df$Gene_id){
 
     aFCs <- (maxes - mins)/timeinterval
 
-    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th))
+    pass_maxtime <- c(pass_maxtime, any(abs(aFCs) > th_maxtime))
     gids <- c(gids, gid)
   }
 }
@@ -876,7 +876,7 @@ write_tsv(final_df, paste0(outdir, 'final_df.tsv'))
 ##setwd('/mnt/Disc4T/Projects/Active_gene_list/')
 ##load('load_gene_state_new.RData')
 #+end_src
-** Create Lists according to thresholds Old
+** Create Lists according to thresholds
 #+begin_src R
 print(final_df, width = 200)
 
@@ -1234,16 +1234,69 @@ state_df <- state_df %>%
     !Gene_id %in% missing_ids
   )
 
+## Filter out genes with duplications/deletions
+
+
+f_path <- '/home/lucas/ISGlobal/Projects/Phd_Project/ChIP_Seq/Duplication_Deletion_Regions_Mean/Crossed_with_genes/'
+
+file_list <- c(
+  "A7K9_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv",
+  "E5K9_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv",
+  "B11_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv"
+)
+
+dupl_dl_A7 <- read_tsv(paste0(f_path, file_list[1]), col_names = F) %>%
+  select(X1) %>% pull()
+
+dupl_dl_E5 <- read_tsv(paste0(f_path, file_list[2]), col_names = F) %>%
+  select(X1) %>% pull()
+
+dupl_dl_B11 <- read_tsv(paste0(f_path, file_list[3]), col_names = F) %>%
+  select(X1) %>% pull()
+
+
+state_df <- state_df %>%
+  mutate(state_A7 = ifelse(
+           Gene_id %in% dupl_dl_A7,
+           'Not_Settable',
+           state_A7
+         )) %>%
+  mutate(category_A7 = ifelse(
+           Gene_id %in% dupl_dl_A7,
+           'Not_Settable',
+           category_A7
+         )) %>%
+  mutate(state_E5 = ifelse(
+           Gene_id %in% dupl_dl_E5,
+           'Not_Settable',
+           state_E5
+         )) %>%
+  mutate(category_E5 = ifelse(
+           Gene_id %in% dupl_dl_E5,
+           'Not_Settable',
+           category_E5
+         )) %>%
+  mutate(state_B11 = ifelse(
+           Gene_id %in% dupl_dl_B11,
+           'Not_Settable',
+           state_B11
+         )) %>%
+  mutate(category_B11 = ifelse(
+           Gene_id %in% dupl_dl_B11,
+           'Not_Settable',
+           category_B11
+         ))
+
 ## Save results
-outname <- sprintf(
-  'state_df_new_arrays__rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s.csv',
+outname <- sprintf(  'state_df_new_arrays__rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s_maxtime%s_dupldel_filtered.csv',
   th_rnapcnt,
   th_redpcnt_up,
   th_redpcnt_dw,
   th_reddown,
   th_areaFC,
   th_areaFC_redrescue,
-  th_redpcntdif
+  th_redpcntdif,
+  th_maxtime
 )
 write_tsv(state_df, paste0(outdir, outname))
 #+end_src
