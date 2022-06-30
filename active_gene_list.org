@@ -876,6 +876,7 @@ th_reddown <- 15
 th_areaFC <- 1
 th_areaFC_redrescue <- 3
 th_redpcntdif <- 30
+th_maxtime <- 1
 
 ## Set areaFC of genes that don't pass MaxTime filter under the FC threshold.
 final_df <- final_df %>%
@@ -1160,11 +1161,11 @@ set_state <- function(df, statecol, redcol, relcol){
 
                 Variant &
                 is.na(areaFC) &
-                is.na(MaxRedPercent) ~ 'Not_Settable',
+                is.na(MaxRedPercent) ~ 'CVG_Not_Settable',
 
                 ## Double NAs
                 is.na(areaFC) &
-                is.na(MeanPercent) ~ 'Not_Settable',
+                is.na(MeanPercent) ~ 'CVG_Not_Settable',
 
                 TRUE ~ 'Wrong!'))
 
@@ -1184,11 +1185,14 @@ set_category <- function(df, statecol, categorycol){
     mutate(!! categorycol := case_when(
                 startsWith(!! statecol, 'Active') ~ 'Active',
                 startsWith(!! statecol, 'Inactive') ~ 'Inactive',
+                startsWith(!! statecol, 'Undetermined') ~ 'Undetermined',
+                startsWith(!! statecol, 'Not_Settable') ~ 'Undetermined',
                 startsWith(!! statecol, 'CVG_Active') ~ 'CVG_Active',
-                startsWith(!! statecol, 'CVG_Semiactive') ~ 'CVG_Semiactive',
+                startsWith(!! statecol, 'CVG_Semiactive') ~ 'CVG_Undetermined',
                 startsWith(!! statecol, 'CVG_Silenced') ~ 'CVG_Silenced',
-                startsWith(!! statecol, 'Not_Settable') ~ 'Not_Settable',
-                TRUE ~ 'No_Category'))
+                startsWith(!! statecol, 'CVG_Undetermined') ~ 'CVG_Undetermined',
+                startsWith(!! statecol, 'CVG_Not_Settable') ~ 'CVG_Undetermined',
+                TRUE ~ 'Undetermined'))
   return(df)
 }
 
@@ -1202,6 +1206,12 @@ state_df <- final_df %>%
   set_category(state_10G, category_10G) %>%
   set_category(state_3D7B, category_3D7B)
 
+
+
+state_df %>%
+  filter(Variant & category_3D7B == 'Undetermined') %>%
+  select(Variant, contains('state'), contains('category'))
+
 state_df %>%
   filter(grepl('Undetermined', state_12B)) %>%
   print(width = 400)
@@ -1213,43 +1223,64 @@ state_df %>%
 
 ## Filter out deleted/duplicated genes
 
-f_path <- '/home/lucas/ISGlobal/Projects/Phd_Project/ChIP_Seq/Duplication_Deletion_Regions_Mean/Crossed_with_genes/'
+f_path <- '/mnt/Disc4T/Projects/PhD_Project/Paper/Paper_Analysis/Data_Files/Duplication_Deletion_Regions_Mean_Separate_DuplDel/'
 
-file_list <- c(
-  "1.2B_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv",
-  "10G_in_sort_q5_RPKMs_bymean_fact_1.75_0.1_minlen500_mergelen_200_filtered_genes.tsv"
+file_list <- c( '1.2B_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered.bed',
+               '10G_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered.bed'
 )
 
 dupl_dl_12B <- read_tsv(paste0(f_path, file_list[1]), col_names = F) %>%
   select(X1) %>% pull()
-
 dupl_dl_10G <- read_tsv(paste0(f_path, file_list[2]), col_names = F) %>%
   select(X1) %>% pull()
 
+## state_df <- state_df %>%
+##   mutate(state_12B = ifelse(
+##            Gene_id %in% dupl_dl_12B,
+##            'Not_Settable',
+##            state_12B
+##          )) %>%
+##   mutate(category_12B = ifelse(
+##            Gene_id %in% dupl_dl_12B,
+##            'Not_Settable',
+##            category_12B
+##          )) %>%
+##   mutate(state_10G = ifelse(
+##            Gene_id %in% dupl_dl_10G,
+##            'Not_Settable',
+##            state_10G
+##          )) %>%
+##   mutate(category_10G = ifelse(
+##            Gene_id %in% dupl_dl_10G,
+##            'Not_Settable',
+##            category_10G
+##          ))
+
 state_df <- state_df %>%
-  mutate(state_12B = ifelse(
-           Gene_id %in% dupl_dl_12B,
-           'Not_Settable',
-           state_12B
+  mutate(state_12B = case_when(
+           Gene_id %in% dupl_dl_12B & !Variant ~ 'Undetermined_dupldel',
+           Gene_id %in% dupl_dl_12B & Variant ~ 'CVG_Undetermined_dupldel',
+           TRUE ~ state_12B
          )) %>%
-  mutate(category_12B = ifelse(
-           Gene_id %in% dupl_dl_12B,
-           'Not_Settable',
-           category_12B
+  mutate(category_12B = case_when(
+           Gene_id %in% dupl_dl_12B & !Variant ~ 'Undetermined',
+           Gene_id %in% dupl_dl_12B & Variant ~ 'CVG_Undetermined',
+           TRUE ~ category_12B
          )) %>%
-  mutate(state_10G = ifelse(
-           Gene_id %in% dupl_dl_10G,
-           'Not_Settable',
-           state_10G
+  mutate(state_10G = case_when(
+           Gene_id %in% dupl_dl_10G & !Variant ~ 'Undetermined_dupldel',
+           Gene_id %in% dupl_dl_10G & Variant ~ 'CVG_Undetermined_dupldel',
+           TRUE ~ state_10G
          )) %>%
-  mutate(category_10G = ifelse(
-           Gene_id %in% dupl_dl_10G,
-           'Not_Settable',
-           category_10G
+  mutate(category_10G = case_when(
+           Gene_id %in% dupl_dl_10G & !Variant ~ 'Undetermined',
+           Gene_id %in% dupl_dl_10G & Variant ~ 'CVG_Undetermined',
+           TRUE ~ category_10G
          ))
 
+
 ## Save results
-outname <- sprintf(  'state_df_old_arrays_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s_maxtime%s_dupldel_filtered.csv',
+outname <- sprintf(  'state_df_old_arrays_rna%s_red_up%s_red_dw%s_reddw%s_areaFC%s_areaFCbig%s_redpcntdif%s_maxtime%s_dupldel_filtered_new.csv',
   th_rnapcnt,
   th_redpcnt_up,
   th_redpcnt_dw,
