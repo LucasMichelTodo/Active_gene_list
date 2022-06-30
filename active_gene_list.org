@@ -1223,14 +1223,15 @@ state_df %>%
 
 ## Filter out deleted/duplicated genes
 
-f_path <- '/mnt/Disc4T/Projects/PhD_Project/Paper/Paper_Analysis/Data_Files/Duplication_Deletion_Regions_Mean_Separate_DuplDel/'
+f_path <- '/mnt/Disc4T/Projects/PhD_Project/Paper/Paper_Analysis/Data_Files/Duplication_Deletion_Regions_Mean_Separate_DuplDel/Crossed_with_genes/'
 
-file_list <- c( '1.2B_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered.bed',
-               '10G_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered.bed'
+file_list <- c( '1.2B_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered_genes.tsv',
+               '10G_in_sort_q5_noDup_rpkm_normInput_bs10_smth200_bymean_dupl_del_fact_1.75up_0.1dw_minlen500_mergelen_200_filtered_genes.tsv'
 )
 
 dupl_dl_12B <- read_tsv(paste0(f_path, file_list[1]), col_names = F) %>%
   select(X1) %>% pull()
+
 dupl_dl_10G <- read_tsv(paste0(f_path, file_list[2]), col_names = F) %>%
   select(X1) %>% pull()
 
